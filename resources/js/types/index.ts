@@ -18,6 +18,14 @@ export interface BreadcrumbItem {
     href: string;
 }
 
+export interface Building {
+    id: number;
+    code: string;
+    name: string;
+    created_at?: string;
+    updated_at?: string;
+}
+
 export interface NavGroup {
     title: string;
     items: NavItem[];
