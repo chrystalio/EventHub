@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\BuildingController;
 use App\Http\Controllers\Admin\RoleController;
 use App\Http\Controllers\Admin\RolePermissionController;
 use App\Http\Controllers\Admin\UserController;
@@ -29,6 +30,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
         Route::get('/roles/{role}/permissions', [RolePermissionController::class, 'index'])->middleware('can:rolepermission.view')->name('admin.roles.permissions.index');
         Route::post('/roles/{role}/permissions', [RolePermissionController::class, 'update'])->middleware('can:rolepermission.update')->name('admin.roles.permissions.update');
+
+        Route::get('/buildings', [BuildingController::class, 'index'])->name('admin.buildings.index')->middleware('can:building.view');
     });
 });
 
