@@ -1,0 +1,67 @@
+[
+    {
+        "name": "user.view",
+        "shortname": "Admin - Manage Users",
+        "guard_name": "web"
+    },
+    {
+        "name": "user.create",
+        "shortname": "Admin - Manage Users",
+        "guard_name": "web"
+    },
+    {
+        "name": "user.edit",
+        "shortname": "Admin - Manage Users",
+        "guard_name": "web"
+    },
+    {
+        "name": "user.delete",
+        "shortname": "Admin - Manage Users",
+        "guard_name": "web"
+    },
+    {
+        "name": "user.impersonate",
+        "shortname": "Admin - Impersonate User",
+        "guard_name": "web"
+    },
+    {
+        "name": "role.view",
+        "shortname": "Admin - Manage Roles",
+        "guard_name": "web"
+    },
+    {
+        "name": "role.create",
+        "shortname": "Admin - Manage Roles",
+        "guard_name": "web"
+    },
+    {
+        "name": "role.edit",
+        "shortname": "Admin - Manage Roles",
+        "guard_name": "web"
+    },
+    {
+        "name": "role.delete",
+        "shortname": "Admin - Manage Roles",
+        "guard_name": "web"
+    },
+    {
+        "name": "rolepermission.view",
+        "shortname": "Admin - Manage Role Permissions",
+        "guard_name": "web"
+    },
+    {
+        "name": "rolepermission.create",
+        "shortname": "Admin - Manage Role Permissions",
+        "guard_name": "web"
+    },
+    {
+        "name": "rolepermission.update",
+        "shortname": "Admin - Manage Role Permissions",
+        "guard_name": "web"
+    },
+    {
+        "name": "rolepermission.delete",
+        "shortname": "Admin - Manage Role Permissions",
+        "guard_name": "web"
+    }
+]
