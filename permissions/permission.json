@@ -63,5 +63,25 @@
         "name": "rolepermission.delete",
         "shortname": "Admin - Manage Role Permissions",
         "guard_name": "web"
+    },
+    {
+        "name": "building.view",
+        "shortname": "Admin - Manage Buildings",
+        "guard_name": "web"
+    },
+    {
+        "name": "building.create",
+        "shortname": "Admin - Manage Buildings",
+        "guard_name": "web"
+    },
+    {
+        "name": "building.update",
+        "shortname": "Admin - Manage Buildings",
+        "guard_name": "web"
+    },
+    {
+        "name": "building.delete",
+        "shortname": "Admin - Manage Buildings",
+        "guard_name": "web"
     }
 ]
