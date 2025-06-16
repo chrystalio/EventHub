@@ -3,11 +3,15 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\StoreBuildingRequest;
+use App\Http\Requests\UpdateBuildingRequest;
 use App\Models\Building;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 
 class BuildingController extends Controller
 {
+
     /**
      * Display a listing of the resource.
      */
@@ -31,15 +35,21 @@ class BuildingController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(StoreBuildingRequest $request): RedirectResponse
     {
-        //
+        Building::create([
+            'code' => $request->code,
+            'name' => $request->name,
+        ]);
+
+        return redirect()->route('admin.buildings.index')
+            ->with('success', 'Building created successfully.');
     }
 
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show(string $id): void
     {
         //
     }
@@ -47,7 +57,7 @@ class BuildingController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(string $id)
+    public function edit(string $id): void
     {
         //
     }
@@ -55,16 +65,27 @@ class BuildingController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(UpdateBuildingRequest $request, string $id): RedirectResponse
     {
-        //
+        $building = Building::findOrFail($id);
+        $building->update([
+            'code' => $request->code,
+            'name' => $request->name,
+        ]);
+
+        return redirect()->route('admin.buildings.index')
+            ->with('success', 'Building updated successfully.');
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(string $id): RedirectResponse
     {
-        //
+        $building = Building::findOrFail($id);
+        $building->delete();
+
+        return redirect()->route('admin.buildings.index')
+            ->with('success', 'Building deleted successfully.');
     }
 }
