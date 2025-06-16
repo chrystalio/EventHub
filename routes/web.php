@@ -32,6 +32,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::post('/roles/{role}/permissions', [RolePermissionController::class, 'update'])->middleware('can:rolepermission.update')->name('admin.roles.permissions.update');
 
         Route::get('/buildings', [BuildingController::class, 'index'])->name('admin.buildings.index')->middleware('can:building.view');
+        Route::post('/buildings', [BuildingController::class, 'store'])->name('admin.buildings.store')->middleware('can:building.create');
+        Route::put('/buildings/{building}', [BuildingController::class, 'update'])->name('admin.buildings.update')->middleware('can:building.update');
+        Route::delete('/buildings/{building}', [BuildingController::class, 'destroy'])->name('admin.buildings.destroy')->middleware('can:building.delete');
     });
 });
 
