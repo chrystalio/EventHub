@@ -8,7 +8,7 @@ import {
 } from '@/components/ui/sidebar';
 import { type NavItem, AuthUser } from '@/types';
 import { Link } from '@inertiajs/react';
-import { LayoutGrid, UserCog, Users, Building } from 'lucide-react';
+import { LayoutGrid, UserCog, Users, Building, DoorOpenIcon } from 'lucide-react';
 import AppLogo from './app-logo';
 
 const rawNavItems: NavItem[] = [
@@ -21,6 +21,12 @@ const rawNavItems: NavItem[] = [
         'title': 'Buildings',
         url: '/admin/buildings',
         icon: Building,
+        permission: 'building.view',
+    },
+    {
+        'title': 'Rooms',
+        url: '/admin/rooms',
+        icon: DoorOpenIcon,
         permission: 'building.view',
     },
     {
