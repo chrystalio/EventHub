@@ -26,6 +26,16 @@ export interface Building {
     updated_at?: string;
 }
 
+export interface Room {
+    id: number;
+    code: string;
+    name: string;
+    building_id: number;
+    created_at?: string;
+    updated_at?: string;
+    building?: Building | null; // Optional relationship
+}
+
 export interface NavGroup {
     title: string;
     items: NavItem[];
