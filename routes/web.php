@@ -3,6 +3,7 @@
 use App\Http\Controllers\Admin\BuildingController;
 use App\Http\Controllers\Admin\RoleController;
 use App\Http\Controllers\Admin\RolePermissionController;
+use App\Http\Controllers\Admin\RoomController;
 use App\Http\Controllers\Admin\UserController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -35,6 +36,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::post('/buildings', [BuildingController::class, 'store'])->name('admin.buildings.store')->middleware('can:building.create');
         Route::put('/buildings/{building}', [BuildingController::class, 'update'])->name('admin.buildings.update')->middleware('can:building.update');
         Route::delete('/buildings/{building}', [BuildingController::class, 'destroy'])->name('admin.buildings.destroy')->middleware('can:building.delete');
+
+        Route::get('/rooms', [RoomController::class, 'index'])->name('admin.rooms.index')->middleware('can:room.view');
+        Route::post('/rooms', [RoomController::class, 'store'])->name('admin.rooms.store')->middleware('can:room.create');
+        Route::put('/rooms/{room}', [RoomController::class, 'update'])->name('admin.rooms.update')->middleware('can:room.update');  
+        Route::delete('/rooms/{room}', [RoomController::class, 'destroy'])->name('admin.rooms.destroy')->middleware('can:room.delete');
     });
 });
 
