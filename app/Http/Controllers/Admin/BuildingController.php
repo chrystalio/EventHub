@@ -37,13 +37,9 @@ class BuildingController extends Controller
      */
     public function store(StoreBuildingRequest $request): RedirectResponse
     {
-        Building::create([
-            'code' => $request->code,
-            'name' => $request->name,
-        ]);
+        Building::create($request->validated());
 
-        return redirect()->route('admin.buildings.index')
-            ->with('success', 'Building created successfully.');
+        return redirect()->route('admin.buildings.index')->with('success', 'Building created successfully.');
     }
 
     /**
@@ -68,13 +64,9 @@ class BuildingController extends Controller
     public function update(UpdateBuildingRequest $request, string $id): RedirectResponse
     {
         $building = Building::findOrFail($id);
-        $building->update([
-            'code' => $request->code,
-            'name' => $request->name,
-        ]);
+        $building->update($request->validated());
 
-        return redirect()->route('admin.buildings.index')
-            ->with('success', 'Building updated successfully.');
+        return redirect()->route('admin.buildings.index')->with('success', 'Building updated successfully.');
     }
 
     /**
