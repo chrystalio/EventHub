@@ -8,7 +8,7 @@ import {
 } from '@/components/ui/sidebar';
 import { type NavItem, AuthUser } from '@/types';
 import { Link } from '@inertiajs/react';
-import { Github, LayoutGrid, UserCog, Users } from 'lucide-react';
+import { LayoutGrid, UserCog, Users, Building, DoorOpenIcon } from 'lucide-react';
 import AppLogo from './app-logo';
 
 const rawNavItems: NavItem[] = [
@@ -16,6 +16,18 @@ const rawNavItems: NavItem[] = [
         title: 'Dashboard',
         url: '/dashboard',
         icon: LayoutGrid,
+    },
+    {
+        'title': 'Buildings',
+        url: '/admin/buildings',
+        icon: Building,
+        permission: 'building.view',
+    },
+    {
+        'title': 'Rooms',
+        url: '/admin/rooms',
+        icon: DoorOpenIcon,
+        permission: 'building.view',
     },
     {
         title: 'Users',
@@ -31,13 +43,7 @@ const rawNavItems: NavItem[] = [
     }
 ];
 
-const footerNavItems: NavItem[] = [
-    {
-        title: 'Repository',
-        url: 'https://github.com/chrystalio/lareact-starter-kit',
-        icon: Github,
-    }
-];
+const footerNavItems: NavItem[] = [];
 
 export function AppSidebar() {
     const { props } = usePage<{ auth: { user: AuthUser } }>()
