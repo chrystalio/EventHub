@@ -83,5 +83,25 @@
         "name": "building.delete",
         "shortname": "Admin - Manage Buildings",
         "guard_name": "web"
+    },
+    {
+        "name": "room.view",
+        "shortname": "Admin - Manage Rooms",
+        "guard_name": "web"
+    },
+    {
+        "name": "room.create",
+        "shortname": "Admin - Manage Rooms",
+        "guard_name": "web"
+    },
+    {
+        "name": "room.update",
+        "shortname": "Admin - Manage Rooms",
+        "guard_name": "web"
+    },
+    {
+        "name": "room.delete",
+        "shortname": "Admin - Manage Rooms",
+        "guard_name": "web"
     }
 ]
