@@ -12,7 +12,6 @@ export interface AuthUser {
     permissions: string[]
 }
 
-
 export interface BreadcrumbItem {
     title: string;
     href: string;
@@ -26,6 +25,21 @@ export interface Building {
     updated_at?: string;
 }
 
+export interface Event {
+    id: number;
+    uuid: string;
+    name: string;
+    description: string;
+    organizer: string;
+    start_time: string;
+    end_time: string;
+    max_guests_per_registration: number;
+    building: { id: number; name: string };
+    room: { id: number; name: string };
+    creator: { id: number; name: string };
+}
+
+
 export interface Room {
     id: number;
     code: string;
@@ -33,8 +47,9 @@ export interface Room {
     building_id: number;
     created_at?: string;
     updated_at?: string;
-    building?: Building | null; // Optional relationship
+    building?: Building | null;
 }
+
 
 export interface NavGroup {
     title: string;
