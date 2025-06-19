@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\BuildingController;
+use App\Http\Controllers\Admin\EventController;
 use App\Http\Controllers\Admin\RoleController;
 use App\Http\Controllers\Admin\RolePermissionController;
 use App\Http\Controllers\Admin\RoomController;
@@ -39,8 +40,14 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
         Route::get('/rooms', [RoomController::class, 'index'])->name('admin.rooms.index')->middleware('can:room.view');
         Route::post('/rooms', [RoomController::class, 'store'])->name('admin.rooms.store')->middleware('can:room.create');
-        Route::put('/rooms/{room}', [RoomController::class, 'update'])->name('admin.rooms.update')->middleware('can:room.update');  
+        Route::put('/rooms/{room}', [RoomController::class, 'update'])->name('admin.rooms.update')->middleware('can:room.update');
         Route::delete('/rooms/{room}', [RoomController::class, 'destroy'])->name('admin.rooms.destroy')->middleware('can:room.delete');
+
+        Route::get('/events', [EventController::class, 'index'])->name('admin.events.index')->middleware('can:event.view');
+        Route::post('/events', [EventController::class, 'store'])->name('admin.events.store')->middleware('can:event.create');
+        Route::put('/events/{event}', [EventController::class, 'update'])->name('admin.events.update')->middleware('can:event.update');
+        Route::delete('/events/{event}', [EventController::class, 'destroy'])->name('admin.events.destroy')->middleware('can:event.delete');
+        Route::get('/events/{event}/show', [EventController::class, 'show'])->name('admin.events.show');
     });
 });
 

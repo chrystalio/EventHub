@@ -4,10 +4,12 @@ namespace App\Models;
 
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Lab404\Impersonate\Models\Impersonate;
 use Spatie\Permission\Traits\HasRoles;
+use App\Models\Event;
 
 class User extends Authenticatable implements MustVerifyEmail
 {
@@ -56,5 +58,10 @@ class User extends Authenticatable implements MustVerifyEmail
     public function canBeImpersonated()
     {
         return !$this->hasRole('System Administrator');
+    }
+
+    public function events(): HasMany
+    {
+        return $this->hasMany(Event::class, 'created_by');
     }
 }

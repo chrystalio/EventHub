@@ -103,5 +103,25 @@
         "name": "room.delete",
         "shortname": "Admin - Manage Rooms",
         "guard_name": "web"
+    },
+    {
+        "name": "event.view",
+        "shortname": "Admin - Manage Events",
+        "guard_name": "web"
+    },
+    {
+        "name": "event.create",
+        "shortname": "Admin - Manage Events",
+        "guard_name": "web"
+    },
+    {
+        "name": "event.update",
+        "shortname": "Admin - Manage Events",
+        "guard_name": "web"
+    },
+    {
+        "name": "event.delete",
+        "shortname": "Admin - Manage Events",
+        "guard_name": "web"
     }
 ]
