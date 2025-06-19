@@ -35,7 +35,7 @@ export interface Event {
     end_time: string;
     max_guests_per_registration: number;
     building: { id: number; name: string };
-    room: { id: number; name: string };
+    room: { id: number; name: string; code: string };
     creator: { id: number; name: string };
 }
 
