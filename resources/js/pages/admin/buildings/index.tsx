@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import AppLayout from '@/layouts/app-layout';
 import { Head, useForm, usePage } from '@inertiajs/react';
 import { ColumnFiltersState } from '@tanstack/react-table';
@@ -9,10 +9,10 @@ import { DataTable } from '@/components/ui/data-table';
 import { FormDialog } from '@/components/ui/form-dialog';
 import { ConfirmDialog } from '@/components/ui/confirm-dialog';
 import { Label } from '@/components/ui/label';
-import { toast } from 'sonner';
 import { getColumns } from './columns';
-import type { BreadcrumbItem, Building, SharedData } from '@/types';
+import type { BreadcrumbItem, Building } from '@/types';
 import { PlusCircle } from 'lucide-react';
+import { useFlashToast } from '@/hooks/useFlashToast';
 
 const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Dashboard', href: route('dashboard') },
@@ -20,7 +20,8 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 export default function Index({ buildings }: { buildings: Building[] }) {
-    const { props } = usePage<SharedData & { success?: string }>();
+    useFlashToast();
+
     const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
 
     const [dialogMode, setDialogMode] = useState<'create' | 'edit' | null>(null);
@@ -32,12 +33,6 @@ export default function Index({ buildings }: { buildings: Building[] }) {
         code: '',
         name: '',
     });
-
-    useEffect(() => {
-        if (props.success) {
-            toast.success("Success", { description: props.success });
-        }
-    }, [props.success]);
 
     const handleCreate = () => {
         reset();
