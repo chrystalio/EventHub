@@ -47,7 +47,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::post('/events', [EventController::class, 'store'])->name('admin.events.store')->middleware('can:event.create');
         Route::put('/events/{event}', [EventController::class, 'update'])->name('admin.events.update')->middleware('can:event.update');
         Route::delete('/events/{event}', [EventController::class, 'destroy'])->name('admin.events.destroy')->middleware('can:event.delete');
-        Route::get('/events/{event}/show', [EventController::class, 'show'])->name('admin.events.show');
+        Route::get('/events/{event}/show', [EventController::class, 'show'])->name('admin.events.show')->middleware('can:event.view');
     });
 });
 
