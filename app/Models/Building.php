@@ -12,7 +12,7 @@ class Building extends Model
         'name',
     ];
 
-    public function events(): Building|HasMany
+    public function events(): HasMany
     {
         return $this->hasMany(Event::class);
     }
