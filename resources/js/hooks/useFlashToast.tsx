@@ -6,8 +6,6 @@ export const useFlashToast = () => {
     const { props } = usePage<{ flash?: { success?: string; error?: string } }>();
 
     useEffect(() => {
-        console.log('Flash props:', props.flash);
-
         if (props.flash?.success) {
             toast.success("Success", { description: props.flash.success });
         }
