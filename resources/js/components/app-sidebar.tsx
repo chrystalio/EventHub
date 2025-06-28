@@ -8,7 +8,16 @@ import {
 } from '@/components/ui/sidebar';
 import { type NavItem, AuthUser } from '@/types';
 import { Link } from '@inertiajs/react';
-import { LayoutGrid, UserCog, Users, Building, DoorOpenIcon, CalendarRange, CalendarIcon } from 'lucide-react';
+import {
+    LayoutGrid,
+    UserCog,
+    Users,
+    Building,
+    DoorOpenIcon,
+    CalendarRange,
+    CalendarIcon,
+    TicketIcon
+} from 'lucide-react';
 import AppLogo from './app-logo';
 
 const rawNavItems: NavItem[] = [
@@ -22,6 +31,18 @@ const rawNavItems: NavItem[] = [
         url: '/admin/events',
         icon: CalendarRange,
         permission: 'event.view',
+    },
+    {
+        'title': 'Events',
+        url: route('registrations.browse'),
+        icon: CalendarIcon,
+        permission: 'registration.view',
+    },
+    {
+        'title': 'My Registrations',
+        url: route('registrations.index'),
+        icon: TicketIcon,
+        permission: 'registration.view',
     },
     {
         'title': 'Buildings',
