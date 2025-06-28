@@ -39,6 +39,62 @@ export interface Event {
     creator: { id: number; name: string };
 }
 
+export interface Registration {
+    id: number;
+    uuid: string;
+    event_id: number;
+    user_id: number;
+    guest_count: number;
+    status: 'approved' | 'pending' | 'rejected' | 'attended' | 'missed' | 'cancelled';
+    registered_at: string;
+    approved_at: string | null;
+    created_at: string;
+    updated_at: string;
+    user?: User;
+    attendees?: RegistrationAttendee[];
+    event: Event;
+}
+
+export interface RegistrationAttendee {
+    id: number;
+    registration_id: number;
+    attendee_type: 'registrant' | 'guest';
+    name: string;
+    phone: string | null;
+    qr_code: string;
+    attended_at: string | null;
+    cancelled_at: string | null;
+    created_at: string;
+    updated_at: string;
+}
+
+export interface PublicEventShowProps {
+    event: Event;
+    userRegistration: Registration | null;
+    canRegister: boolean;
+    totalRegistered: number;
+    isAuthenticated: boolean;
+}
+
+export interface PaginationLink {
+    url: string | null;
+    label: string;
+    active: boolean;
+}
+
+export interface PaginatedEvents {
+    data: Event[];
+    current_page: number;
+    last_page: number;
+    per_page: number;
+    total: number;
+    links: PaginationLink[];
+}
+
+export interface PublicEventsIndexProps {
+    events: PaginatedEvents;
+}
+
 
 export interface Room {
     id: number;
