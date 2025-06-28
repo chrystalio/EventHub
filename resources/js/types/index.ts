@@ -58,7 +58,7 @@ export interface Registration {
 export interface RegistrationAttendee {
     id: number;
     registration_id: number;
-    attendee_type: 'registrant' | 'guest';
+    attendee_type: 'user' | 'guest';
     name: string;
     phone: string | null;
     qr_code: string;
