@@ -4,9 +4,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use App\Models\Building;
-use App\Models\Room;
-use App\Models\User;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Support\Str;
 
 class Event extends Model
@@ -57,5 +56,30 @@ class Event extends Model
     public function creator(): BelongsTo
     {
         return $this->belongsTo(User::class, 'created_by');
+    }
+
+    public function registrations(): HasMany
+    {
+        return $this->hasMany(Registration::class);
+    }
+
+    public function attendees(): HasManyThrough
+    {
+        return $this->hasManyThrough(RegistrationAttendee::class, Registration::class);
+    }
+    public function getTotalRegisteredAttribute(): int
+    {
+        return $this->registrations()
+                ->where('status', '!=', 'cancelled')
+                ->sum('guest_count') + $this->registrations()
+                ->where('status', '!=', 'cancelled')
+                ->count();
+    }
+    public function isUserRegistered($userId): bool
+    {
+        return $this->registrations()
+            ->where('user_id', $userId)
+            ->where('status', '!=', 'cancelled')
+            ->exists();
     }
 }
