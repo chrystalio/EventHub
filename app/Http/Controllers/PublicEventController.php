@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Models\Event;
-use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -24,7 +23,7 @@ class PublicEventController extends Controller
     public function show(Event $event): Response
     {
         $event->load(['building', 'room', 'creator']);
-        
+
         $userRegistration = null;
         if (auth()->check()) {
             $userRegistration = $event->registrations()
