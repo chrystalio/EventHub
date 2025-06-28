@@ -54,6 +54,19 @@ class RegistrationController extends Controller
         ]);
     }
 
+    public function show(Registration $registration)
+    {
+        if ($registration->user_id !== auth()->id()) {
+            abort(403, 'This is not your registration.');
+        }
+
+        $registration->load(['event.building', 'event.room', 'attendees']);
+
+        return Inertia::render('authenticated/registrations/show', [
+            'registration' => $registration,
+        ]);
+    }
+
     public function showEvent(Event $event): Response
     {
         $event->load(['building', 'room', 'creator']);
