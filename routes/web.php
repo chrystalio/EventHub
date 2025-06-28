@@ -6,6 +6,8 @@ use App\Http\Controllers\Admin\RoleController;
 use App\Http\Controllers\Admin\RolePermissionController;
 use App\Http\Controllers\Admin\RoomController;
 use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\PublicEventController;
+use App\Http\Controllers\RegistrationController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -49,7 +51,34 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::delete('/events/{event}', [EventController::class, 'destroy'])->name('admin.events.destroy')->middleware('can:event.delete');
         Route::get('/events/{event}/show', [EventController::class, 'show'])->name('admin.events.show')->middleware('can:event.view');
     });
+
+    Route::prefix('/registrants')->group(function() {
+
+        Route::get('/my-registrations', [RegistrationController::class, 'index'])
+        ->name('registrations.index')
+        ->middleware('can:registration.view');
+
+        Route::get('/my-registrations/{registration:uuid}', [RegistrationController::class, 'show'])
+            ->name('registrations.show')
+            ->middleware('can:registration.view');
+
+        Route::get('/events/browse', [RegistrationController::class, 'browse'])
+            ->name('registrations.browse')
+            ->middleware('can:registration.view');
+
+        // Show event details for registration
+        Route::get('/events/{event:uuid}', [RegistrationController::class, 'showEvent'])
+            ->name('registrations.show_event')
+            ->middleware('can:registration.view');
+
+        Route::post('events/{event:uuid}/register', [RegistrationController::class, 'store'])
+            ->name('registrations.store')
+            ->middleware('can:registration.create');
+    });
 });
+
+Route::get('/events', [PublicEventController::class, 'index'])->name('public.events.index');
+Route::get('/events/{event:uuid}/show', [PublicEventController::class, 'show'])->name('public.events.show');
 
 require __DIR__.'/settings.php';
 require __DIR__.'/auth.php';
