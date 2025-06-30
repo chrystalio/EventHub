@@ -1,8 +1,14 @@
 export const formatDateTime = (datetime: string): string => {
     if (!datetime) return '-';
 
-    const [datePart, timePart] = datetime.split('T');
+    const isoDatetime = datetime.replace(' ', 'T');
+
+    const [datePart, timePart] = isoDatetime.split('T');
     const [year, month, day] = datePart.split('-');
+
+    if (!timePart) {
+        return datePart;
+    }
 
     const cleanTimePart = timePart.replace('Z', '').split('.')[0];
     const [hour, minute] = cleanTimePart.split(':');
