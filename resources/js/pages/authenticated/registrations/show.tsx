@@ -5,6 +5,7 @@ import { Registration } from '@/types';
 import { ArrowLeftIcon, CalendarIcon, MapPinIcon, UsersIcon } from 'lucide-react';
 import { formatDateTime } from '@/utils/dateUtils';
 import { Badge } from '@/components/ui/badge';
+import { QRCodeSVG } from 'qrcode.react';
 
 interface Props {
     registration: Registration;
@@ -43,8 +44,8 @@ export default function RegistrationShow({ registration }: Props) {
                             </div>
                         </div>
                     </div>
-                    <div className="space-y-6">
-                        <div className="px-1">
+                    <div className="bg-white border rounded-lg shadow-sm">
+                        <div className="p-6 border-b">
                             <h2 className="text-lg font-semibold text-gray-900 flex items-center">
                                 <UsersIcon className="h-5 w-5 mr-3 text-gray-500" />
                                 Registered Attendees ({attendees?.length})
@@ -52,17 +53,14 @@ export default function RegistrationShow({ registration }: Props) {
                             <p className="text-sm text-gray-500 mt-1">This is your ticket. Each attendee has a unique QR
                                 code for check-in.</p>
                         </div>
-                        <div className="space-y-4">
+                        <div className="divide-y">
                             {attendees?.map((attendee) => (
-                                <div key={attendee.id} className="bg-white border rounded-lg shadow-sm">
-                                    <div className="p-4 sm:p-6 flex flex-col sm:flex-row items-center gap-6">
-                                        <div
-                                            className="w-32 h-32 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0 p-2 shadow-inner">
-                                            <div
-                                                className="w-full h-full bg-white flex items-center justify-center rounded-md">
-                                                <span className="text-xs text-gray-400">QR Code Here</span>
-                                            </div>
+                                <div key={attendee.id} className="p-4 sm:p-6">
+                                    <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6">
+                                        <div className="bg-white p-2 rounded-lg shadow-md">
+                                            <QRCodeSVG value={attendee.qr_code} size={128} />
                                         </div>
+
                                         <div className="flex-grow text-center sm:text-left">
                                             <Badge variant={attendee.attendee_type === 'user' ? 'default' : 'secondary'}
                                                    className="capitalize">
