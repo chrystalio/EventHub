@@ -9,8 +9,6 @@ use App\Models\Building;
 use App\Models\Event;
 use App\Models\Room;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
-use Inertia\Inertia;
 
 class EventController extends Controller
 {
