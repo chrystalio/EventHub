@@ -37,6 +37,7 @@ export interface Event {
     building: { id: number; name: string };
     room: { id: number; name: string; code: string };
     creator: { id: number; name: string };
+    registrations?: Registration[];
 }
 
 export interface Registration {
