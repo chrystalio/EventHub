@@ -58,7 +58,7 @@ class EventController extends Controller
      */
     public function show(Event $event)
     {
-        $event->load(['building', 'room', 'creator']);
+        $event->load(['building', 'room', 'creator', 'registrations.user']);
 
         return inertia('admin/events/show', [
             'event' => $event,
