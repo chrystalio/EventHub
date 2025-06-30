@@ -8,9 +8,11 @@ import {
     CalendarIcon,
     MapPinIcon,
     UserIcon,
-    BuildingIcon
+    BuildingIcon, UsersIcon
 } from 'lucide-react';
 import type { BreadcrumbItem, Event } from '@/types';
+import { DataTable } from '@/components/ui/data-table';
+import { registrantColumns } from '@/pages/admin/events/registrant-columns';
 
 interface ShowProps {
     event: Event;
@@ -60,6 +62,21 @@ export default function Show({ event }: ShowProps) {
                                 <p className="text-muted-foreground leading-relaxed">
                                     {event.description || 'No description provided for this event.'}
                                 </p>
+                            </CardContent>
+                        </Card>
+
+                        <Card>
+                            <CardHeader>
+                                <CardTitle className="flex items-center gap-2">
+                                    <UsersIcon className="h-5 w-5" />
+                                    Registered Attendees
+                                </CardTitle>
+                                <p className="text-sm text-muted-foreground pt-2">
+                                    A total of {event.registrations?.length || 0} registrations have been made.
+                                </p>
+                            </CardHeader>
+                            <CardContent>
+                                <DataTable columns={registrantColumns} data={event.registrations || []} />
                             </CardContent>
                         </Card>
                     </div>
