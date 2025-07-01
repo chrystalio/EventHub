@@ -14,6 +14,7 @@ class StoreEventRequest extends FormRequest
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
             'organizer' => 'required|string|max:255',
+            'type' => 'required|in:free,private,paid',
             'start_time' => 'required|date',
             'end_time' => 'required|date|after:start_time',
             'max_guests_per_registration' => 'required|integer|min:0',
