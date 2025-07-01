@@ -9,6 +9,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { MoreHorizontal, PencilIcon, LucideTrash, EyeIcon } from 'lucide-react';
 import { formatDateTime } from '@/utils/dateUtils';
+import { Badge } from '@/components/ui/badge';
 
 interface GetColumnsProps {
     onEdit: (event: Event) => void;
@@ -57,6 +58,23 @@ export function getColumns({ onEdit, onDelete }: GetColumnsProps): ColumnDef<Eve
                         </div>
                     );
                 }
+            },
+        },
+        {
+            id: 'type',
+            'header': 'Type',
+            cell: ({ row }) => {
+                const type = row.original.type;
+                const typeLabels: Record<string, string> = {
+                    free: 'Free',
+                    paid: 'Paid',
+                    private: 'Private',
+                };
+                return (
+                    <Badge variant="outline" className="capitalize">
+                        {typeLabels[type] || 'Unknown'}
+                    </Badge>
+                );
             },
         },
 
