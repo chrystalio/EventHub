@@ -21,6 +21,7 @@ class EventController extends Controller
         $buildings = Building::all();
         $rooms = Room::with('building')->get();
 
+
         return inertia('admin/events/index', [
             'events' => $events,
             'buildings' => $buildings,
@@ -56,7 +57,9 @@ class EventController extends Controller
      */
     public function show(Event $event)
     {
-        $event->load(['building', 'room', 'creator', 'registrations.user']);
+        $this->authorize('manage', $event);
+
+        $event->load(['building', 'room', 'creator', 'registrations.user', 'registrations.attendees', 'staff']);
 
         return inertia('admin/events/show', [
             'event' => $event,
