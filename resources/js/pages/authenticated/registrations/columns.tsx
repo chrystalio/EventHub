@@ -26,7 +26,6 @@ const statusConfig: Record<Registration['status'], { bg: string, text: string }>
     rejected: { bg: 'bg-red-100', text: 'text-red-800' },
     attended: { bg: 'bg-blue-100', text: 'text-blue-800' },
     missed: { bg: 'bg-gray-100', text: 'text-gray-800' },
-    cancelled: { bg: 'bg-gray-100', text: 'text-gray-800' },
 };
 
 export const columns: ColumnDef<Registration>[] = [
