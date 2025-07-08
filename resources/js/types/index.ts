@@ -39,6 +39,7 @@ export interface Event {
     room: { id: number; name: string; code: string };
     creator: { id: number; name: string };
     registrations?: Registration[];
+    staff?: User[];
 }
 
 export interface Registration {
@@ -47,7 +48,7 @@ export interface Registration {
     event_id: number;
     user_id: number;
     guest_count: number;
-    status: 'approved' | 'pending' | 'rejected' | 'attended' | 'missed' | 'cancelled';
+    status: 'approved' | 'pending' | 'rejected' | 'attended' | 'missed';
     registered_at: string;
     approved_at: string | null;
     created_at: string;
@@ -120,6 +121,7 @@ export interface NavItem {
     icon?: LucideIcon | null;
     isActive?: boolean;
     permission?: string;
+    role?: string | string[];
 }
 
 export interface SharedData {
@@ -138,6 +140,7 @@ export interface User {
     created_at: string;
     updated_at: string;
     roles: Role[];
+    permissions?: string[];
     [key: string]: unknown;
 }
 
