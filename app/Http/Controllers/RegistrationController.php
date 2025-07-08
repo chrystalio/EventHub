@@ -7,6 +7,7 @@ use App\Models\Event;
 use App\Models\Registration;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -95,32 +96,49 @@ class RegistrationController extends Controller
     public function store(StoreRegistrationRequest $request, Event $event): RedirectResponse
     {
         $validated = $request->validated();
-
-        $registration = Registration::create([
-            'user_id' => auth()->id(),
-            'event_id' => $event->id,
-            'guest_count' => $validated['guest_count'],
-            'status' => 'approved',
-        ]);
-
         $user = Auth::user();
-        $registration->attendees()->create([
-            'attendee_type' => 'user',
-            'name' => $user->name,
-            'phone' => $user->phone ?? '',
-        ]);
 
-        if (!empty($validated['guests'])) {
-            foreach ($validated['guests'] as $guestData){
-                $registration->attendees()->create([
-                    'attendee_type' => 'guest',
-                    'name' => $guestData['name'],
-                    'phone' => $guestData['phone'],
-                ]);
+        $status = ($event->type === 'private') ? 'pending' : 'approved';
+
+        $message = ($status === 'pending')
+            ? 'Your registration is submitted and is now pending approval.'
+            : 'Registration successful! You can now view your registration details.';
+
+        try {
+            DB::beginTransaction();
+
+            $registration = Registration::create([
+                'user_id'     => $user->id,
+                'event_id'    => $event->id,
+                'guest_count' => $validated['guest_count'],
+                'status'      => $status,
+            ]);
+
+            $registration->attendees()->create([
+                'attendee_type' => 'user',
+                'name' => $user->name,
+                'phone' => $user->phone ?? '',
+            ]);
+
+            if (!empty($validated['guests'])) {
+                foreach ($validated['guests'] as $guestData){
+                    $registration->attendees()->create([
+                        'attendee_type' => 'guest',
+                        'name' => $guestData['name'],
+                        'phone' => $guestData['phone'],
+                    ]);
+                }
             }
+
+            DB::commit();
+
+        } catch (\Throwable $e) {
+            DB::rollBack();
+            report($e);
+            return back()->with('error', 'A server error occurred during registration.');
         }
 
         return redirect()->route('registrations.show_event', $event->uuid)
-        ->with('success', 'Registration successful! You can now view your registration details.');
+            ->with('success', $message);
     }
 }
