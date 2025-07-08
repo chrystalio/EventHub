@@ -8,7 +8,7 @@ use Inertia\Inertia;
 use Inertia\Response;
 
 class EventController extends Controller
-{   
+{
     public function index(Request $request): Response
     {
         $panitia = $request->user();
