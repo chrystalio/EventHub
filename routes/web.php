@@ -2,12 +2,15 @@
 
 use App\Http\Controllers\Admin\BuildingController;
 use App\Http\Controllers\Admin\EventController;
+use App\Http\Controllers\Admin\EventStaffController;
+use App\Http\Controllers\Admin\RegistrationManagementController;
 use App\Http\Controllers\Admin\RoleController;
 use App\Http\Controllers\Admin\RolePermissionController;
 use App\Http\Controllers\Admin\RoomController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\PublicEventController;
 use App\Http\Controllers\RegistrationController;
+use App\Http\Controllers\Panitia\EventController as PanitiaEventController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -50,6 +53,14 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::put('/events/{event}', [EventController::class, 'update'])->name('admin.events.update')->middleware('can:event.update');
         Route::delete('/events/{event}', [EventController::class, 'destroy'])->name('admin.events.destroy')->middleware('can:event.delete');
         Route::get('/events/{event}/show', [EventController::class, 'show'])->name('admin.events.show')->middleware('can:event.view');
+        Route::post('/events/{event}/staff', [EventStaffController::class, 'store'])->name('admin.events.staff.store');
+        Route::delete('/events/{event}/staff/{user}', [EventStaffController::class, 'destroy'])->name('admin.events.staff.destroy');
+
+        Route::get('/users/search', [UserController::class, 'search'])->name('admin.users.search');
+
+
+        Route::patch('/registrations/{registration}/approve', [RegistrationManagementController::class, 'approve'])->name('admin.registrations.approve');
+        Route::patch('/registrations/{registration}/reject', [RegistrationManagementController::class, 'reject'])->name('admin.registrations.reject');
     });
 
     Route::prefix('/registrants')->group(function() {
@@ -74,6 +85,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::post('events/{event:uuid}/register', [RegistrationController::class, 'store'])
             ->name('registrations.store')
             ->middleware('can:registration.create');
+    });
+
+    Route::prefix('/panitia')->middleware(['auth', 'role:Panitia'])->group(function () {
+        Route::get('/events', [PanitiaEventController::class, 'index'])->name('panitia.events.index');
     });
 });
 
