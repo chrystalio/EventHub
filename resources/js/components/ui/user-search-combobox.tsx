@@ -11,7 +11,7 @@ import axios from "axios"
 import { useEffect, useState } from "react"
 
 interface UserSearchComboboxProps {
-    value: string; 
+    value: string;
     onSelect: (userId: string) => void;
 }
 
