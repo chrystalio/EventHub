@@ -48,14 +48,12 @@ export default function AuthenticatedEventShow({ event, userRegistration, canReg
         });
     };
 
-    // --- NEW: Handler for updating a specific guest's details ---
     const handleGuestDetailChange = (index: number, field: 'name' | 'phone', value: string) => {
         const updatedGuests = [...data.guests];
         updatedGuests[index] = { ...updatedGuests[index], [field]: value };
         setData('guests', updatedGuests);
     };
 
-    // --- NEW: Form submission handler ---
     const handleRegistrationSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         post(route('registrations.store', event.uuid), {
@@ -262,25 +260,10 @@ export default function AuthenticatedEventShow({ event, userRegistration, canReg
 
                             {/* Submit Button */}
                             <Button type="submit" disabled={processing} className="w-full bg-gray-900 text-white hover:bg-gray-800 sm:w-auto">
-                                {processing ? 'Registering...' : `Confirm Registration (${1 + data.guest_count} person)`}
+                                {processing ? 'Registering...' : `Confirm Registration`}
                             </Button>
                         </form>
                     ) : (
-                        // <div className="bg-white border-2 border-gray-900 rounded-lg p-6 sm:p-8">
-                        //     <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                        //         <div className="space-y-2">
-                        //             <h3 className="font-semibold text-gray-900 text-lg">Ready to join?</h3>
-                        //             <p className="text-gray-600 text-sm sm:text-base">
-                        //                 Free registration • Takes less than a minute
-                        //             </p>
-                        //         </div>
-                        //         <Button className="bg-gray-900 text-white hover:bg-gray-800 px-6 sm:px-8 py-3 text-sm w-full sm:w-auto" asChild>
-                        //             <Link href="#">
-                        //                 Register Now
-                        //             </Link>
-                        //         </Button>
-                        //     </div>
-                        // </div>
                         <div className="rounded-lg border border-gray-200 bg-gray-50 p-6 text-center sm:p-8">
                             <div className="space-y-4">
                                 <p className="text-gray-600">Registration requires proper permissions.</p>
