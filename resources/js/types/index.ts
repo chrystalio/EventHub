@@ -31,12 +31,71 @@ export interface Event {
     name: string;
     description: string;
     organizer: string;
+    type: 'free' | 'paid' | 'private';
     start_time: string;
     end_time: string;
     max_guests_per_registration: number;
     building: { id: number; name: string };
     room: { id: number; name: string; code: string };
     creator: { id: number; name: string };
+    registrations?: Registration[];
+    staff?: User[];
+}
+
+export interface Registration {
+    id: number;
+    uuid: string;
+    event_id: number;
+    user_id: number;
+    guest_count: number;
+    status: 'approved' | 'pending' | 'rejected' | 'attended' | 'missed';
+    registered_at: string;
+    approved_at: string | null;
+    created_at: string;
+    updated_at: string;
+    user?: User;
+    attendees?: RegistrationAttendee[];
+    event: Event;
+}
+
+export interface RegistrationAttendee {
+    id: number;
+    registration_id: number;
+    attendee_type: 'user' | 'guest';
+    name: string;
+    phone: string | null;
+    qr_code: string;
+    attended_at: string | null;
+    cancelled_at: string | null;
+    created_at: string;
+    updated_at: string;
+}
+
+export interface PublicEventShowProps {
+    event: Event;
+    userRegistration: Registration | null;
+    canRegister: boolean;
+    totalRegistered: number;
+    isAuthenticated: boolean;
+}
+
+export interface PaginationLink {
+    url: string | null;
+    label: string;
+    active: boolean;
+}
+
+export interface PaginatedEvents {
+    data: Event[];
+    current_page: number;
+    last_page: number;
+    per_page: number;
+    total: number;
+    links: PaginationLink[];
+}
+
+export interface PublicEventsIndexProps {
+    events: PaginatedEvents;
 }
 
 
@@ -62,6 +121,7 @@ export interface NavItem {
     icon?: LucideIcon | null;
     isActive?: boolean;
     permission?: string;
+    role?: string | string[];
 }
 
 export interface SharedData {
@@ -80,6 +140,7 @@ export interface User {
     created_at: string;
     updated_at: string;
     roles: Role[];
+    permissions?: string[];
     [key: string]: unknown;
 }
 

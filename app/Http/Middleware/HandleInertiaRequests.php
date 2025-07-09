@@ -54,10 +54,8 @@ class HandleInertiaRequests extends Middleware
                         'id' => $user->id,
                         'name' => $user->name,
                         'email' => $user->email,
-                        'permissions' => $user->loadMissing('roles.permissions')
-                            ->getAllPermissions()
-                            ->pluck('name')
-                            ->toArray(),
+                        'roles' => $user->getRoleNames(),
+                        'permissions' => $user->getAllPermissions()->pluck('name')->toArray(),
                     ],
                     'is_impersonating' => $user->isImpersonated(),
                 ];

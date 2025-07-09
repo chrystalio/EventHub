@@ -9,8 +9,6 @@ use App\Models\Building;
 use App\Models\Event;
 use App\Models\Room;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
-use Inertia\Inertia;
 
 class EventController extends Controller
 {
@@ -22,6 +20,7 @@ class EventController extends Controller
         $events = Event::with(['building', 'room', 'creator'])->latest()->get();
         $buildings = Building::all();
         $rooms = Room::with('building')->get();
+
 
         return inertia('admin/events/index', [
             'events' => $events,
@@ -58,7 +57,9 @@ class EventController extends Controller
      */
     public function show(Event $event)
     {
-        $event->load(['building', 'room', 'creator']);
+        $this->authorize('manage', $event);
+
+        $event->load(['building', 'room', 'creator', 'registrations.user', 'registrations.attendees', 'staff']);
 
         return inertia('admin/events/show', [
             'event' => $event,

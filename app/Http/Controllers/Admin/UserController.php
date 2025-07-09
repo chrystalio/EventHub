@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Spatie\Permission\Models\Role;
@@ -22,7 +24,30 @@ class UserController extends Controller
         ]);
     }
 
-    public function updateRoles(Request $request, User $user)
+    public function search(Request $request): JsonResponse
+    {
+        $query = $request->input('query');
+        $excludedRoles = ['System Administrator', 'Akademik'];
+
+        $userQuery = User::whereDoesntHave('roles', function ($query) use ($excludedRoles) {
+            $query->whereIn('name', $excludedRoles);
+        });
+
+        if ($query) {
+            $users = $userQuery->where(function ($q) use ($query) {
+                $q->where('name', 'LIKE', "%{$query}%")
+                    ->orWhere('email', 'LIKE', "%{$query}%");
+            })
+                ->limit(10)
+                ->get(['id', 'name', 'email']);
+        } else {
+            $users = $userQuery->latest()->limit(5)->get(['id', 'name', 'email']);
+        }
+
+        return response()->json($users);
+    }
+
+    public function updateRoles(Request $request, User $user): RedirectResponse
     {
         $validated = $request->validate([
             'roles' => ['array'],

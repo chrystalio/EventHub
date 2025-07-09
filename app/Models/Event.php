@@ -2,19 +2,23 @@
 
 namespace App\Models;
 
+use App\Policies\EventPolicy;
+use Illuminate\Database\Eloquent\Attributes\UsePolicy;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use App\Models\Building;
-use App\Models\Room;
-use App\Models\User;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Support\Str;
 
+#[UsePolicy(EventPolicy::class)]
 class Event extends Model
 {
     protected $fillable = [
         'name',
         'description',
         'organizer',
+        'type',
         'start_time',
         'end_time',
         'max_guests_per_registration',
@@ -57,5 +61,37 @@ class Event extends Model
     public function creator(): BelongsTo
     {
         return $this->belongsTo(User::class, 'created_by');
+    }
+
+    public function registrations(): HasMany
+    {
+        return $this->hasMany(Registration::class);
+    }
+
+    public function staff(): BelongsToMany
+    {
+        return $this->belongsToMany(User::class, 'event_staff', 'event_id', 'user_id')
+            ->withPivot('role')
+            ->withTimestamps();
+    }
+
+    public function attendees(): HasManyThrough
+    {
+        return $this->hasManyThrough(RegistrationAttendee::class, Registration::class);
+    }
+    public function getTotalRegisteredAttribute(): int
+    {
+        return $this->registrations()
+                ->where('status', '!=', 'cancelled')
+                ->sum('guest_count') + $this->registrations()
+                ->where('status', '!=', 'cancelled')
+                ->count();
+    }
+    public function isUserRegistered($userId): bool
+    {
+        return $this->registrations()
+            ->where('user_id', $userId)
+            ->where('status', '!=', 'cancelled')
+            ->exists();
     }
 }

@@ -9,6 +9,7 @@ import { DataTable } from '@/components/ui/data-table';
 import { FormDialog } from '@/components/ui/form-dialog';
 import { ConfirmDialog } from '@/components/ui/confirm-dialog';
 import { Label } from '@/components/ui/label';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { getColumns } from './columns';
@@ -40,6 +41,7 @@ export default function Index({ events = [], buildings = [], rooms = [] }: Index
         name: '',
         description: '',
         organizer: '',
+        type: '',
         start_time: '',
         end_time: '',
         max_guests_per_registration: '0',
@@ -69,6 +71,7 @@ export default function Index({ events = [], buildings = [], rooms = [] }: Index
             name: '',
             description: '',
             organizer: '',
+            type: '',
             start_time: '',
             end_time: '',
             max_guests_per_registration: '0',
@@ -94,6 +97,7 @@ export default function Index({ events = [], buildings = [], rooms = [] }: Index
             name: event.name,
             description: event.description || '',
             organizer: event.organizer || '',
+            type: event.type,
             start_time: formatForInput(event.start_time),
             end_time: formatForInput(event.end_time),
             max_guests_per_registration: event.max_guests_per_registration?.toString() || '0',
@@ -212,7 +216,42 @@ export default function Index({ events = [], buildings = [], rooms = [] }: Index
                         />
                         {errors.organizer && <p className="text-sm text-red-500">{errors.organizer}</p>}
                     </div>
-
+                    <div className="space-y-2">
+                        <Label>Event Type</Label>
+                        <p className="text-sm text-muted-foreground">
+                            Choose the registration method for this event.
+                        </p>
+                        <RadioGroup
+                            value={data.type}
+                            onValueChange={(value) => setData('type', value)}
+                            className="space-y-1 pt-2"
+                        >
+                            <div
+                                className="flex items-center space-x-3 p-3 rounded-md border has-[input:checked]:border-primary">
+                                <RadioGroupItem value="free" id="type-free" />
+                                <Label htmlFor="type-free" className="font-normal cursor-pointer w-full">
+                                    <span className="font-semibold block">Free</span>
+                                    <span className="text-muted-foreground text-xs">Anyone can register instantly. No approval needed.</span>
+                                </Label>
+                            </div>
+                            <div
+                                className="flex items-center space-x-3 p-3 rounded-md border has-[input:checked]:border-primary">
+                                <RadioGroupItem value="private" id="type-private" />
+                                <Label htmlFor="type-private" className="font-normal cursor-pointer w-full">
+                                    <span className="font-semibold block">Private (Requires Approval)</span>
+                                    <span className="text-muted-foreground text-xs">Registrants must be manually approved by an admin.</span>
+                                </Label>
+                            </div>
+                            <div
+                                className="flex items-center space-x-3 p-3 rounded-md border has-[input:checked]:border-primary">
+                                <RadioGroupItem value="paid" id="type-paid" />
+                                <Label htmlFor="type-paid" className="font-normal cursor-pointer w-full">
+                                    <span className="font-semibold block">Paid</span>
+                                    <span className="text-muted-foreground text-xs">Registrants must complete payment to register.</span>
+                                </Label>
+                            </div>
+                        </RadioGroup>
+                    </div>
                     <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-2">
                             <Label htmlFor="start_time">Start Time</Label>
@@ -274,7 +313,8 @@ export default function Index({ events = [], buildings = [], rooms = [] }: Index
 
                         <div className="space-y-2">
                             <Label htmlFor="room_id">Room</Label>
-                            <Select value={data.room_id} onValueChange={(value) => setData('room_id', value)} disabled={!data.building_id}>
+                            <Select value={data.room_id} onValueChange={(value) => setData('room_id', value)}
+                                    disabled={!data.building_id}>
                                 <SelectTrigger>
                                     <SelectValue
                                         placeholder={data.building_id ? "Select room" : "Select building first"}

@@ -6,58 +6,53 @@ import {
     Sidebar, SidebarContent, SidebarFooter,
     SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem
 } from '@/components/ui/sidebar';
-import { type NavItem, AuthUser } from '@/types';
+import { type NavItem, User } from '@/types';
 import { Link } from '@inertiajs/react';
-import { LayoutGrid, UserCog, Users, Building, DoorOpenIcon, CalendarRange, CalendarIcon } from 'lucide-react';
+import {
+    LayoutGrid,
+    UserCog,
+    Users,
+    Building,
+    DoorOpenIcon,
+    CalendarRange,
+    CalendarIcon,
+    TicketIcon,
+    Briefcase,
+} from 'lucide-react';
 import AppLogo from './app-logo';
 
 const rawNavItems: NavItem[] = [
-    {
-        title: 'Dashboard',
-        url: '/dashboard',
-        icon: LayoutGrid,
-    },
-    {
-        'title': 'Events',
-        url: '/admin/events',
-        icon: CalendarRange,
-        permission: 'event.view',
-    },
-    {
-        'title': 'Buildings',
-        url: '/admin/buildings',
-        icon: Building,
-        permission: 'building.view',
-    },
-    {
-        'title': 'Rooms',
-        url: '/admin/rooms',
-        icon: DoorOpenIcon,
-        permission: 'building.view',
-    },
-    {
-        title: 'Users',
-        url: '/admin/users',
-        icon: Users,
-        permission: 'user.view',
-    },
-    {
-        title: 'Roles',
-        url: '/admin/roles',
-        icon: UserCog,
-        permission: 'role.view',
-    }
+    { title: 'Dashboard', url: route('dashboard'), icon: LayoutGrid },
+    { title: 'Managed Events', url: route('panitia.events.index'), icon: Briefcase, role: 'Panitia' },
+    { title: 'Browse Events', url: route('registrations.browse'), icon: CalendarIcon, role: 'Peserta' },
+    { title: 'My Registrations', url: route('registrations.index'), icon: TicketIcon, role: 'Peserta' },
+    { title: 'Events', url: route('admin.events.index'), icon: CalendarRange, role: ['System Administrator', 'Akademik'] },
+    { title: 'Buildings', url: route('admin.buildings.index'), icon: Building, role: ['System Administrator', 'Akademik'] },
+    { title: 'Rooms', url: route('admin.rooms.index'), icon: DoorOpenIcon, role: ['System Administrator', 'Akademik'] },
+    { title: 'Users', url: route('admin.users.index'), icon: Users, role: ['System Administrator', 'Akademik'] },
+    { title: 'Roles', url: route('roles.index'), icon: UserCog, role: ['System Administrator', 'Akademik'] },
 ];
 
 const footerNavItems: NavItem[] = [];
 
 export function AppSidebar() {
-    const { props } = usePage<{ auth: { user: AuthUser } }>()
-    const permissions: string[] = props.auth?.user?.permissions ?? [];
+    const { props } = usePage<{ auth: { user: User } }>();
+    const user = props.auth?.user;
 
-    const mainNavItems = rawNavItems.filter(
-        item => !item.permission || permissions.includes(item.permission)
-    );
+    const mainNavItems = rawNavItems.filter(item => {
+        if (item.permission) {
+            return user?.permissions?.includes(item.permission);
+        }
+
+        if (item.role) {
+            const requiredRoles = Array.isArray(item.role) ? item.role : [item.role];
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-expect-error
+            return user?.roles?.some(userRoleName => requiredRoles.includes(userRoleName));
+        }
+
+        return true;
+    });
 
     return (
         <Sidebar collapsible="icon" variant="inset">

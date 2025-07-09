@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import AppLayout from '@/layouts/app-layout';
-import { Head, useForm, usePage } from '@inertiajs/react';
+import { Head, useForm } from '@inertiajs/react';
 import { ColumnFiltersState } from '@tanstack/react-table';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
