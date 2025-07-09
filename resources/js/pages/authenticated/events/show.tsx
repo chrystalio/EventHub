@@ -17,7 +17,7 @@ import { formatDateTime } from '@/utils/dateUtils';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 
-interface Props {
+interface Props {   
     event: Event;
     userRegistration?: Registration;
     canRegister: boolean;
