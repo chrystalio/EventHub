@@ -8,6 +8,7 @@ use App\Models\Registration;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\URL;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -55,7 +56,7 @@ class RegistrationController extends Controller
         ]);
     }
 
-    public function show(Registration $registration)
+    public function show(Registration $registration): Response
     {
         if ($registration->user_id !== auth()->id()) {
             abort(403, 'This is not your registration.');
@@ -63,6 +64,15 @@ class RegistrationController extends Controller
 
         $registration->load(['event.building', 'event.room', 'attendees']);
 
+        if ($registration->status === 'approved') {
+            $registration->attendees->each(function ($attendee) {
+                $attendee->signed_url = URL::signedRoute(
+                    'ticket.verify',
+                    ['attendee' => $attendee->qr_code]
+                );
+            });
+        }
+        
         return Inertia::render('authenticated/registrations/show', [
             'registration' => $registration,
         ]);
