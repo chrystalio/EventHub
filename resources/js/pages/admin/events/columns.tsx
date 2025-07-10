@@ -61,21 +61,30 @@ export function getColumns({ onEdit, onDelete }: GetColumnsProps): ColumnDef<Eve
             },
         },
         {
-            id: 'type',
-            'header': 'Type',
+            accessorKey: "type",
+            header: "Type",
             cell: ({ row }) => {
                 const type = row.original.type;
-                const typeLabels: Record<string, string> = {
-                    free: 'Free',
-                    paid: 'Paid',
-                    private: 'Private',
-                };
+                let variant: "default" | "secondary" | "destructive" | "outline" = "secondary";
+
+                switch (type) {
+                    case 'free':
+                        variant = 'default';
+                        break;
+                    case 'private':
+                        variant = 'secondary';
+                        break;
+                    case 'paid':
+                        variant = 'destructive';
+                        break;
+                }
+
                 return (
-                    <Badge variant="outline" className="capitalize">
-                        {typeLabels[type] || 'Unknown'}
+                    <Badge variant={variant} className="capitalize">
+                        {type}
                     </Badge>
-                );
-            },
+                )
+            }
         },
 
         {

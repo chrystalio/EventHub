@@ -2,7 +2,7 @@ import React from 'react';
 import { Head, Link } from '@inertiajs/react';
 import AppLayout from '@/layouts/app-layout';
 import { Registration } from '@/types';
-import { ArrowLeftIcon, CalendarIcon, MapPinIcon, UsersIcon } from 'lucide-react';
+import { ArrowLeftIcon, CalendarIcon, MapPinIcon, UsersIcon, ClockIcon, AlertCircleIcon } from 'lucide-react';
 import { formatDateTime } from '@/utils/dateUtils';
 import { Badge } from '@/components/ui/badge';
 import { QRCodeSVG } from 'qrcode.react';
@@ -11,8 +11,33 @@ interface Props {
     registration: Registration;
 }
 
+const StatusInfo = ({ status }) => {
+    if (status === 'pending') {
+        return (
+            <div className="p-6 text-center">
+                <ClockIcon className="mx-auto h-12 w-12 text-yellow-500" />
+                <h3 className="mt-2 text-lg font-semibold text-gray-900">Registration Pending</h3>
+                <p className="mt-1 text-sm text-gray-600">
+                    Your registration is awaiting approval. Your ticket will be available here once confirmed.
+                </p>
+            </div>
+        );
+    }
+
+    return (
+        <div className="p-6 text-center">
+            <AlertCircleIcon className="mx-auto h-12 w-12 text-red-500" />
+            <h3 className="mt-2 text-lg font-semibold text-gray-900">Registration Issue</h3>
+            <p className="mt-1 text-sm text-gray-600">
+                There is an issue with this registration. Please contact the event organizer.
+            </p>
+        </div>
+    );
+};
+
+
 export default function RegistrationShow({ registration }: Props) {
-    const { event, attendees } = registration;
+    const { event, attendees, status } = registration;
 
     return (
         <AppLayout>
@@ -48,33 +73,35 @@ export default function RegistrationShow({ registration }: Props) {
                         <div className="p-6 border-b">
                             <h2 className="text-lg font-semibold text-gray-900 flex items-center">
                                 <UsersIcon className="h-5 w-5 mr-3 text-gray-500" />
-                                Registered Attendees ({attendees?.length})
+                                Your Ticket & Attendees
                             </h2>
-                            <p className="text-sm text-gray-500 mt-1">This is your ticket. Each attendee has a unique QR
-                                code for check-in.</p>
                         </div>
-                        <div className="divide-y">
-                            {attendees?.map((attendee) => (
-                                <div key={attendee.id} className="p-4 sm:p-6">
-                                    <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6">
-                                        <div className="bg-white p-2 rounded-lg shadow-md">
-                                            <QRCodeSVG value={attendee.qr_code} size={128} />
-                                        </div>
+                        {status === 'approved' ? (
+                            <div className="divide-y">
+                                {attendees?.map((attendee) => (
+                                    <div key={attendee.id} className="p-4 sm:p-6">
+                                        <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6">
+                                            <div className="bg-white p-2 rounded-lg shadow-md">
+                                                <QRCodeSVG value={attendee.signed_url || ''} size={250} />
+                                            </div>
 
-                                        <div className="flex-grow text-center sm:text-left">
-                                            <Badge variant={attendee.attendee_type === 'user' ? 'default' : 'secondary'}
-                                                   className="capitalize">
-                                                {attendee.attendee_type === 'user' ? 'Registrant' : 'Guest'}
-                                            </Badge>
-                                            <p className="font-bold text-2xl text-gray-900 mt-2">{attendee.name}</p>
-                                            {attendee.phone && (
-                                                <p className="text-base text-gray-500">{attendee.phone}</p>
-                                            )}
+                                            <div className="flex-grow text-center sm:text-left">
+                                                <Badge variant={attendee.attendee_type === 'user' ? 'default' : 'secondary'}
+                                                       className="capitalize">
+                                                    {attendee.attendee_type === 'user' ? 'Registrant' : 'Guest'}
+                                                </Badge>
+                                                <p className="font-bold text-2xl text-gray-900 mt-2">{attendee.name}</p>
+                                                {attendee.phone && (
+                                                    <p className="text-base text-gray-500">{attendee.phone}</p>
+                                                )}
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                            ))}
-                        </div>
+                                ))}
+                            </div>
+                        ) : (
+                            <StatusInfo status={status} />
+                        )}
                     </div>
                 </div>
             </div>

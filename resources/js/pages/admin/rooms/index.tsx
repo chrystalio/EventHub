@@ -92,12 +92,16 @@ export default function Index({ rooms, buildings }: { rooms: Room[], buildings: 
                             </Button>
                         </div>
 
-                        <DataTable
-                            columns={getColumns({ onEdit: handleEdit, onDelete: handleDelete })}
-                            data={rooms}
-                            columnFilters={columnFilters}
-                            onColumnFiltersChange={setColumnFilters}
-                        />
+                        <div className="grid">
+                            <div className="overflow-x-auto">
+                                <DataTable
+                                    columns={getColumns({ onEdit: handleEdit, onDelete: handleDelete })}
+                                    data={rooms}
+                                    columnFilters={columnFilters}
+                                    onColumnFiltersChange={setColumnFilters}
+                                />
+                            </div>
+                        </div>
                     </CardContent>
                 </Card>
             </div>
