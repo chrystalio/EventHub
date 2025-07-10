@@ -55,12 +55,17 @@ export default function Index({ users, roles }: { users: User[], roles: string[]
                                 className="w-full sm:w-64"
                             />
                         </div>
-                        <DataTable
-                            columns={getColumns(setEditingUser, setIsDialogOpen, setFormData)}
-                            data={users}
-                            columnFilters={columnFilters}
-                            onColumnFiltersChange={setColumnFilters}
-                        />
+
+                        <div className="grid">
+                            <div className="overflow-x-auto">
+                                <DataTable
+                                    columns={getColumns(setEditingUser, setIsDialogOpen, setFormData)}
+                                    data={users}
+                                    columnFilters={columnFilters}
+                                    onColumnFiltersChange={setColumnFilters}
+                                />
+                            </div>
+                        </div>
                         <FormDialog
                             title={`Assign Roles to ${editingUser?.name}`}
                             isOpen={isDialogOpen}

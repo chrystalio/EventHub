@@ -186,18 +186,22 @@ export default function Index({ roles }: { roles: Role[] }) {
                             />
                         </div>
                         {Array.isArray(roles) && (
-                            <DataTable
-                                columns={getColumns(
-                                    setEditingRole,
-                                    setIsDialogOpen,
-                                    setRoleToDelete,
-                                    setIsDeleteDialogOpen,
-                                    handleManagePermissions
-                                )}
-                                data={roles}
-                                columnFilters={columnFilters}
-                                onColumnFiltersChange={setColumnFilters}
-                            />
+                            <div className="grid">
+                                <div className="overflow-x-auto">
+                                    <DataTable
+                                        columns={getColumns(
+                                            setEditingRole,
+                                            setIsDialogOpen,
+                                            setRoleToDelete,
+                                            setIsDeleteDialogOpen,
+                                            handleManagePermissions
+                                        )}
+                                        data={roles}
+                                        columnFilters={columnFilters}
+                                        onColumnFiltersChange={setColumnFilters}
+                                    />
+                                </div>
+                            </div>
                         )}
                     </CardContent>
                 </Card>

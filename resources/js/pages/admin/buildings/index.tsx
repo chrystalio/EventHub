@@ -91,12 +91,16 @@ export default function Index({ buildings }: { buildings: Building[] }) {
                             </Button>
                         </div>
 
-                        <DataTable
-                            columns={getColumns({ onEdit: handleEdit, onDelete: handleDelete })}
-                            data={buildings}
-                            columnFilters={columnFilters}
-                            onColumnFiltersChange={setColumnFilters}
-                        />
+                        <div className="grid">
+                            <div className="overflow-x-auto">
+                                <DataTable
+                                    columns={getColumns({ onEdit: handleEdit, onDelete: handleDelete })}
+                                    data={buildings}
+                                    columnFilters={columnFilters}
+                                    onColumnFiltersChange={setColumnFilters}
+                                />
+                            </div>
+                        </div>
                     </CardContent>
                 </Card>
             </div>
@@ -110,26 +114,17 @@ export default function Index({ buildings }: { buildings: Building[] }) {
                     }
                 }}
                 onSubmit={handleSubmit}
-                isLoading={processing}>
+                isLoading={processing}
+            >
                 <div className="space-y-4">
                     <div className="space-y-2">
                         <Label htmlFor="code">Building Code</Label>
-                        <Input
-                            id="code"
-                            value={data.code}
-                            onChange={(e) => setData('code', e.target.value)}
-                            required
-                        />
+                        <Input id="code" value={data.code} onChange={(e) => setData('code', e.target.value)} required />
                         {errors.code && <p className="text-sm text-red-500">{errors.code}</p>}
                     </div>
                     <div className="space-y-2">
                         <Label htmlFor="name">Building Name</Label>
-                        <Input
-                            id="name"
-                            value={data.name}
-                            onChange={(e) => setData('name', e.target.value)}
-                            required
-                        />
+                        <Input id="name" value={data.name} onChange={(e) => setData('name', e.target.value)} required />
                         {errors.name && <p className="text-sm text-red-500">{errors.name}</p>}
                     </div>
                 </div>
