@@ -64,6 +64,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::patch('/registrations/{registration}/reject', [RegistrationManagementController::class, 'reject'])->name('admin.registrations.reject');
 
         Route::get('/questionnaire-categories', [QuestionnaireCategoryController::class, 'index'])->name('admin.questionnaire-categories.index')->middleware('can:questionnairecategory.view');
+        Route::get('/questionnaire-categories/{questionnaireCategory}', [QuestionnaireCategoryController::class, 'show'])->name('admin.questionnaire-categories.show')->middleware('can:questionnairecategory.view');
         Route::post('/questionnaire-categories', [QuestionnaireCategoryController::class, 'store'])->name('admin.questionnaire-categories.store')->middleware('can:questionnairecategory.create');
         Route::put('/questionnaire-categories/{questionnaireCategory}', [QuestionnaireCategoryController::class, 'update'])->name('admin.questionnaire-categories.update')->middleware('can:questionnairecategory.update');
         Route::delete('/questionnaire-categories/{questionnaireCategory}', [QuestionnaireCategoryController::class, 'destroy'])->name('admin.questionnaire-categories.destroy')->middleware('can:questionnairecategory.delete');

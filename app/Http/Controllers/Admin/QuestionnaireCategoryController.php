@@ -42,6 +42,13 @@ class QuestionnaireCategoryController extends Controller
             ->with('success', 'Questionnaire category updated successfully.');
     }
 
+    public function show(QuestionnaireCategory $questionnaireCategory): Response
+    {
+        return Inertia::render('admin/questionnaire-categories/show', [
+            'questionnaireCategory' => $questionnaireCategory->load('questions'),
+        ]);
+    }
+
     public function destroy(QuestionnaireCategory $questionnaireCategory): RedirectResponse
     {
         $questionnaireCategory->delete();
