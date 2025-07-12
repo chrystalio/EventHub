@@ -12,7 +12,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Switch } from "@/components/ui/switch";
 import { getColumns } from './columns';
-import type { BreadcrumbItem, QuestionnaireCategory } from '@/types';
+import type { BreadcrumbItem, QuestionnaireCategory, QuestionnaireFormData } from '@/types';
 import { PlusCircle } from 'lucide-react';
 import { useFlashToast } from '@/hooks/useFlashToast';
 
@@ -22,7 +22,7 @@ interface IndexProps {
 
 const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Dashboard', href: route('dashboard') },
-    { title: 'Questionnaire Categories', href: route('admin.questionnaire-categories.index') },
+    { title: 'Questionnaires', href: route('admin.questionnaire-categories.index') },
 ];
 
 export default function Index({ questionnaireCategories = [] }: IndexProps) {
@@ -33,7 +33,7 @@ export default function Index({ questionnaireCategories = [] }: IndexProps) {
     const [editingQuestionnaire, setEditingQuestionnaire] = useState<QuestionnaireCategory | null>(null);
     const [questionnaireToDelete, setQuestionnaireToDelete] = useState<QuestionnaireCategory | null>(null);
 
-    const { data, setData, post, put, delete: destroy, processing, errors, reset } = useForm({
+    const { data, setData, post, put, delete: destroy, processing, errors, reset } = useForm<QuestionnaireFormData>({
         title: '',
         description: '',
         is_active: false,
@@ -86,7 +86,7 @@ export default function Index({ questionnaireCategories = [] }: IndexProps) {
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title="Questionnaire Category Management" />
+            <Head title="Questionnaire Management" />
 
             <div className="m-4">
                 <Card>
