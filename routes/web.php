@@ -3,6 +3,7 @@
 use App\Http\Controllers\Admin\BuildingController;
 use App\Http\Controllers\Admin\EventController;
 use App\Http\Controllers\Admin\EventStaffController;
+use App\Http\Controllers\Admin\QuestionnaireCategoryController;
 use App\Http\Controllers\Admin\RegistrationManagementController;
 use App\Http\Controllers\Admin\RoleController;
 use App\Http\Controllers\Admin\RolePermissionController;
@@ -61,6 +62,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
         Route::patch('/registrations/{registration}/approve', [RegistrationManagementController::class, 'approve'])->name('admin.registrations.approve');
         Route::patch('/registrations/{registration}/reject', [RegistrationManagementController::class, 'reject'])->name('admin.registrations.reject');
+
+        Route::get('/questionnaire-categories', [QuestionnaireCategoryController::class, 'index'])->name('admin.questionnaire-categories.index')->middleware('can:questionnairecategory.view');
+        Route::post('/questionnaire-categories', [QuestionnaireCategoryController::class, 'store'])->name('admin.questionnaire-categories.store')->middleware('can:questionnairecategory.create');
+        Route::put('/questionnaire-categories/{questionnaireCategory}', [QuestionnaireCategoryController::class, 'update'])->name('admin.questionnaire-categories.update')->middleware('can:questionnairecategory.update');
+        Route::delete('/questionnaire-categories/{questionnaireCategory}', [QuestionnaireCategoryController::class, 'destroy'])->name('admin.questionnaire-categories.destroy')->middleware('can:questionnairecategory.delete');
     });
 
     Route::prefix('/registrants')->group(function() {
