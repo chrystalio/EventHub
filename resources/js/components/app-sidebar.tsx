@@ -18,6 +18,7 @@ import {
     CalendarIcon,
     TicketIcon,
     Briefcase,
+    ClipboardList
 } from 'lucide-react';
 import AppLogo from './app-logo';
 
@@ -27,6 +28,7 @@ const rawNavItems: NavItem[] = [
     { title: 'Browse Events', url: route('registrations.browse'), icon: CalendarIcon, role: 'Peserta' },
     { title: 'My Registrations', url: route('registrations.index'), icon: TicketIcon, role: 'Peserta' },
     { title: 'Events', url: route('admin.events.index'), icon: CalendarRange, role: ['System Administrator', 'Akademik'] },
+    { title: 'Questionnaires', url: route('admin.questionnaire-categories.index'), icon: ClipboardList, role: ['System Administrator', 'Akademik'] },
     { title: 'Buildings', url: route('admin.buildings.index'), icon: Building, role: ['System Administrator', 'Akademik'] },
     { title: 'Rooms', url: route('admin.rooms.index'), icon: DoorOpenIcon, role: ['System Administrator', 'Akademik'] },
     { title: 'Users', url: route('admin.users.index'), icon: Users, role: ['System Administrator', 'Akademik'] },
