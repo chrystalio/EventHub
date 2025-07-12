@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('questions', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('questionnaire_id')->constrained()->onDelete('cascade');
+            $table->foreignId('questionnaire_category_id')->constrained()->onDelete('cascade');
             $table->text('label');
             $table->string('type');
             $table->integer('order_column')->default(0);
