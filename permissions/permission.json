@@ -123,5 +123,45 @@
         "name": "event.delete",
         "shortname": "Admin - Manage Events",
         "guard_name": "web"
+    },
+    {
+        "name": "registration.view",
+        "shortname": "Registrant - Manage Registration",
+        "guard_name": "web"
+    },
+    {
+        "name": "registration.create",
+        "shortname": "Registrant - Manage Registration",
+        "guard_name": "web"
+    },
+    {
+        "name": "registration.update",
+        "shortname": "Registrant - Manage Registration",
+        "guard_name": "web"
+    },
+    {
+        "name": "registration.delete",
+        "shortname": "Registrant - Manage Registration",
+        "guard_name": "web"
+    },
+    {
+        "name": "questionnairecategory.view",
+        "shortname": "Admin - Manage Questionnaire Category",
+        "guard_name": "web"
+    },
+    {
+        "name": "questionnairecategory.create",
+        "shortname": "Admin - Manage Questionnaire Category",
+        "guard_name": "web"
+    },
+    {
+        "name": "questionnairecategory.update",
+        "shortname": "Admin - Manage Questionnaire Category",
+        "guard_name": "web"
+    },
+    {
+        "name": "questionnairecategory.delete",
+        "shortname": "Admin - Manage Questionnaire Category",
+        "guard_name": "web"
     }
 ]
