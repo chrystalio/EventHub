@@ -42,6 +42,16 @@ export interface Event {
     staff?: User[];
 }
 
+export interface QuestionnaireCategory {
+    id: number;
+    title: string;
+    description: string | null;
+    is_active: boolean;
+    questions_count: number;
+    created_at: string;
+    updated_at: string;
+}
+
 export interface Registration {
     id: number;
     uuid: string;
