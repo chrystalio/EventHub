@@ -4,6 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class UpdateQuestionnaireCategoryRequest extends FormRequest
 {
@@ -23,7 +24,12 @@ class UpdateQuestionnaireCategoryRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'title' => 'required|string|max:255',
+            'title' => [
+                'required',
+                'string',
+                'max:255',
+                Rule::unique('questionnaire_categories', 'title')->ignore($this->route('questionnaireCategory'))
+            ],
             'description' => 'nullable|string|max:1000',
             'is_active' => 'boolean',
         ];

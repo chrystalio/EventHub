@@ -23,7 +23,7 @@ class StoreQuestionnaireCategoryRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'title' => 'required|string|max:255',
+            'title' => 'required|string|max:255|unique:questionnaire_categories,title',
             'description' => 'nullable|string|max:1000',
             'is_active' => 'boolean',
         ];
