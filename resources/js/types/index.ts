@@ -52,6 +52,13 @@ export interface QuestionnaireCategory {
     updated_at: string;
 }
 
+export interface QuestionnaireFormData {
+    title: string;
+    description: string;
+    is_active: boolean;
+    [key: string]: any;
+}
+
 export interface Registration {
     id: number;
     uuid: string;
