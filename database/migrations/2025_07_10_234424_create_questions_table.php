@@ -16,6 +16,7 @@ return new class extends Migration
             $table->foreignId('questionnaire_category_id')->constrained()->onDelete('cascade');
             $table->text('label');
             $table->string('type');
+            $table->json('options')->nullable();
             $table->integer('order_column')->default(0);
             $table->timestamps();
         });
