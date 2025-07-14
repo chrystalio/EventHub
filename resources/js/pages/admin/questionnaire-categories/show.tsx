@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import AppLayout from '@/layouts/app-layout';
-import { Head, useForm, Link } from '@inertiajs/react';
+import { Head, useForm, Link, router } from '@inertiajs/react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -13,33 +13,32 @@ import {
     DropdownMenu,
     DropdownMenuContent,
     DropdownMenuItem,
-    DropdownMenuLabel,
-    DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { ArrowLeft, Edit, Plus, ClipboardList, Calendar, FileText, MoreHorizontal, Trash2 } from 'lucide-react';
-import type { BreadcrumbItem, QuestionnaireCategory } from '@/types';
+import type { BreadcrumbItem, QuestionnaireCategory, Question } from '@/types';
 import { useFlashToast } from '@/hooks/useFlashToast';
+import { QuestionFormModal } from '@/components/form/question-form';
+import { ConfirmDialog } from '@/components/ui/confirm-dialog';
 
 interface ShowPageProps {
-    questionnaireCategory: QuestionnaireCategory & {
-        questions_count?: number;
-    };
+    questionnaireCategory: QuestionnaireCategory;
+    questions: Question[];
 }
 
 type QuestionnaireFormData = Pick<QuestionnaireCategory, 'title' | 'description' | 'is_active'>;
 
 const formatDate = (dateString: string): string => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric',
-    });
+    return new Date(dateString).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
 };
 
 export default function Show({ questionnaireCategory, questions = [] }: ShowPageProps) {
     useFlashToast();
     const [isEditModalOpen, setEditModalOpen] = useState(false);
+    const [questionModalOpen, setQuestionModalOpen] = useState(false);
+    const [editingQuestion, setEditingQuestion] = useState<Question | null>(null);
+    const [questionToDelete, setQuestionToDelete] = useState<Question | null>(null);
 
     const breadcrumbs: BreadcrumbItem[] = [
         { title: 'Dashboard', href: route('dashboard') },
@@ -47,13 +46,40 @@ export default function Show({ questionnaireCategory, questions = [] }: ShowPage
         { title: questionnaireCategory.title, href: '#' },
     ];
 
-    const hasQuestions = questions.length > 0;
+    const handleAddQuestion = () => {
+        setEditingQuestion(null);
+        setQuestionModalOpen(true);
+    };
+
+    const handleDeleteQuestion = (question: Question) => {
+        setQuestionToDelete(question);
+    };
+
+    const handleConfirmDeleteQuestion = () => {
+        if (!questionToDelete) return;
+
+        router.delete(
+            route('admin.questionnaire-categories.questions.destroy', {
+                questionnaireCategory: questionnaireCategory.id,
+                question: questionToDelete.id,
+            }),
+            {
+                onSuccess: () => setQuestionToDelete(null),
+                preserveScroll: true,
+            },
+        );
+    };
+
+    const handleEditQuestion = (question: Question) => {
+        setEditingQuestion(question);
+        setQuestionModalOpen(true);
+    };
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={`${questionnaireCategory.title} - Questionnaire Category`} />
 
-            <div className="p-4 lg:p-6 max-w-screen-2xl space-y-6">
+            <div className="p-4 lg:p-6 max-screen-3xl space-y-6">
                 <div className="bg-white rounded-lg border shadow-sm p-4 lg:p-6">
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                         <div className="flex items-center gap-3">
@@ -63,7 +89,7 @@ export default function Show({ questionnaireCategory, questions = [] }: ShowPage
                                 </Link>
                             </Button>
                             <div className="min-w-0 flex-1">
-                                <h1 className="text-xl lg:text-xl font-bold text-gray-900 truncate" title={questionnaireCategory.title}>
+                                <h1 className="text-xl lg:text-2xl font-bold text-gray-900 truncate" title={questionnaireCategory.title}>
                                     {questionnaireCategory.title}
                                 </h1>
                             </div>
@@ -80,15 +106,9 @@ export default function Show({ questionnaireCategory, questions = [] }: ShowPage
                                     </Button>
                                 </DropdownMenuTrigger>
                                 <DropdownMenuContent align="end" className="w-48">
-                                    <DropdownMenuLabel>Manage Category</DropdownMenuLabel>
-                                    <DropdownMenuSeparator />
                                     <DropdownMenuItem onSelect={() => setEditModalOpen(true)}>
                                         <Edit className="mr-2 h-4 w-4" />
                                         <span>Edit Details</span>
-                                    </DropdownMenuItem>
-                                    <DropdownMenuItem disabled>
-                                        <Trash2 className="mr-2 h-4 w-4" />
-                                        <span>Delete (soon)</span>
                                     </DropdownMenuItem>
                                 </DropdownMenuContent>
                             </DropdownMenu>
@@ -96,6 +116,97 @@ export default function Show({ questionnaireCategory, questions = [] }: ShowPage
                     </div>
                 </div>
                 <div className="grid w-full grid-cols-1 lg:grid-cols-10 gap-6">
+                    <Card className="lg:col-span-7">
+                        <CardHeader>
+                            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                                <CardTitle className="flex items-center text-base">
+                                    <ClipboardList className="h-4 w-4 mr-2 text-gray-500" />
+                                    Questions
+                                    <Badge variant="outline" className="ml-2 font-mono text-xs">{questions.length}</Badge>
+                                </CardTitle>
+                                <Button size="sm" onClick={handleAddQuestion}>
+                                    <Plus className="h-4 w-4 mr-2" />
+                                    Add Question
+                                </Button>
+                            </div>
+                        </CardHeader>
+                        <CardContent>
+                            {questions.length > 0 ? (
+                                <Accordion type="multiple" className="w-full space-y-2">
+                                    {questions.map((question) => (
+                                        <AccordionItem key={question.id} value={`question-${question.id}`} className="border rounded-lg bg-white">
+                                            <div className="flex items-center">
+                                                <AccordionTrigger className="flex-1 px-4 py-3 text-left hover:no-underline">
+                                                    <div className="flex items-center gap-4">
+                                                        <span className="text-sm font-mono text-gray-500">#{question.order_column}</span>
+                                                        <p className="font-medium text-gray-900">{question.label}</p>
+                                                    </div>
+                                                </AccordionTrigger>
+                                                <div className="px-4 py-3">
+                                                    <DropdownMenu>
+                                                        <DropdownMenuTrigger asChild>
+                                                            <Button variant="ghost" size="sm" className="shrink-0" aria-label={`Actions for question: ${question.label}`}>
+                                                                <MoreHorizontal className="h-4 w-4" />
+                                                            </Button>
+                                                        </DropdownMenuTrigger>
+                                                        <DropdownMenuContent align="end" className="w-40">
+                                                            <DropdownMenuItem onClick={() => handleEditQuestion(question)}>
+                                                                <Edit className="mr-2 h-4 w-4" /> Edit
+                                                            </DropdownMenuItem>
+                                                            <DropdownMenuItem
+                                                                className="text-red-600 focus:text-red-600"
+                                                                onSelect={() => handleDeleteQuestion(question)}
+                                                            >
+                                                                <Trash2 className="mr-2 h-4 w-4" /> Delete
+                                                            </DropdownMenuItem>
+
+                                                        </DropdownMenuContent>
+                                                    </DropdownMenu>
+                                                </div>
+                                            </div>
+
+                                            <AccordionContent className="border-t px-4 py-4 bg-gray-50/50">
+                                                <div className="space-y-3 text-sm">
+                                                    <div className="flex items-center">
+                                                        <Label className="w-20 text-gray-500 font-medium">Type:</Label>
+                                                        <Badge variant="outline" className="capitalize">
+                                                            {question.type === 'open' ? 'Open Text' : 'Likert Scale'}
+                                                        </Badge>
+                                                    </div>
+                                                    {question.options && question.options.length > 0 && (
+                                                        <div className="flex items-start">
+                                                            <Label className="w-20 mt-1 text-gray-500 font-medium">Options:</Label>
+                                                            <div className="flex flex-wrap gap-2">
+                                                                {(question.options as string[]).map((option, index) => (
+                                                                    <Badge key={index} variant="secondary">
+                                                                        {option}
+                                                                    </Badge>
+                                                                ))}
+                                                            </div>
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            </AccordionContent>
+                                        </AccordionItem>
+                                    ))}
+                                </Accordion>
+                            ) : (
+                                <div className="text-center py-12">
+                                    <div className="w-16 h-16 mx-auto bg-gray-100 rounded-full flex items-center justify-center mb-4">
+                                        <ClipboardList className="h-8 w-8 text-gray-400" />
+                                    </div>
+                                    <h3 className="text-lg font-medium text-gray-900">No questions yet</h3>
+                                    <p className="text-sm text-gray-500 mt-2 mb-4 max-w-xs mx-auto">
+                                        Start by adding the first question to this category.
+                                    </p>
+                                    <Button size="sm" variant="outline" onClick={handleAddQuestion}>
+                                        <Plus className="h-4 w-4 mr-2" />
+                                        Add First Question
+                                    </Button>
+                                </div>
+                            )}
+                        </CardContent>
+                    </Card>
                     <Card className="lg:col-span-3 h-fit">
                         <CardHeader>
                             <CardTitle className="flex items-center text-base">
@@ -119,55 +230,21 @@ export default function Show({ questionnaireCategory, questions = [] }: ShowPage
                             </div>
                         </CardContent>
                     </Card>
-                    <Card className="lg:col-span-7">
-                        <CardHeader>
-                            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                                <CardTitle className="flex items-center text-base">
-                                    <ClipboardList className="h-4 w-4 mr-2 text-gray-500" />
-                                    Questions
-                                    <Badge variant="outline" className="ml-2 font-mono text-xs">{questions.length}</Badge>
-                                </CardTitle>
-                                <Button size="sm" disabled>
-                                    <Plus className="h-4 w-4 mr-2" />
-                                    Add Question
-                                </Button>
-                            </div>
-                        </CardHeader>
-                        <CardContent>
-                            {hasQuestions ? (
-                                <div className="text-center py-8 border-2 border-dashed border-gray-200 rounded-lg">
-                                    <p className="text-sm text-gray-500">
-                                        Question rendering will be implemented in the next phase.
-                                    </p>
-                                </div>
-                            ) : (
-                                <div className="text-center py-12">
-                                    <div className="w-16 h-16 mx-auto bg-gray-100 rounded-full flex items-center justify-center mb-4">
-                                        <ClipboardList className="h-8 w-8 text-gray-400" />
-                                    </div>
-                                    <h3 className="text-lg font-medium text-gray-900">No questions yet</h3>
-                                    <p className="text-sm text-gray-500 mt-2 mb-4 max-w-xs mx-auto">
-                                        Get started by adding the first question to this category.
-                                    </p>
-                                    <Button size="sm" variant="outline" disabled>
-                                        <Plus className="h-4 w-4 mr-2" />
-                                        Add First Question
-                                    </Button>
-                                </div>
-                            )}
-                        </CardContent>
-                    </Card>
                 </div>
             </div>
-
-            <EditCategoryDialog
-                category={questionnaireCategory}
-                isOpen={isEditModalOpen}
-                onOpenChange={setEditModalOpen}
+            <EditCategoryDialog category={questionnaireCategory} isOpen={isEditModalOpen} onOpenChange={setEditModalOpen} />
+            <QuestionFormModal category={questionnaireCategory} question={editingQuestion} isOpen={questionModalOpen} onOpenChange={setQuestionModalOpen} />
+            <ConfirmDialog
+                isOpen={!!questionToDelete}
+                onOpenChange={() => setQuestionToDelete(null)}
+                title={`Delete Question: ${questionToDelete?.label}`}
+                description="This action cannot be undone. This will permanently delete the question and reorder remaining questions."
+                onConfirm={handleConfirmDeleteQuestion}
             />
         </AppLayout>
     );
 }
+
 interface EditCategoryDialogProps {
     category: QuestionnaireCategory;
     isOpen: boolean;
@@ -184,13 +261,8 @@ function EditCategoryDialog({ category, isOpen, onOpenChange }: EditCategoryDial
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         put(route('admin.questionnaire-categories.update', category.id), {
-            onSuccess: () => {
-                onOpenChange(false);
-            },
+            onSuccess: () => onOpenChange(false),
             onFinish: () => reset(),
-            onError: () => {
-
-            }
         });
     };
 
