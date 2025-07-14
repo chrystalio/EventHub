@@ -15,23 +15,21 @@ class QuestionnaireCategoryController extends Controller
 {
     public function index(): Response
     {
-        $questionnaireCategories = QuestionnaireCategory::latest()->get();
-
-        $questionnaireCategories->each(function ($category) {
-            $category->questions_count = 0;
-        });
+        $questionnaireCategories = QuestionnaireCategory::withCount('questions')
+            ->latest()
+            ->get();
 
         return Inertia::render('admin/questionnaire-categories/index', [
             'questionnaireCategories' => $questionnaireCategories,
         ]);
     }
 
-
     public function store(StoreQuestionnaireCategoryRequest $request): RedirectResponse
     {
         QuestionnaireCategory::create($request->validated());
 
-        return redirect()->route('admin.questionnaire-categories.index')->with('success', 'Questionnaire category created successfully.');
+        return redirect()->route('admin.questionnaire-categories.index')
+            ->with('success', 'Questionnaire category created successfully.');
     }
 
     public function update(UpdateQuestionnaireCategoryRequest $request, QuestionnaireCategory $questionnaireCategory): RedirectResponse
@@ -44,8 +42,13 @@ class QuestionnaireCategoryController extends Controller
 
     public function show(QuestionnaireCategory $questionnaireCategory): Response
     {
+        $questionnaireCategory->load(['questions' => function ($query) {
+            $query->orderBy('order_column');
+        }]);
+
         return Inertia::render('admin/questionnaire-categories/show', [
-            'questionnaireCategory' => $questionnaireCategory->load('questions'),
+            'questionnaireCategory' => $questionnaireCategory,
+            'questions' => $questionnaireCategory->questions,
         ]);
     }
 
@@ -56,5 +59,4 @@ class QuestionnaireCategoryController extends Controller
         return redirect()->route('admin.questionnaire-categories.index')
             ->with('success', 'Questionnaire category deleted successfully.');
     }
-
 }
