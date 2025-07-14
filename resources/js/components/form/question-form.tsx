@@ -93,7 +93,7 @@
                     },
                 });
             } else {
-                post(route('admin.questionnaire-categories.questions.store', category.id), {
+                post(route('admin.questionnaire-categories.questions.store', { questionnaireCategory: category.id }), {
                     data: submitData,
                     onSuccess: () => {
                         onOpenChange(false);
