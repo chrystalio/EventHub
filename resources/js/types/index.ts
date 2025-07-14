@@ -59,6 +59,17 @@ export interface QuestionnaireFormData {
     [key: string]: any;
 }
 
+export interface Question {
+    id: number;
+    questionnaire_category_id: number;
+    label: string;
+    type: 'open' | 'likert';
+    options?: string[];
+    order_column: number;
+    created_at: string;
+    updated_at: string;
+}
+
 export interface Registration {
     id: number;
     uuid: string;
