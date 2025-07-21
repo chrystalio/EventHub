@@ -51,7 +51,9 @@ export default function Show({ event }: ShowProps) {
     ];
 
     const { auth } = usePage<Page<SharedData>>().props;
-    const isSuperAdmin = auth.user.roles.some((role: { name: string }) => ['System Administrator', 'Akademik'].includes(role.name));
+    const isSuperAdmin = ['System Administrator', 'Akademik'].some(role =>
+        auth.user.roles.includes(role)
+    );
     const startDate = event.start_time.split('T')[0];
     const endDate = event.end_time.split('T')[0];
     const isSameDay = startDate === endDate;
