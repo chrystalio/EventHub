@@ -22,6 +22,16 @@ const StatusInfo = ({ status }) => {
                 </p>
             </div>
         );
+    } else if (status === 'attended') {
+        return (
+            <div className="p-6 text-center">
+                <UsersIcon className="mx-auto h-12 w-12 text-green-500" />
+                <h3 className="mt-2 text-lg font-semibold text-gray-900">Registration Completed</h3>
+                <p className="mt-1 text-sm text-gray-600">
+                    Thank you for attending! Your registration is now complete.
+                </p>
+            </div>
+        );
     }
 
     return (
