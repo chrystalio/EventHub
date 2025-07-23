@@ -47,8 +47,8 @@ export interface Event {
 export interface Registration {
     id: number;
     uuid: string;
-    event_id: number;
-    user_id: number;
+    event_uuid: string;
+    user_uuid: string;
     guest_count: number;
     status: 'approved' | 'pending' | 'rejected' | 'attended' | 'missed';
     registered_at: string;
