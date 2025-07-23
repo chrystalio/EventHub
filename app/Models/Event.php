@@ -19,6 +19,7 @@ class Event extends Model
         'description',
         'organizer',
         'type',
+        'price',
         'start_time',
         'end_time',
         'max_guests_per_registration',
