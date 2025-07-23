@@ -5,7 +5,7 @@ import { Event } from '@/types';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Briefcase } from 'lucide-react';
 import { DataTable } from '@/components/ui/data-table';
-import { columns } from './columns'; // Assuming columns.tsx is in the same directory
+import { columns } from './columns';
 
 interface Props {
     managedEvents: Event[];
@@ -16,7 +16,6 @@ export default function PanitiaEventsIndex({ managedEvents = [] }: Props) {
         <AppLayout>
             <Head title="Managed Events" />
             <div className="space-y-6 p-4 sm:p-6 lg:p-8">
-                {/* Page Header */}
                 <div className="rounded-lg border bg-white p-6 shadow-sm">
                     <div className="flex items-center gap-4">
                         <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-lg bg-indigo-100">
