@@ -77,7 +77,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
             ->name('registrations.browse')
             ->middleware('can:registration.view');
 
-        // Show event details for registration
         Route::get('/events/{event:uuid}', [RegistrationController::class, 'showEvent'])
             ->name('registrations.show_event')
             ->middleware('can:registration.view');
