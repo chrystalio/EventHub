@@ -140,7 +140,7 @@ export default function Show({ event }: ShowProps) {
                                                     <Link
                                                         href={route('admin.events.staff.destroy', {
                                                             event: event.uuid,
-                                                            user: staffMember.id,
+                                                            user: staffMember.uuid,
                                                         })}
                                                         method="delete"
                                                         as="button"
@@ -207,13 +207,13 @@ export default function Show({ event }: ShowProps) {
 
 function AssignStaffForm({ event }: { event: Event }) {
     const { data, setData, post, processing, errors, reset } = useForm({
-        user_id: '',
+        user_uuid: '',
     });
 
     const submit = (e: React.FormEvent) => {
         e.preventDefault();
         post(route('admin.events.staff.store', event.uuid), {
-            onSuccess: () => reset('user_id'),
+            onSuccess: () => reset('user_uuid'),
         });
     };
 
@@ -222,12 +222,12 @@ function AssignStaffForm({ event }: { event: Event }) {
             <h3 className="text-sm font-medium text-muted-foreground">Assign New Staff (Panitia)</h3>
             <div className="flex items-center gap-2">
                 <UserSearchCombobox
-                    value={data.user_id}
-                    onSelect={(userId) => setData('user_id', userId)}
+                    value={data.user_uuid}
+                    onSelect={(userUuid) => setData('user_uuid', userUuid)}
                 />
                 <Button type="submit" disabled={processing}>Assign</Button>
             </div>
-            {errors.user_id && <p className="text-sm text-red-500">{errors.user_id}</p>}
+            {errors.user_uuid && <p className="text-sm text-red-500">{errors.user_uuid}</p>}
         </form>
     );
 }
