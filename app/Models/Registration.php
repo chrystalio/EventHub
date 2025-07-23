@@ -12,7 +12,7 @@ class Registration extends Model
     protected $fillable = [
         'uuid',
         'event_uuid',
-        'user_id',
+        'user_uuid',
         'guest_count',
         'status',
         'registered_at',
@@ -44,12 +44,12 @@ class Registration extends Model
 
     public function event(): BelongsTo
     {
-        return $this->belongsTo(Event::class, 'event_id', 'uuid');
+        return $this->belongsTo(Event::class, 'event_uuid', 'uuid');
     }
 
     public function user(): BelongsTo
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class, 'user_uuid', 'uuid');
     }
 
     public function attendees(): HasMany
