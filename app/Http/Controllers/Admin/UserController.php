@@ -39,9 +39,9 @@ class UserController extends Controller
                     ->orWhere('email', 'LIKE', "%{$query}%");
             })
                 ->limit(10)
-                ->get(['id', 'name', 'email']);
+                ->get(['uuid', 'name', 'email']);
         } else {
-            $users = $userQuery->latest()->limit(5)->get(['id', 'name', 'email']);
+            $users = $userQuery->latest()->limit(5)->get(['uuid', 'name', 'email']);
         }
 
         return response()->json($users);
