@@ -66,19 +66,31 @@ class Event extends Model
 
     public function registrations(): HasMany
     {
-        return $this->hasMany(Registration::class);
+        return $this->hasMany(Registration::class, 'event_uuid', 'uuid');
     }
 
     public function staff(): BelongsToMany
     {
-        return $this->belongsToMany(User::class, 'event_staff', 'event_id', 'user_id')
-            ->withPivot('role')
-            ->withTimestamps();
+        return $this->belongsToMany(
+            User::class,
+            'event_staff',
+            'event_uuid',
+            'user_uuid',
+            'uuid',
+            'uuid'
+        )->withPivot('role')->withTimestamps();
     }
 
     public function attendees(): HasManyThrough
     {
-        return $this->hasManyThrough(RegistrationAttendee::class, Registration::class);
+        return $this->hasManyThrough(
+            RegistrationAttendee::class,
+            Registration::class,
+            'event_uuid',
+            'registration_id',
+            'uuid',
+            'id'
+        );
     }
     public function getTotalRegisteredAttribute(): int
     {
@@ -88,10 +100,10 @@ class Event extends Model
                 ->where('status', '!=', 'cancelled')
                 ->count();
     }
-    public function isUserRegistered($userId): bool
+    public function isUserRegistered($userUuid): bool
     {
         return $this->registrations()
-            ->where('user_id', $userId)
+            ->where('user_uuid', $userUuid)
             ->where('status', '!=', 'cancelled')
             ->exists();
     }

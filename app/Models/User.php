@@ -85,13 +85,18 @@ class User extends Authenticatable implements MustVerifyEmail
 
     public function managedEvents()
     {
-        return $this->belongsToMany(Event::class, 'event_staff', 'user_id', 'event_id')
-            ->withPivot('role')
-            ->withTimestamps();
+        return $this->belongsToMany(
+            Event::class,
+            'event_staff',
+            'user_uuid',
+            'event_uuid',
+            'uuid',
+            'uuid'
+        )->withPivot('role')->withTimestamps();
     }
 
     public function registrations(): HasMany
     {
-        return $this->hasMany(Registration::class);
+        return $this->hasMany(Registration::class, 'user_uuid', 'uuid');
     }
 }
