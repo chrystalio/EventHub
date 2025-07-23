@@ -64,7 +64,6 @@ class EventController extends Controller
         return inertia('admin/events/show', [
             'event' => $event,
         ]);
-
     }
 
     /**
