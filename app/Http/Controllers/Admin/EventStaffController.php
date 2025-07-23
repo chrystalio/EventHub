@@ -17,20 +17,14 @@ class EventStaffController extends Controller
             'user_uuid' => 'required|exists:users,uuid'
         ]);
 
-        $user = User::find($validated['user_uuid']);
+        $user = User::where('uuid', $validated['user_uuid'])->firstOrFail();
 
-        $currentRoles = $user->getRoleNames()->toArray();
-
-        if (!in_array('Panitia', $currentRoles, true)) {
-            $currentRoles[] = 'Panitia';
+        if (!$user->hasRole('Panitia')) {
+            $user->assignRole('Panitia');
         }
 
-        app(PermissionRegistrar::class)->forgetCachedPermissions();
-
-        $user->syncRoles($currentRoles);
-
         $event->staff()->syncWithoutDetaching([
-            $validated['user_uuid'] => ['role' => 'panitia']
+            $user->uuid => ['role' => 'panitia']
         ]);
 
         return back()->with('success', 'User successfully assigned as Panitia.');
@@ -40,7 +34,7 @@ class EventStaffController extends Controller
     {
         $event->staff()->detach($user->uuid);
 
-        $remainingAssignments = $event->staff()->count();
+        $remainingAssignments = $user->managedEvents()->count();
 
         if ($remainingAssignments === 0 && $user->hasRole('Panitia')) {
             $user->removeRole('Panitia');
