@@ -14,10 +14,10 @@ class EventStaffController extends Controller
     public function store(Request $request, Event $event): RedirectResponse
     {
         $validated = $request->validate([
-            'user_id' => 'required|exists:users,id'
+            'user_uuid' => 'required|exists:users,uuid'
         ]);
 
-        $user = User::find($validated['user_id']);
+        $user = User::find($validated['user_uuid']);
 
         $currentRoles = $user->getRoleNames()->toArray();
 
@@ -30,7 +30,7 @@ class EventStaffController extends Controller
         $user->syncRoles($currentRoles);
 
         $event->staff()->syncWithoutDetaching([
-            $validated['user_id'] => ['role' => 'panitia']
+            $validated['user_uuid'] => ['role' => 'panitia']
         ]);
 
         return back()->with('success', 'User successfully assigned as Panitia.');
@@ -38,7 +38,7 @@ class EventStaffController extends Controller
 
     public function destroy(Event $event, User $user): RedirectResponse
     {
-        $event->staff()->detach($user->id);
+        $event->staff()->detach($user->uuid);
 
         $remainingAssignments = $event->staff()->count();
 
