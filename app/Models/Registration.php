@@ -11,7 +11,7 @@ class Registration extends Model
 {
     protected $fillable = [
         'uuid',
-        'event_id',
+        'event_uuid',
         'user_id',
         'guest_count',
         'status',
@@ -44,7 +44,7 @@ class Registration extends Model
 
     public function event(): BelongsTo
     {
-        return $this->belongsTo(Event::class);
+        return $this->belongsTo(Event::class, 'event_id', 'uuid');
     }
 
     public function user(): BelongsTo
