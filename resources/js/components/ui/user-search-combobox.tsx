@@ -12,7 +12,7 @@ import { useEffect, useState } from "react"
 
 interface UserSearchComboboxProps {
     value: string;
-    onSelect: (userId: string) => void;
+    onSelect: (userUuid: string) => void;
 }
 
 export function UserSearchCombobox({ value, onSelect }: UserSearchComboboxProps) {
@@ -45,7 +45,7 @@ export function UserSearchCombobox({ value, onSelect }: UserSearchComboboxProps)
         };
     }, [searchQuery, open]);
 
-    const selectedUser = results.find(user => user.id.toString() === value);
+    const selectedUser = results.find(user => user.uuid === value);
 
     return (
         <Popover open={open} onOpenChange={setOpen}>
@@ -73,10 +73,10 @@ export function UserSearchCombobox({ value, onSelect }: UserSearchComboboxProps)
                         <CommandGroup>
                             {results.map((user) => (
                                 <CommandItem
-                                    key={user.id}
+                                    key={user.uuid}
                                     value={user.name}
                                     onSelect={() => {
-                                        onSelect(user.id.toString() === value ? "" : user.id.toString());
+                                        onSelect(user.uuid === value ? "" : user.uuid);
                                         setOpen(false);
                                     }}
                                 >
@@ -84,7 +84,7 @@ export function UserSearchCombobox({ value, onSelect }: UserSearchComboboxProps)
                                     <Check
                                         className={cn(
                                             "ml-auto h-4 w-4",
-                                            value === user.id.toString() ? "opacity-100" : "opacity-0"
+                                            value === user.uuid ? "opacity-100" : "opacity-0"
                                         )}
                                     />
                                 </CommandItem>
