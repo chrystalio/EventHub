@@ -7,8 +7,10 @@ export interface Auth {
 
 export interface AuthUser {
     id: number
+    uuid: string
     name: string
     email: string
+    phone: string;
     permissions: string[]
 }
 
@@ -134,8 +136,10 @@ export interface SharedData {
 
 export interface User {
     id: number;
+    uuid: string;
     name: string;
     email: string;
+    phone?: string;
     avatar?: string;
     email_verified_at: string | null;
     created_at: string;
