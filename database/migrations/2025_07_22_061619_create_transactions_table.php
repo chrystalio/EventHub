@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('transactions', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_uuid')->constrained('users')->onDelete('cascade');
+            $table->uuid('user_uuid');
             $table->uuid('event_uuid');
             $table->string('order_id')->unique();
             $table->unsignedBigInteger('total_amount');
@@ -22,6 +22,9 @@ return new class extends Migration
             $table->json('payment_details')->nullable();
             $table->timestamp('expires_at')->nullable();
             $table->timestamps();
+
+            $table->foreign('user_uuid')->references('uuid')->on('users')->onDelete('cascade');
+            $table->foreign('event_uuid')->references('uuid')->on('events')->onDelete('cascade');
         });
     }
 
