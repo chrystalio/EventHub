@@ -13,6 +13,7 @@ class Registration extends Model
         'uuid',
         'event_uuid',
         'user_uuid',
+        'order_id',
         'guest_count',
         'status',
         'registered_at',
