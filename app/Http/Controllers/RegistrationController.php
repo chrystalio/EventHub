@@ -117,7 +117,7 @@ class RegistrationController extends Controller
             $timeCode = strtoupper(base_convert($timestamp, 10, 36));
             $UniqueId = strtoupper(Str::random(3));
 
-            $orderId = 'REG-' . $timeCode . '-' . $UniqueId;
+            $orderId = 'REG-' . $timeCode.$UniqueId;
 
             DB::beginTransaction();
             try {
