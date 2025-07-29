@@ -7,11 +7,11 @@ use App\Models\Transaction;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Midtrans\Config;
 use Midtrans\Snap;
 use Inertia\Inertia;
 use Inertia\Response;
-use Midtrans\Notification;
 
 class TransactionController extends Controller
 {
@@ -59,14 +59,23 @@ class TransactionController extends Controller
         ]);
     }
 
-    public function webhook(Request $request): ?JsonResponse
+    public function webhook(Request $request): JsonResponse
     {
         try {
-            $notification = new Notification();
+            $payload = json_decode($request->getContent(), true, 512, JSON_THROW_ON_ERROR);
+            $orderId = $payload['order_id'];
+            $statusCode = $payload['status_code'];
+            $grossAmount = $payload['gross_amount'];
+            $serverKey = config('services.midtrans.server_key');
 
-            $orderId = $notification->order_id;
-            $transactionStatus = $notification->transaction_status;
-            $fraudStatus = $notification->fraud_status;
+            $signature = hash('sha512', $orderId . $statusCode . $grossAmount . $serverKey);
+
+            if ($signature !== $payload['signature_key']) {
+                return response()->json(['message' => 'Invalid signature.'], 403);
+            }
+
+            $transactionStatus = $payload['transaction_status'];
+            $fraudStatus = $payload['fraud_status'];
 
             $transaction = Transaction::where('order_id', $orderId)->first();
 
@@ -80,28 +89,30 @@ class TransactionController extends Controller
 
             if ($transactionStatus === 'capture' || $transactionStatus === 'settlement') {
                 if ($fraudStatus === 'accept') {
-                    DB::transaction(function () use ($transaction, $notification) {
+                    DB::transaction(function () use ($transaction, $payload) {
                         $transaction->update([
                             'status' => 'paid',
-                            'transaction_id' => $notification->transaction_id,
-                            'payment_details' => $notification->getResponse(),
+                            'transaction_id' => $payload['transaction_id'],
+                            'payment_details' => $payload,
                         ]);
-
 
                         Registration::where('order_id', $transaction->order_id)
                             ->update(['status' => 'approved']);
                     });
                 }
-            } else if ($transactionStatus === 'pending') {
-
             } else if ($transactionStatus === 'deny' || $transactionStatus === 'expire' || $transactionStatus === 'cancel') {
-
                 $transaction->update(['status' => 'failed']);
             }
 
             return response()->json(['message' => 'Webhook processed successfully.']);
 
         } catch (\Exception $e) {
+            Log::error('Midtrans Webhook Error: ' . $e->getMessage(), [
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+                'request_body' => $request->getContent()
+            ]);
+
             report($e);
             return response()->json(['message' => 'Error processing webhook.'], 500);
         }
