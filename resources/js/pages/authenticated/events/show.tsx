@@ -22,6 +22,7 @@ import {
 import { formatDateTime } from '@/utils/dateUtils';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { PhoneInput } from '@/components/form/phone-input';
 
 interface PageProps {
     event: Event;
@@ -169,7 +170,14 @@ const RegistrationForm = ({ event, onSubmit, ...formProps }) => (
                 </div>
                 <div>
                     <Label htmlFor={`guest_phone_${index}`}>Phone Number</Label>
-                    <Input id={`guest_phone_${index}`} type="text" value={guest.phone} onChange={(e) => formProps.handleGuestDetailChange(index, 'phone', e.target.value)} required />
+                    <PhoneInput
+                        id={`guest_phone_${index}`}
+                        value={guest.phone}
+                        onChange={(value) => formProps.handleGuestDetailChange(index, 'phone', value || '')}
+                        defaultCountry="ID"
+                        placeholder="Enter phone number"
+                        required
+                    />
                     {formProps.errors[`guests.${index}.phone`] && <p className="mt-1 text-xs text-red-500">{formProps.errors[`guests.${index}.phone`]}</p>}
                 </div>
             </div>
