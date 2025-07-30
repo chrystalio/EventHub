@@ -4,10 +4,9 @@ import { useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { useFlashToast } from '@/hooks/useFlashToast';
 import { toast } from 'sonner';
-import type { BreadcrumbItem, SharedData, Transaction } from '@/types';
-import { usePage } from '@inertiajs/react';
+import type { BreadcrumbItem, Transaction } from '@/types';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { Terminal, ShieldCheck, User, Ticket, Clock } from 'lucide-react';
+import { Terminal, ShieldCheck, User, Ticket, Clock, HelpCircle } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
 import { formatDateTime } from '@/utils/dateUtils';
 
@@ -32,32 +31,39 @@ export default function Show({ transaction, snapToken, errors }: ShowProps) {
     }, [errors]);
 
     useEffect(() => {
-        if (!window.snap) {
+        if (!(window as any).snap) {
             console.error("Midtrans Snap.js is not loaded.");
             toast.error("Payment service is currently unavailable. Please refresh the page.");
             return;
         }
 
         if (snapToken) {
-            window.snap.embed(snapToken, {
+            (window as any).snap.embed(snapToken, {
                 embedId: 'snap-container',
-                onSuccess: function (result) {
-                    toast.success("Payment successful!");
-                    router.visit(route('registrations.index'), {
-                        data: { success: 'Payment successful! Your registration is confirmed.' }
-                    });
+                onSuccess: function (result: any) {
+                    toast.success("Payment successful! Redirecting...");
+                    setTimeout(() => {
+                        if (transaction.registration) {
+                            router.visit(route('registrations.show', transaction.registration.uuid));
+                        } else {
+                            router.visit(route('registrations.index'));
+                        }
+                    }, 2000);
                 },
-                onPending: function (result) {
+                onPending: function (result: any) {
                     toast.info("Waiting for your payment. We'll notify you upon confirmation.");
                     router.visit(route('registrations.index'));
                 },
-                onError: function (result) {
+                onError: function (result: any) {
                     toast.error("Payment failed. Please try again.");
                 },
+                onClose: function () {
+                    toast.info("You can complete the payment later from the 'My Registrations' page.");
+                    router.visit(route('registrations.index'), { replace: true });
+                }
             });
         }
-    }, [snapToken]);
-
+    }, [snapToken, transaction]);
     const formattedAmount = new Intl.NumberFormat('id-ID', {
         style: 'currency',
         currency: 'IDR',
@@ -65,7 +71,6 @@ export default function Show({ transaction, snapToken, errors }: ShowProps) {
     }).format(transaction.total_amount);
     const ticketPrice = transaction.event.price ?? 0;
     const ticketCount = ticketPrice > 0 ? Math.round(transaction.total_amount / ticketPrice) : 1;
-
     const expirationDate = transaction.expires_at ? formatDateTime(transaction.expires_at) : 'N/A';
 
     return (
@@ -83,7 +88,6 @@ export default function Show({ transaction, snapToken, errors }: ShowProps) {
 
                     <Card className="overflow-hidden shadow-lg">
                         <div className="grid grid-cols-1 lg:grid-cols-2">
-
                             <div className="p-8 bg-muted/30 flex flex-col">
                                 <CardHeader className="p-0 mb-6">
                                     <CardTitle className="text-2xl">Transaction Summary</CardTitle>
@@ -121,14 +125,13 @@ export default function Show({ transaction, snapToken, errors }: ShowProps) {
                                         <span className="font-semibold">{expirationDate}</span>
                                     </div>
                                 </CardContent>
-                                <CardFooter className="p-0 pt-6 mt-auto">
+                                <CardFooter className="p-0 pt-8 flex flex-col items-center justify-center gap-4">
                                     <div className="flex items-center text-xs text-green-600">
                                         <ShieldCheck className="h-4 w-4 mr-2" />
                                         <span>Secure payment powered by Midtrans</span>
                                     </div>
                                 </CardFooter>
                             </div>
-
                             <div className="p-6 flex items-center justify-center">
                                 {snapToken ? (
                                     <div id="snap-container" className="w-full"></div>
