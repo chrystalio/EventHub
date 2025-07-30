@@ -25,7 +25,9 @@ class TransactionController extends Controller
 
     public function show(string $order_id): Response
     {
-        $transaction = Transaction::where('order_id', $order_id)->with(['event', 'user'])->firstOrFail();
+        $transaction = Transaction::where('order_id', $order_id)
+            ->with(['event', 'user', 'registration'])
+            ->firstOrFail();
 
         if ($transaction->user_uuid !== auth()->user()->uuid) {
             abort(403, 'This is not your transaction.');
@@ -96,8 +98,10 @@ class TransactionController extends Controller
                             'payment_details' => $payload,
                         ]);
 
-                        Registration::where('order_id', $transaction->order_id)
-                            ->update(['status' => 'approved']);
+                        Registration::where('order_id', $transaction->order_id)->update([
+                            'status' => 'approved',
+                            'approved_at' => now(),
+                        ]);
                     });
                 }
             } else if ($transactionStatus === 'deny' || $transactionStatus === 'expire' || $transactionStatus === 'cancel') {
