@@ -122,6 +122,7 @@ const RegistrationStatusCard = ({ registration }: { registration: Registration }
         pending: { icon: ClockIcon, color: 'yellow', title: 'Registration Pending', description: 'Your registration is awaiting approval and will be available here once confirmed.' },
         rejected: { icon: XCircleIcon, color: 'red', title: 'Registration Not Approved', description: 'Unfortunately, your registration for this event was not approved.' },
         cancelled: { icon: XCircleIcon, color: 'red', title: 'Registration Cancelled', description: 'This registration has been cancelled.' },
+        pending_payment: { icon: ClockIcon, color: 'yellow', title: 'Payment Pending', description: 'Your registration is pending payment. Please complete the payment to confirm your registration.' },
     };
     const config = statusMap[registration.status] || statusMap.rejected;
     const Icon = config.icon;
