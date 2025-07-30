@@ -45,13 +45,29 @@ export interface Event {
     staff?: User[];
 }
 
+export interface Transaction {
+    id: number;
+    user_uuid: string;
+    event_uuid: string;
+    order_id: string;
+    total_amount: number;
+    status: 'pending' | 'paid' | 'failed' | 'expired';
+    transaction_id: string | null;
+    expires_at: string | null;
+    created_at: string;
+    updated_at: string;
+    event: Event;
+    user: User;
+    registration?: Registration;
+}
+
 export interface Registration {
     id: number;
     uuid: string;
     event_uuid: string;
     user_uuid: string;
     guest_count: number;
-    status: 'approved' | 'pending' | 'rejected' | 'attended' | 'missed';
+    status: 'approved' | 'pending' | 'rejected' | 'attended' | 'pending_payment' |  'missed';
     registered_at: string;
     approved_at: string | null;
     created_at: string;
