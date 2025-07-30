@@ -1,12 +1,12 @@
 import AppLayout from '@/layouts/app-layout';
 import { Head, router } from '@inertiajs/react';
 import { useEffect } from 'react';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { useFlashToast } from '@/hooks/useFlashToast';
 import { toast } from 'sonner';
 import type { BreadcrumbItem, Transaction } from '@/types';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { Terminal, ShieldCheck, User, Ticket, Clock, HelpCircle } from 'lucide-react';
+import { Terminal, ShieldCheck, User, Ticket, Clock } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
 import { formatDateTime } from '@/utils/dateUtils';
 
