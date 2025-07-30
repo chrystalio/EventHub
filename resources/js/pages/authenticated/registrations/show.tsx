@@ -32,8 +32,17 @@ const StatusInfo = ({ status }) => {
                 </p>
             </div>
         );
+    } else if (status === 'pending_payment') {
+        return (
+            <div className="p-6 text-center">
+                <ClockIcon className="mx-auto h-12 w-12 text-yellow-500" />
+                <h3 className="mt-2 text-lg font-semibold text-gray-900">Payment Pending</h3>
+                <p className="mt-1 text-sm text-gray-600">
+                    Your registration is pending payment. Please complete your payment to finalize your registration.
+                </p>
+            </div>
+        );
     }
-
     return (
         <div className="p-6 text-center">
             <AlertCircleIcon className="mx-auto h-12 w-12 text-red-500" />
