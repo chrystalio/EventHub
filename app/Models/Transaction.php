@@ -32,4 +32,9 @@ class Transaction extends Model
     {
         return $this->belongsTo(Event::class, 'event_uuid', 'uuid');
     }
+
+    public function registration(): BelongsTo
+    {
+        return $this->belongsTo(Registration::class, 'order_id', 'order_id');
+    }
 }
