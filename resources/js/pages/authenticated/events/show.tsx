@@ -140,7 +140,7 @@ const RegistrationStatusCard = ({ registration }: { registration: Registration }
             </CardHeader>
             <CardContent>
                 <p className={`text-sm text-${config.color}-800`}>{config.description}</p>
-                <Button variant="outline" size="sm" className={`mt-4 w-fit border-${config.color}-300 bg-transparent text-${config.color}-700 hover:bg-${config.color}-100`} asChild>
+                <Button variant="outline" size="sm" className={`mt-4 w-full border-${config.color}-300 bg-transparent text-${config.color}-700 hover:bg-${config.color}-100`} asChild>
                     <Link href={route('registrations.index')}>View My Registrations</Link>
                 </Button>
             </CardContent>
