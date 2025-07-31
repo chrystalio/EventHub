@@ -1,80 +1,61 @@
-export const formatDateTime = (datetime: string): string => {
-    if (!datetime) return '-';
-
+const getLocalDate = (datetime: string): Date | null => {
+    if (!datetime) return null;
     const isoDatetime = datetime.replace(' ', 'T');
+    return new Date(isoDatetime.endsWith('Z') ? isoDatetime : isoDatetime + 'Z');
+};
 
-    const [datePart, timePart] = isoDatetime.split('T');
-    const [year, month, day] = datePart.split('-');
+export const formatDateTime = (datetime: string): string => {
+    const date = getLocalDate(datetime);
+    if (!date) return '-';
 
-    if (!timePart) {
-        return datePart;
-    }
-
-    const cleanTimePart = timePart.replace('Z', '').split('.')[0];
-    const [hour, minute] = cleanTimePart.split(':');
-
-    const monthNames = [
-        'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-        'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
-    ];
-
-    const monthName = monthNames[parseInt(month) - 1];
-    return `${day} ${monthName} ${year}, ${hour}:${minute}`;
+    const options: Intl.DateTimeFormatOptions = {
+        day: 'numeric',
+        month: 'short',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: false,
+    };
+    return new Intl.DateTimeFormat('en-GB', options).format(date);
 };
 
 export const formatDateTimeLong = (datetime: string): string => {
-    if (!datetime) return '-';
+    const date = getLocalDate(datetime);
+    if (!date) return '-';
 
-    const [datePart, timePart] = datetime.split('T');
-    const [year, month, day] = datePart.split('-');
-
-    const cleanTimePart = timePart.replace('Z', '').split('.')[0];
-    const [hour, minute] = cleanTimePart.split(':');
-
-    const monthNames = [
-        'January', 'February', 'March', 'April', 'May', 'June',
-        'July', 'August', 'September', 'October', 'November', 'December'
-    ];
-
-    const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-
-    // Calculate day of week (simplified)
-    const date = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
-    const dayName = dayNames[date.getDay()];
-
-    const monthName = monthNames[parseInt(month) - 1];
-    const hourNum = parseInt(hour);
-    const ampm = hourNum >= 12 ? 'PM' : 'AM';
-    const hour12 = hourNum % 12 || 12;
-
-    return `${dayName}, ${monthName} ${parseInt(day)}, ${year} at ${hour12}:${minute} ${ampm}`;
+    const options: Intl.DateTimeFormatOptions = {
+        weekday: 'long',
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+        hour: 'numeric',
+        minute: '2-digit',
+        hour12: true,
+    };
+    const formatted = new Intl.DateTimeFormat('en-US', options).format(date);
+    return formatted.replace(' at', ' at');
 };
 
 export const formatDateOnly = (datetime: string): string => {
-    if (!datetime) return '-';
+    const date = getLocalDate(datetime);
+    if (!date) return '-';
 
-    const [datePart] = datetime.split('T');
-    const [year, month, day] = datePart.split('-');
-
-    const monthNames = [
-        'January', 'February', 'March', 'April', 'May', 'June',
-        'July', 'August', 'September', 'October', 'November', 'December'
-    ];
-
-    const monthName = monthNames[parseInt(month) - 1];
-    return `${monthName} ${parseInt(day)}, ${year}`;
+    const options: Intl.DateTimeFormatOptions = {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+    };
+    return new Intl.DateTimeFormat('en-US', options).format(date);
 };
 
 export const formatTimeOnly = (datetime: string): string => {
-    if (!datetime) return '-';
+    const date = getLocalDate(datetime);
+    if (!date) return '-';
 
-    const [, timePart] = datetime.split('T');
-    const cleanTimePart = timePart.replace('Z', '').split('.')[0];
-    const [hour, minute] = cleanTimePart.split(':');
-
-    const hourNum = parseInt(hour);
-    const ampm = hourNum >= 12 ? 'PM' : 'AM';
-    const hour12 = hourNum % 12 || 12;
-
-    return `${hour12}:${minute} ${ampm}`;
+    const options: Intl.DateTimeFormatOptions = {
+        hour: 'numeric',
+        minute: '2-digit',
+        hour12: true,
+    };
+    return new Intl.DateTimeFormat('en-US', options).format(date);
 };

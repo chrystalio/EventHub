@@ -42,6 +42,7 @@ export default function Index({ events = [], buildings = [], rooms = [] }: Index
         description: '',
         organizer: '',
         type: '',
+        price: '0',
         start_time: '',
         end_time: '',
         max_guests_per_registration: '0',
@@ -72,6 +73,7 @@ export default function Index({ events = [], buildings = [], rooms = [] }: Index
             description: '',
             organizer: '',
             type: '',
+            price: '0',
             start_time: '',
             end_time: '',
             max_guests_per_registration: '0',
@@ -98,6 +100,7 @@ export default function Index({ events = [], buildings = [], rooms = [] }: Index
             description: event.description || '',
             organizer: event.organizer || '',
             type: event.type,
+            price: event.price?.toString() || '0',
             start_time: formatForInput(event.start_time),
             end_time: formatForInput(event.end_time),
             max_guests_per_registration: event.max_guests_per_registration?.toString() || '0',
@@ -186,8 +189,9 @@ export default function Index({ events = [], buildings = [], rooms = [] }: Index
                         </p>
                     </div>
                 )}
-                <div className="space-y-4">
-                    <div className="space-y-2">
+                {/* --- REFACTORED FORM LAYOUT --- */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-2 md:col-span-2">
                         <Label htmlFor="name">Event Name</Label>
                         <Input
                             id="name"
@@ -198,7 +202,7 @@ export default function Index({ events = [], buildings = [], rooms = [] }: Index
                         {errors.name && <p className="text-sm text-red-500">{errors.name}</p>}
                     </div>
 
-                    <div className="space-y-2">
+                    <div className="space-y-2 md:col-span-2">
                         <Label htmlFor="description">Description</Label>
                         <Textarea
                             id="description"
@@ -209,7 +213,7 @@ export default function Index({ events = [], buildings = [], rooms = [] }: Index
                         {errors.description && <p className="text-sm text-red-500">{errors.description}</p>}
                     </div>
 
-                    <div className="space-y-2">
+                    <div className="space-y-2 md:col-span-2">
                         <Label htmlFor="organizer">Organizer</Label>
                         <Input
                             id="organizer"
@@ -219,7 +223,8 @@ export default function Index({ events = [], buildings = [], rooms = [] }: Index
                         />
                         {errors.organizer && <p className="text-sm text-red-500">{errors.organizer}</p>}
                     </div>
-                    <div className="space-y-2">
+
+                    <div className="space-y-2 md:col-span-2">
                         <Label>Event Type</Label>
                         <p className="text-sm text-muted-foreground">
                             Choose the registration method for this event.
@@ -229,24 +234,21 @@ export default function Index({ events = [], buildings = [], rooms = [] }: Index
                             onValueChange={(value) => setData('type', value)}
                             className="space-y-1 pt-2"
                         >
-                            <div
-                                className="flex items-center space-x-3 p-3 rounded-md border has-[input:checked]:border-primary">
+                            <div className="flex items-center space-x-3 p-3 rounded-md border has-[input:checked]:border-primary">
                                 <RadioGroupItem value="free" id="type-free" />
                                 <Label htmlFor="type-free" className="font-normal cursor-pointer w-full">
                                     <span className="font-semibold block">Free</span>
                                     <span className="text-muted-foreground text-xs">Anyone can register instantly. No approval needed.</span>
                                 </Label>
                             </div>
-                            <div
-                                className="flex items-center space-x-3 p-3 rounded-md border has-[input:checked]:border-primary">
+                            <div className="flex items-center space-x-3 p-3 rounded-md border has-[input:checked]:border-primary">
                                 <RadioGroupItem value="private" id="type-private" />
                                 <Label htmlFor="type-private" className="font-normal cursor-pointer w-full">
                                     <span className="font-semibold block">Private (Requires Approval)</span>
                                     <span className="text-muted-foreground text-xs">Registrants must be manually approved by an admin.</span>
                                 </Label>
                             </div>
-                            <div
-                                className="flex items-center space-x-3 p-3 rounded-md border has-[input:checked]:border-primary">
+                            <div className="flex items-center space-x-3 p-3 rounded-md border has-[input:checked]:border-primary">
                                 <RadioGroupItem value="paid" id="type-paid" />
                                 <Label htmlFor="type-paid" className="font-normal cursor-pointer w-full">
                                     <span className="font-semibold block">Paid</span>
@@ -255,33 +257,48 @@ export default function Index({ events = [], buildings = [], rooms = [] }: Index
                             </div>
                         </RadioGroup>
                     </div>
-                    <div className="grid grid-cols-2 gap-4">
-                        <div className="space-y-2">
-                            <Label htmlFor="start_time">Start Time</Label>
-                            <Input
-                                id="start_time"
-                                type="datetime-local"
-                                value={data.start_time}
-                                onChange={(e) => setData('start_time', e.target.value)}
-                                required
-                            />
-                            {errors.start_time && <p className="text-sm text-red-500">{errors.start_time}</p>}
-                        </div>
 
-                        <div className="space-y-2">
-                            <Label htmlFor="end_time">End Time</Label>
+                    {data.type === 'paid' && (
+                        <div className="space-y-2 md:col-span-2 animate-in fade-in-0 duration-300">
+                            <Label htmlFor="price">Ticket Price (IDR)</Label>
                             <Input
-                                id="end_time"
-                                type="datetime-local"
-                                value={data.end_time}
-                                onChange={(e) => setData('end_time', e.target.value)}
+                                id="price"
+                                type="number"
+                                placeholder="e.g., 50000"
+                                min="0"
+                                value={data.price}
+                                onChange={(e) => setData('price', e.target.value)}
                                 required
                             />
-                            {errors.end_time && <p className="text-sm text-red-500">{errors.end_time}</p>}
+                            {errors.price && <p className="text-sm text-red-500">{errors.price}</p>}
                         </div>
+                    )}
+
+                    <div className="space-y-2">
+                        <Label htmlFor="start_time">Start Time</Label>
+                        <Input
+                            id="start_time"
+                            type="datetime-local"
+                            value={data.start_time}
+                            onChange={(e) => setData('start_time', e.target.value)}
+                            required
+                        />
+                        {errors.start_time && <p className="text-sm text-red-500">{errors.start_time}</p>}
                     </div>
 
                     <div className="space-y-2">
+                        <Label htmlFor="end_time">End Time</Label>
+                        <Input
+                            id="end_time"
+                            type="datetime-local"
+                            value={data.end_time}
+                            onChange={(e) => setData('end_time', e.target.value)}
+                            required
+                        />
+                        {errors.end_time && <p className="text-sm text-red-500">{errors.end_time}</p>}
+                    </div>
+
+                    <div className="space-y-2 md:col-span-2">
                         <Label htmlFor="max_guests_per_registration">Max Guests per Registration</Label>
                         <Input
                             id="max_guests_per_registration"
@@ -296,48 +313,44 @@ export default function Index({ events = [], buildings = [], rooms = [] }: Index
                         )}
                     </div>
 
-                    <div className="grid grid-cols-2 gap-4">
-                        <div className="space-y-2">
-                            <Label htmlFor="building_id">Building</Label>
-                            <Select value={data.building_id} onValueChange={(value) => setData('building_id', value)}>
-                                <SelectTrigger>
-                                    <SelectValue placeholder="Select building" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    {(buildings || []).map((building) => (
-                                        <SelectItem key={building.id} value={building.id.toString()}>
-                                            {building.name}
-                                        </SelectItem>
-                                    ))}
-                                </SelectContent>
-                            </Select>
-                            {errors.building_id && <p className="text-sm text-red-500">{errors.building_id}</p>}
-                        </div>
-
-                        <div className="space-y-2">
-                            <Label htmlFor="room_id">Room</Label>
-                            <Select value={data.room_id} onValueChange={(value) => setData('room_id', value)}
-                                    disabled={!data.building_id}>
-                                <SelectTrigger>
-                                    <SelectValue
-                                        placeholder={data.building_id ? "Select room" : "Select building first"}
-                                    />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    {filteredRooms.map((room) => (
-                                        <SelectItem key={room.id} value={room.id.toString()}>
-                                            {room.code} - {room.name}
-                                        </SelectItem>
-                                    ))}
-                                </SelectContent>
-                            </Select>
-
-                            {errors.room_id && (
-                                <p className="text-sm text-red-500">{errors.room_id}</p>
-                            )}
-                        </div>
+                    <div className="space-y-2">
+                        <Label htmlFor="building_id">Building</Label>
+                        <Select value={data.building_id} onValueChange={(value) => setData('building_id', value)}>
+                            <SelectTrigger>
+                                <SelectValue placeholder="Select building" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                {(buildings || []).map((building) => (
+                                    <SelectItem key={building.id} value={building.id.toString()}>
+                                        {building.name}
+                                    </SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
+                        {errors.building_id && <p className="text-sm text-red-500">{errors.building_id}</p>}
                     </div>
 
+                    <div className="space-y-2">
+                        <Label htmlFor="room_id">Room</Label>
+                        <Select value={data.room_id} onValueChange={(value) => setData('room_id', value)}
+                                disabled={!data.building_id}>
+                            <SelectTrigger>
+                                <SelectValue
+                                    placeholder={data.building_id ? "Select room" : "Select building first"}
+                                />
+                            </SelectTrigger>
+                            <SelectContent>
+                                {filteredRooms.map((room) => (
+                                    <SelectItem key={room.id} value={room.id.toString()}>
+                                        {room.code} - {room.name}
+                                    </SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
+                        {errors.room_id && (
+                            <p className="text-sm text-red-500">{errors.room_id}</p>
+                        )}
+                    </div>
                 </div>
             </FormDialog>
 

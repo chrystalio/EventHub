@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Str;
 use Lab404\Impersonate\Models\Impersonate;
 use Spatie\Permission\Traits\HasRoles;
 
@@ -24,6 +25,7 @@ class User extends Authenticatable implements MustVerifyEmail
     protected $fillable = [
         'name',
         'email',
+        'phone',
         'password',
     ];
 
@@ -50,6 +52,22 @@ class User extends Authenticatable implements MustVerifyEmail
         ];
     }
 
+    public function getRouteKeyName(): string
+    {
+        return 'uuid';
+    }
+
+    protected static function boot(): void
+    {
+        parent::boot();
+
+        static::creating(function ($model) {
+            if (empty($model->uuid)) {
+                $model->uuid = (string) Str::uuid();
+            }
+        });
+    }
+
     public function canImpersonate(): bool
     {
         return $this->can('user.impersonate');
@@ -67,13 +85,18 @@ class User extends Authenticatable implements MustVerifyEmail
 
     public function managedEvents()
     {
-        return $this->belongsToMany(Event::class, 'event_staff', 'user_id', 'event_id')
-            ->withPivot('role')
-            ->withTimestamps();
+        return $this->belongsToMany(
+            Event::class,
+            'event_staff',
+            'user_uuid',
+            'event_uuid',
+            'uuid',
+            'uuid'
+        )->withPivot('role')->withTimestamps();
     }
 
     public function registrations(): HasMany
     {
-        return $this->hasMany(Registration::class);
+        return $this->hasMany(Registration::class, 'user_uuid', 'uuid');
     }
 }

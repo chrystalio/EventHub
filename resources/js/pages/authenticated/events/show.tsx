@@ -22,6 +22,7 @@ import {
 import { formatDateTime } from '@/utils/dateUtils';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { PhoneInput } from '@/components/form/phone-input';
 
 interface PageProps {
     event: Event;
@@ -121,6 +122,7 @@ const RegistrationStatusCard = ({ registration }: { registration: Registration }
         pending: { icon: ClockIcon, color: 'yellow', title: 'Registration Pending', description: 'Your registration is awaiting approval and will be available here once confirmed.' },
         rejected: { icon: XCircleIcon, color: 'red', title: 'Registration Not Approved', description: 'Unfortunately, your registration for this event was not approved.' },
         cancelled: { icon: XCircleIcon, color: 'red', title: 'Registration Cancelled', description: 'This registration has been cancelled.' },
+        pending_payment: { icon: ClockIcon, color: 'yellow', title: 'Payment Pending', description: 'Your registration is pending payment. Please complete the payment to confirm your registration.' },
     };
     const config = statusMap[registration.status] || statusMap.rejected;
     const Icon = config.icon;
@@ -138,7 +140,7 @@ const RegistrationStatusCard = ({ registration }: { registration: Registration }
             </CardHeader>
             <CardContent>
                 <p className={`text-sm text-${config.color}-800`}>{config.description}</p>
-                <Button variant="outline" size="sm" className={`mt-4 w-fit border-${config.color}-300 bg-transparent text-${config.color}-700 hover:bg-${config.color}-100`} asChild>
+                <Button variant="outline" size="sm" className={`mt-4 w-full border-${config.color}-300 bg-transparent text-${config.color}-700 hover:bg-${config.color}-100`} asChild>
                     <Link href={route('registrations.index')}>View My Registrations</Link>
                 </Button>
             </CardContent>
@@ -169,7 +171,14 @@ const RegistrationForm = ({ event, onSubmit, ...formProps }) => (
                 </div>
                 <div>
                     <Label htmlFor={`guest_phone_${index}`}>Phone Number</Label>
-                    <Input id={`guest_phone_${index}`} type="text" value={guest.phone} onChange={(e) => formProps.handleGuestDetailChange(index, 'phone', e.target.value)} required />
+                    <PhoneInput
+                        id={`guest_phone_${index}`}
+                        value={guest.phone}
+                        onChange={(value) => formProps.handleGuestDetailChange(index, 'phone', value || '')}
+                        defaultCountry="ID"
+                        placeholder="Enter phone number"
+                        required
+                    />
                     {formProps.errors[`guests.${index}.phone`] && <p className="mt-1 text-xs text-red-500">{formProps.errors[`guests.${index}.phone`]}</p>}
                 </div>
             </div>

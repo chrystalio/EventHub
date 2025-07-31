@@ -7,8 +7,10 @@ export interface Auth {
 
 export interface AuthUser {
     id: number
+    uuid: string
     name: string
     email: string
+    phone: string;
     permissions: string[]
 }
 
@@ -32,6 +34,7 @@ export interface Event {
     description: string;
     organizer: string;
     type: 'free' | 'paid' | 'private';
+    price: number;
     start_time: string;
     end_time: string;
     max_guests_per_registration: number;
@@ -42,13 +45,30 @@ export interface Event {
     staff?: User[];
 }
 
+export interface Transaction {
+    id: number;
+    user_uuid: string;
+    event_uuid: string;
+    order_id: string;
+    total_amount: number;
+    status: 'pending' | 'paid' | 'failed' | 'expired';
+    transaction_id: string | null;
+    expires_at: string | null;
+    created_at: string;
+    updated_at: string;
+    event: Event;
+    user: User;
+    registration?: Registration;
+}
+
 export interface Registration {
     id: number;
     uuid: string;
-    event_id: number;
-    user_id: number;
+    event_uuid: string;
+    user_uuid: string;
+    order_id: string | null;
     guest_count: number;
-    status: 'approved' | 'pending' | 'rejected' | 'attended' | 'missed';
+    status: 'approved' | 'pending' | 'rejected' | 'attended' | 'pending_payment' |  'missed';
     registered_at: string;
     approved_at: string | null;
     created_at: string;
@@ -134,8 +154,10 @@ export interface SharedData {
 
 export interface User {
     id: number;
+    uuid: string;
     name: string;
     email: string;
+    phone?: string;
     avatar?: string;
     email_verified_at: string | null;
     created_at: string;

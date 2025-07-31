@@ -11,6 +11,7 @@ import { Label } from '@/components/ui/label';
 import AppLayout from '@/layouts/app-layout';
 import SettingsLayout from '@/layouts/settings/layout';
 import { toast } from 'sonner';
+import { PhoneInput } from '@/components/form/phone-input';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -25,6 +26,7 @@ export default function Profile({ mustVerifyEmail, status }: { mustVerifyEmail: 
     const { data, setData, patch, errors, processing } = useForm({
         name: auth.user.name,
         email: auth.user.email,
+        phone: auth.user.phone || '',
     });
 
     const submit: FormEventHandler = (e) => {
@@ -79,6 +81,18 @@ export default function Profile({ mustVerifyEmail, status }: { mustVerifyEmail: 
 
                             <InputError className="mt-2" message={errors.email} />
                         </div>
+
+                        <Label htmlFor="phone">Phone Number</Label>
+
+                        <PhoneInput
+                            id="phone"
+                            value={data.phone}
+                            onChange={(value) => setData('phone', value || '')}
+                            defaultCountry="ID" // Sets Indonesia as the default country
+                            placeholder="Phone number"
+                        />
+
+                        <InputError className="mt-2" message={errors.phone} />
 
                         {mustVerifyEmail && auth.user.email_verified_at === null && (
                             <div>

@@ -11,6 +11,7 @@ use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\PublicEventController;
 use App\Http\Controllers\RegistrationController;
 use App\Http\Controllers\Panitia\EventController as PanitiaEventController;
+use App\Http\Controllers\TransactionController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -28,6 +29,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('dashboard', function () {
         return Inertia::render('dashboard');
     })->name('dashboard');
+
+    Route::get('/transactions/{order_id}', [TransactionController::class, 'show'])->name('transactions.show');
 
     Route::prefix('admin')->group(function () {
         Route::resource('roles', RoleController::class)->middleware('can:role.view');
@@ -77,7 +80,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
             ->name('registrations.browse')
             ->middleware('can:registration.view');
 
-        // Show event details for registration
         Route::get('/events/{event:uuid}', [RegistrationController::class, 'showEvent'])
             ->name('registrations.show_event')
             ->middleware('can:registration.view');
@@ -98,6 +100,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
 Route::get('/events', [PublicEventController::class, 'index'])->name('public.events.index');
 Route::get('/events/{event:uuid}/show', [PublicEventController::class, 'show'])->name('public.events.show');
+Route::post('/midtrans/webhook', [TransactionController::class, 'webhook'])->name('midtrans.webhook');
 
 require __DIR__.'/settings.php';
 require __DIR__.'/auth.php';

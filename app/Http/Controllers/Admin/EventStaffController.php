@@ -14,23 +14,17 @@ class EventStaffController extends Controller
     public function store(Request $request, Event $event): RedirectResponse
     {
         $validated = $request->validate([
-            'user_id' => 'required|exists:users,id'
+            'user_uuid' => 'required|exists:users,uuid'
         ]);
 
-        $user = User::find($validated['user_id']);
+        $user = User::where('uuid', $validated['user_uuid'])->firstOrFail();
 
-        $currentRoles = $user->getRoleNames()->toArray();
-
-        if (!in_array('Panitia', $currentRoles, true)) {
-            $currentRoles[] = 'Panitia';
+        if (!$user->hasRole('Panitia')) {
+            $user->assignRole('Panitia');
         }
 
-        app(PermissionRegistrar::class)->forgetCachedPermissions();
-
-        $user->syncRoles($currentRoles);
-
         $event->staff()->syncWithoutDetaching([
-            $validated['user_id'] => ['role' => 'panitia']
+            $user->uuid => ['role' => 'panitia']
         ]);
 
         return back()->with('success', 'User successfully assigned as Panitia.');
@@ -38,9 +32,9 @@ class EventStaffController extends Controller
 
     public function destroy(Event $event, User $user): RedirectResponse
     {
-        $event->staff()->detach($user->id);
+        $event->staff()->detach($user->uuid);
 
-        $remainingAssignments = $event->staff()->count();
+        $remainingAssignments = $user->managedEvents()->count();
 
         if ($remainingAssignments === 0 && $user->hasRole('Panitia')) {
             $user->removeRole('Panitia');

@@ -15,6 +15,8 @@
         "laravel/framework": "^12.0",
         "laravel/sanctum": "^4.0",
         "laravel/tinker": "^2.10.1",
+        "midtrans/midtrans-php": "^2.6",
+        "propaganistas/laravel-phone": "^6.0",
         "spatie/laravel-permission": "^6.18",
         "spatie/laravel-ray": "^1.40",
         "tightenco/ziggy": "^2.5"
