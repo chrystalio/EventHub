@@ -66,6 +66,7 @@ export interface Registration {
     uuid: string;
     event_uuid: string;
     user_uuid: string;
+    order_id: string | null;
     guest_count: number;
     status: 'approved' | 'pending' | 'rejected' | 'attended' | 'pending_payment' |  'missed';
     registered_at: string;
