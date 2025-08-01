@@ -92,9 +92,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::prefix('/panitia')->middleware(['auth', 'role:Panitia'])->group(function () {
         Route::get('/events', [PanitiaEventController::class, 'index'])->name('panitia.events.index');
         Route::get('/events/{event:uuid}/scan', [PanitiaEventController::class, 'scanner'])->name('panitia.events.scanner');
-        Route::post('/ticket-check/{attendee:qr_code}', [PanitiaEventController::class, 'verifyQrCode'])
-            ->name('ticket.verify')
-            ->middleware('signed');
+        Route::post('/ticket-check', [PanitiaEventController::class, 'verifyQrCode'])
+            ->name('panitia.ticket.verify');
     });
 });
 
