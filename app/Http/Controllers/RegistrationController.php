@@ -69,7 +69,7 @@ class RegistrationController extends Controller
         if ($registration->status === 'approved') {
             $registration->attendees->each(function ($attendee) {
                 $attendee->signed_url = URL::signedRoute(
-                    'ticket.verify',
+                    'panitia.ticket.verify',
                     ['attendee' => $attendee->qr_code]
                 );
             });
