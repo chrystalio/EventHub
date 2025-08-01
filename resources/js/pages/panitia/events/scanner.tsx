@@ -1,8 +1,8 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { Head, Link } from '@inertiajs/react';
-import { Html5Qrcode, Html5QrcodeScannerState } from 'html5-qrcode';
+import { Html5Qrcode, Html5QrcodeScannerState, Html5QrcodeCameraScanConfig, CameraDevice } from 'html5-qrcode';
 import axios from 'axios';
-import { CheckCircle2, XCircle, ScanLine, ArrowLeft } from 'lucide-react';
+import { CheckCircle2, XCircle, ScanLine, ArrowLeft, Camera } from 'lucide-react';
 import { Event } from '@/types';
 import { Button } from '@/components/ui/button';
 
@@ -10,7 +10,7 @@ interface Props {
     event: Event;
 }
 
-const ResultOverlay = ({ result }) => {
+const ResultOverlay = ({ result }: { result: any }) => {
     if (!result) return null;
     const isSuccess = result.status === 'success';
     const isError = result.status === 'error';
@@ -18,7 +18,7 @@ const ResultOverlay = ({ result }) => {
     const bgColor = isSuccess ? 'bg-green-500/90' : isError ? 'bg-red-500/90' : 'bg-black/80';
 
     return (
-        <div className={`absolute inset-0 z-30 flex flex-col items-center justify-center p-4 text-center text-white backdrop-blur-sm rounded-lg`}>
+        <div className={`absolute inset-0 z-30 flex flex-col items-center justify-center p-4 text-center text-white backdrop-blur-sm rounded-lg ${bgColor}`}>
             {isSuccess && <CheckCircle2 className="h-24 w-24" />}
             {isError && <XCircle className="h-24 w-24" />}
             {isLoading && <ScanLine className="h-24 w-24 animate-pulse" />}
@@ -48,6 +48,8 @@ const scannerAnimation = `
 
 export default function Scanner({ event }: Props) {
     const [scanResult, setScanResult] = useState<any>(null);
+    const [cameras, setCameras] = useState<CameraDevice[]>([]);
+    const [activeCameraId, setActiveCameraId] = useState<string | undefined>(undefined);
     const html5QrcodeRef = useRef<Html5Qrcode | null>(null);
 
     const resetScanner = () => {
@@ -58,51 +60,83 @@ export default function Scanner({ event }: Props) {
     };
 
     useEffect(() => {
-        const html5QrcodeScanner = new Html5Qrcode("qr-code-reader-container");
-        html5QrcodeRef.current = html5QrcodeScanner;
+        Html5Qrcode.getCameras()
+            .then(devices => {
+                if (devices && devices.length) {
+                    setCameras(devices);
+                    const backCamera = devices.find(device => device.label.toLowerCase().includes('back'));
+                    setActiveCameraId(backCamera ? backCamera.id : devices[0].id);
+                }
+            })
+            .catch(err => {
+                console.error("Failed to get cameras.", err);
+            });
+    }, []);
+
+    useEffect(() => {
+        if (!activeCameraId) {
+            return;
+        }
+
+        const scanner = new Html5Qrcode("qr-code-reader-container");
+        html5QrcodeRef.current = scanner;
 
         const onScanSuccess = (decodedText: string) => {
-            html5QrcodeScanner.pause();
+            scanner.pause();
             setScanResult({ status: 'loading', message: 'Verifying...' });
 
-            axios.post(decodedText, {
+            const parts = decodedText.split(',');
+            if (parts.length !== 2) {
+                setScanResult({ status: 'error', message: 'Invalid QR Code format.' });
+                return;
+            }
+
+            const [attendee_uuid, token] = parts;
+
+            axios.post(route('panitia.ticket.verify'), {
                 event_uuid: event.uuid,
-            })
+                attendee_uuid: attendee_uuid,
+                token: token,
+            }, { withCredentials: true })
                 .then(response => setScanResult(response.data))
-                .catch(error => setScanResult(error.response?.data || { status: 'error', message: 'Invalid QR Code' }));
+                .catch(error => setScanResult(error.response?.data || { status: 'error', message: 'Verification Failed' }));
         };
 
-        const config = {
+        const config: Html5QrcodeCameraScanConfig = {
             fps: 10,
             qrbox: { width: 300, height: 300 },
-            videoConstraints: {
-                zoom: 1.0
-            }
         };
 
-        html5QrcodeScanner.start(
-            { facingMode: "environment" },
+        scanner.start(
+            activeCameraId,
             config,
             onScanSuccess,
             (errorMessage) => { /* Ignore errors */ }
         ).catch(err => console.error("Unable to start scanning.", err));
 
         return () => {
-            if (html5QrcodeRef.current?.isScanning) {
-                html5QrcodeRef.current.stop().catch(err => console.error("Failed to stop scanner cleanly.", err));
+            if (scanner.isScanning) {
+                scanner.stop().catch(err => console.error("Failed to stop scanner cleanly.", err));
             }
         };
-    }, []);
-
+    }, [activeCameraId]);
+    
     useEffect(() => {
         if (scanResult && (scanResult.status === 'success' || scanResult.status === 'error')) {
             const timer = setTimeout(() => {
                 resetScanner();
-            }, 1500);
+            }, 2500);
 
             return () => clearTimeout(timer);
         }
     }, [scanResult]);
+
+    const handleSwitchCamera = () => {
+        if (cameras.length < 2 || !activeCameraId) return;
+        const currentIndex = cameras.findIndex(cam => cam.id === activeCameraId);
+        const nextIndex = (currentIndex + 1) % cameras.length;
+        setActiveCameraId(cameras[nextIndex].id);
+    };
 
     return (
         <div className="min-h-dvh w-screen bg-black text-white flex flex-col items-center justify-center p-4">
@@ -110,15 +144,21 @@ export default function Scanner({ event }: Props) {
                 <style>{scannerAnimation}</style>
             </Head>
 
-            <header className="w-full max-w-md mb-4">
+            <header className="w-full max-w-md mb-4 flex justify-between items-center">
                 <Button variant="ghost" size="sm" asChild className="text-white hover:bg-white/10 hover:text-white">
                     <Link href={route('panitia.events.index')}>
                         <ArrowLeft className="mr-2 h-4 w-4" />
-                        Back to Dashboard
+                        Back to Event List
                     </Link>
                 </Button>
+                {cameras.length > 1 && (
+                    <Button variant="ghost" size="sm" onClick={handleSwitchCamera} className="text-white hover:bg-white/10 hover:text-white">
+                        <Camera className="mr-2 h-4 w-4" />
+                        Switch Camera
+                    </Button>
+                )}
             </header>
-            
+
             <div className="relative w-full max-w-md aspect-square bg-gray-900 rounded-lg overflow-hidden shadow-2xl border-2 border-gray-700">
                 <div id="qr-code-reader-container" className="w-full h-full"></div>
 
