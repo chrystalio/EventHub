@@ -16,6 +16,7 @@
         "laravel/sanctum": "^4.0",
         "laravel/tinker": "^2.10.1",
         "midtrans/midtrans-php": "^2.6",
+        "pragmarx/google2fa-laravel": "^2.3",
         "propaganistas/laravel-phone": "^6.0",
         "spatie/laravel-permission": "^6.18",
         "spatie/laravel-ray": "^1.40",
