@@ -89,7 +89,7 @@ class EventController extends Controller
             }
 
             $google2fa = new Google2FA();
-            $isValid = $google2fa->verifyKey($attendee->totp_secret, $validated['token']);
+            $isValid = $google2fa->verifyKey($attendee->totp_secret, $validated['token'], 1);
 
             if (!$isValid) {
                 return response()->json([
