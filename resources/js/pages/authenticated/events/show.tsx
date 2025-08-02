@@ -117,8 +117,18 @@ const EventDetails = ({ event }: { event: Event }) => {
 };
 
 const RegistrationStatusCard = ({ registration }: { registration: Registration }) => {
+
+    const getGuestDescription = () => {
+        const count = registration.guest_count;
+        if (count === 0) {
+            return "You're registered for this event.";
+        }
+        const guestWord = count === 1 ? 'guest' : 'guests';
+        return `You're registered for this event with ${count} ${guestWord}.`;
+    };
+
     const statusMap = {
-        approved: { icon: CheckCircleIcon, color: 'green', title: 'Registration Confirmed', description: `You're registered for this event with ${registration.guest_count} guest${registration.guest_count !== 1 ? 's' : ''}.` },
+        approved: { icon: CheckCircleIcon, color: 'green', title: 'Registration Confirmed', description: getGuestDescription() },
         pending: { icon: ClockIcon, color: 'yellow', title: 'Registration Pending', description: 'Your registration is awaiting approval and will be available here once confirmed.' },
         rejected: { icon: XCircleIcon, color: 'red', title: 'Registration Not Approved', description: 'Unfortunately, your registration for this event was not approved.' },
         cancelled: { icon: XCircleIcon, color: 'red', title: 'Registration Cancelled', description: 'This registration has been cancelled.' },
