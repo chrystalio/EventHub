@@ -129,7 +129,7 @@ export default function RegistrationShow({ registration }: Props) {
     const getEventDateParts = (dateString: string) => {
         const date = new Date(dateString);
         return {
-            month: date.toLocaleString('en-US', { month: 'short' }).toUpperCase(),
+            month: date.toLocaleString('en-US', { month: 'short' }),
             day: date.getDate(),
             fullDate: date.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }),
             time: date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true }),
@@ -240,8 +240,12 @@ export default function RegistrationShow({ registration }: Props) {
             <Dialog open={!!selectedAttendee} onOpenChange={(isOpen) => !isOpen && setSelectedAttendee(null)}>
                 <DialogContent className="sm:max-w-sm p-0 overflow-hidden">
                     <div className="p-8 flex flex-col items-center">
-                        <p className="text-sm font-medium text-muted-foreground capitalize">{selectedAttendee?.attendee_type === 'user' ? 'Registrant' : 'Guest'}</p>
-                        <DialogTitle className="text-3xl font-bold text-center">{selectedAttendee?.name}</DialogTitle>
+                        {/*<p className="text-sm font-medium text-muted-foreground capitalize">{selectedAttendee?.attendee_type === 'user' ? 'Registrant' : 'Guest'}</p>*/}
+                        <Badge variant={selectedAttendee?.attendee_type === 'user' ? 'default' : 'secondary'}
+                               className="capitalize mb-2">
+                            {selectedAttendee?.attendee_type === 'user' ? 'Registrant' : 'Guest'}
+                        </Badge>
+                        <DialogTitle className="text-2xl font-bold text-center">{selectedAttendee?.name}</DialogTitle>
 
                         <div className="mt-6 p-2 bg-white rounded-lg min-h-[256px] min-w-[256px] flex items-center justify-center border">
                             {isLoadingQr && <Loader2 className="h-12 w-12 animate-spin text-muted-foreground" />}
@@ -252,7 +256,7 @@ export default function RegistrationShow({ registration }: Props) {
                                 </div>
                             )}
                             {!isLoadingQr && !qrError && qrCodeValue && (
-                                <QRCodeSVG value={qrCodeValue} size={240} />
+                                <QRCodeSVG value={qrCodeValue} size={225} />
                             )}
                         </div>
 
