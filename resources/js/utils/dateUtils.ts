@@ -1,7 +1,7 @@
 const getLocalDate = (datetime: string): Date | null => {
     if (!datetime) return null;
     const isoDatetime = datetime.replace(' ', 'T');
-    return new Date(isoDatetime.endsWith('Z') ? isoDatetime : isoDatetime + 'Z');
+    return new Date(isoDatetime);
 };
 
 export const formatDateTime = (datetime: string): string => {
@@ -16,7 +16,8 @@ export const formatDateTime = (datetime: string): string => {
         minute: '2-digit',
         hour12: false,
     };
-    return new Intl.DateTimeFormat('en-GB', options).format(date);
+
+    return new Intl.DateTimeFormat('en-US', options).format(date);
 };
 
 export const formatDateTimeLong = (datetime: string): string => {
