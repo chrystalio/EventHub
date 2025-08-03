@@ -90,9 +90,13 @@ export default function Index({ events = [], buildings = [], rooms = [] }: Index
 
         const formatForInput = (datetime: string) => {
             if (!datetime) return '';
-            const [datePart, timePart] = datetime.split('T');
-            const cleanTimePart = timePart.replace('Z', '').split('.')[0].slice(0, 5);
-            return `${datePart}T${cleanTimePart}`;
+            const localDate = new Date(datetime);
+            const year = localDate.getFullYear();
+            const month = String(localDate.getMonth() + 1).padStart(2, '0');
+            const day = String(localDate.getDate()).padStart(2, '0');
+            const hours = String(localDate.getHours()).padStart(2, '0');
+            const minutes = String(localDate.getMinutes()).padStart(2, '0');
+            return `${year}-${month}-${day}T${hours}:${minutes}`;
         };
 
         setData({

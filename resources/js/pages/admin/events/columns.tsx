@@ -34,27 +34,28 @@ export function getColumns({ onEdit, onDelete }: GetColumnsProps): ColumnDef<Eve
             id: 'schedule',
             header: 'Schedule',
             cell: ({ row }) => {
-                const startTime = formatDateTime(row.original.start_time);
-                const endTime = formatDateTime(row.original.end_time);
-
-                const startDate = startTime.split(',')[0];
-                const endDate = endTime.split(',')[0];
+                const { start_time, end_time } = row.original;
+                const fullStartTimeString = formatDateTime(start_time);
+                const fullEndTimeString = formatDateTime(end_time);
+                const startParts = fullStartTimeString.split(',');
+                const endParts = fullEndTimeString.split(',');
+                const startDate = `${startParts[0]},${startParts[1]}`;
+                const endDate = `${endParts[0]},${endParts[1]}`;
+                const startTime = startParts[2].trim();
+                const endTime = endParts[2].trim();
 
                 if (startDate === endDate) {
-                    const timeOnly = (datetime: string) => datetime.split(', ')[1];
                     return (
-                        <div className="space-y-1">
+                        <div>
                             <div className="text-sm font-medium">{startDate}</div>
-                            <div className="text-xs text-muted-foreground">
-                                {timeOnly(startTime)} - {timeOnly(endTime)}
-                            </div>
+                            <div className="text-xs text-muted-foreground">{startTime} - {endTime}</div>
                         </div>
                     );
                 } else {
                     return (
                         <div className="space-y-1">
-                            <div className="text-sm font-medium">{startTime}</div>
-                            <div className="text-xs text-muted-foreground">to {endTime}</div>
+                            <div className="text-sm font-medium">{fullStartTimeString}</div>
+                            <div className="text-xs text-muted-foreground">to {fullEndTimeString}</div>
                         </div>
                     );
                 }

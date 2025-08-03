@@ -74,7 +74,13 @@ class BuildingController extends Controller
      */
     public function destroy(string $id): RedirectResponse
     {
-        $building = Building::findOrFail($id);
+        $building = Building::with('rooms')->findOrFail($id);
+
+        if ($building->rooms()->exists()) {
+            return redirect()->route('admin.buildings.index')
+                ->with('error', 'Building cannot be deleted because it has associated rooms.');
+        }
+
         $building->delete();
 
         return redirect()->route('admin.buildings.index')

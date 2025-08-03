@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Str;
+use PragmaRX\Google2FA\Google2FA;
 
 class RegistrationAttendee extends Model
 {
@@ -16,8 +17,13 @@ class RegistrationAttendee extends Model
         'name',
         'phone',
         'qr_code',
+        'totp_secret',
         'attended_at',
         'cancelled_at',
+    ];
+
+    protected $hidden = [
+        'totp_secret',
     ];
 
     protected static function boot()
@@ -27,6 +33,11 @@ class RegistrationAttendee extends Model
         static::creating(function ($attendee) {
             if (empty($attendee->qr_code)) {
                 $attendee->qr_code = (string) Str::uuid();
+            }
+
+            if (empty($attendee->totp_secret)) {
+                $google2fa = new Google2FA();
+                $attendee->totp_secret = $google2fa->generateSecretKey();
             }
         });
     }

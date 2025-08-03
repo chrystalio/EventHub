@@ -16,4 +16,9 @@ class Building extends Model
     {
         return $this->hasMany(Event::class);
     }
+
+    public function rooms(): HasMany
+    {
+        return $this->hasMany(Room::class);
+    }
 }
