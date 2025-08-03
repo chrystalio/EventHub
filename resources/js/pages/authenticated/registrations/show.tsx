@@ -9,6 +9,7 @@ import { Card, CardContent, CardTitle, CardDescription } from '@/components/ui/c
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import { QRCodeSVG } from 'qrcode.react';
 import { Separator } from '@/components/ui/separator';
+import { formatDateTime } from '@/utils/dateUtils';
 import axios from 'axios';
 
 interface Props {
@@ -225,10 +226,22 @@ export default function RegistrationShow({ registration }: Props) {
                                             <p className="text-sm text-muted-foreground">{attendee.phone}</p>
                                         )}
                                     </div>
-                                    <Button variant="outline" onClick={() => setSelectedAttendee(attendee)} className="w-full sm:w-auto flex-shrink-0">
-                                        <QrCodeIcon className="h-4 w-4 mr-2" />
-                                        Show QR Code
-                                    </Button>
+                                    {attendee.attended_at ? (
+                                        <div className="flex flex-col items-center text-center sm:text-right">
+                                            <Badge className="bg-green-100 text-green-800 hover:bg-green-100 border-green-200">
+                                                <CheckCircle2 className="h-4 w-4 mr-1.5" />
+                                                Checked-in
+                                            </Badge>
+                                            <p className="text-xs text-muted-foreground mt-1">
+                                                at {formatDateTime(attendee.attended_at)}
+                                            </p>
+                                        </div>
+                                    ) : (
+                                        <Button variant="outline" onClick={() => setSelectedAttendee(attendee)} className="w-full sm:w-auto flex-shrink-0">
+                                            <QrCodeIcon className="h-4 w-4 mr-2" />
+                                            Show QR Code
+                                        </Button>
+                                    )}
                                 </Card>
                             ))}
                         </div>
@@ -240,7 +253,6 @@ export default function RegistrationShow({ registration }: Props) {
             <Dialog open={!!selectedAttendee} onOpenChange={(isOpen) => !isOpen && setSelectedAttendee(null)}>
                 <DialogContent className="sm:max-w-sm p-0 overflow-hidden">
                     <div className="p-8 flex flex-col items-center">
-                        {/*<p className="text-sm font-medium text-muted-foreground capitalize">{selectedAttendee?.attendee_type === 'user' ? 'Registrant' : 'Guest'}</p>*/}
                         <Badge variant={selectedAttendee?.attendee_type === 'user' ? 'default' : 'secondary'}
                                className="capitalize mb-2">
                             {selectedAttendee?.attendee_type === 'user' ? 'Registrant' : 'Guest'}
