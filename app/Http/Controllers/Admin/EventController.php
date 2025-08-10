@@ -9,6 +9,7 @@ use App\Models\Building;
 use App\Models\Event;
 use App\Models\Room;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\Auth;
 
 class EventController extends Controller
 {
@@ -21,11 +22,13 @@ class EventController extends Controller
         $buildings = Building::all();
         $rooms = Room::with('building')->get();
 
-
         return inertia('admin/events/index', [
             'events' => $events,
             'buildings' => $buildings,
             'rooms' => $rooms,
+            'canCreate' => auth()->user()->can('event.create', Event::class),
+            'canUpdate' => Auth::user()->hasPermissionTo('event.update'),
+            'canDelete' => Auth::user()->hasPermissionTo('event.delete'),
         ]);
     }
 
