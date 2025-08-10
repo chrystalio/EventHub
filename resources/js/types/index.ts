@@ -106,6 +106,23 @@ export interface PaginationLink {
     active: boolean;
 }
 
+export type PaginatedData<T> = {
+    data: T[];
+    current_page: number;
+    last_page: number;
+    per_page: number;
+    total: number;
+    links: PaginationLink[];
+    first_page_url?: string;
+    last_page_url?: string;
+    next_page_url?: string | null;
+    prev_page_url?: string | null;
+    from?: number | null;
+    to?: number | null;
+    path?: string;
+};
+
+
 export interface PaginatedEvents {
     data: Event[];
     current_page: number;
@@ -208,4 +225,50 @@ export interface RolePermissionPageProps {
     role: Role
     permissions: Record<string, Permission[]>
     assigned: string[]
+}
+
+export interface UserGrowthData {
+    date: string;
+    count: number;
+}
+
+export interface RoomAvailability {
+    id: number;
+    name: string;
+    building: string;
+    status: 'Available' | 'In Use';
+    event_name: string | null;
+}
+
+export interface EventTypeDistribution {
+    type: 'free' | 'paid' | 'private';
+    count: number;
+}
+
+export interface EventWithPendingCount extends Event {
+    pending_requests_count: number;
+}
+
+// For the "Upcoming Managed Schedule" widget
+export interface EventWithRegistrationsCount extends Event {
+    registrations_count: number;
+}
+
+// For the "Attendance Performance" chart widget
+export interface AttendancePerformanceData {
+    name: string;
+    registered: number;
+    attended: number;
+}
+
+// For the "Registrations Per Event" chart widget
+export interface RegistrationsPerEventData {
+    name: string;
+    registrants: number;
+}
+
+export interface MonthlyAttendanceData {
+    month: string; // e.g., "Jan", "Feb"
+    attended: number;
+    missed: number;
 }
