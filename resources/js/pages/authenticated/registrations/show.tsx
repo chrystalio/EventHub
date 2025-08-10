@@ -2,7 +2,20 @@ import React, { useState, useEffect } from 'react';
 import { Head, Link } from '@inertiajs/react';
 import AppLayout from '@/layouts/app-layout';
 import { Registration, Attendee } from '@/types';
-import { ArrowLeftIcon, MapPinIcon, UsersIcon, ClockIcon, CheckCircle2, QrCodeIcon, CreditCard, TicketIcon, Loader2, AlertTriangle, ArrowRightIcon } from 'lucide-react';
+import {
+    ArrowLeftIcon,
+    MapPinIcon,
+    UsersIcon,
+    ClockIcon,
+    CheckCircle2,
+    QrCodeIcon,
+    CreditCard,
+    TicketIcon,
+    Loader2,
+    AlertTriangle,
+    ArrowRightIcon,
+    XCircle
+} from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardTitle, CardDescription } from '@/components/ui/card';
@@ -35,6 +48,12 @@ const StatusDisplay = ({ status, orderId }: { status: Registration['status'], or
             title: 'Payment Required',
             description: 'Your spot is reserved. Please complete the payment to finalize your registration and receive your tickets.',
             color: 'blue',
+        },
+        missed: {
+            icon: XCircle,
+            title: 'Registration Missed',
+            description: 'You missed the event. If you have any questions, please contact the organizer.',
+            color: 'red',
         },
         default: {
             icon: ClockIcon,
@@ -74,6 +93,11 @@ export default function RegistrationShow({ registration }: Props) {
     const [isLoadingQr, setIsLoadingQr] = useState<boolean>(false);
     const [qrError, setQrError] = useState<string | null>(null);
     const [countdown, setCountdown] = useState(30);
+
+    const now = new Date();
+    const startTime = new Date(event.start_time);
+    const checkinWindowEnd = new Date(startTime.getTime() + 60 * 60 * 1000);
+    const isCheckinClosed = now > checkinWindowEnd;
 
     useEffect(() => {
         if (!selectedAttendee) return;
@@ -212,7 +236,7 @@ export default function RegistrationShow({ registration }: Props) {
                         Your Ticket & Attendees
                     </h2>
 
-                    {status === 'approved' ? (
+                    {(status === 'approved' || status === 'attended') ? (
                         <div className="space-y-4">
                             {attendees?.map((attendee) => (
                                 <Card key={attendee.id} className="flex flex-col sm:flex-row items-center justify-between p-4 gap-4">
@@ -236,6 +260,11 @@ export default function RegistrationShow({ registration }: Props) {
                                                 at {formatDateTime(attendee.attended_at)}
                                             </p>
                                         </div>
+                                    ) : isCheckinClosed ? (
+                                        <Badge className="bg-red-100 text-red-800 hover:bg-red-100 border-red-200">
+                                            <XCircle className="h-4 w-4 mr-1.5" />
+                                            Missed
+                                        </Badge>
                                     ) : (
                                         <Button variant="outline" onClick={() => setSelectedAttendee(attendee)} className="w-full sm:w-auto flex-shrink-0">
                                             <QrCodeIcon className="h-4 w-4 mr-2" />
