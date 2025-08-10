@@ -16,14 +16,16 @@ export default function PanitiaEventsIndex({ managedEvents = [] }: Props) {
         <AppLayout>
             <Head title="Managed Events" />
             <div className="space-y-6 p-4 sm:p-6 lg:p-8">
-                <div className="rounded-lg border bg-white p-6 shadow-sm">
+                <div className="rounded-lg border bg-white p-6 shadow-sm dark:border-gray-800 dark:bg-gray-900">
                     <div className="flex items-center gap-4">
-                        <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-lg bg-indigo-100">
-                            <Briefcase className="h-6 w-6 text-indigo-600" />
+                        <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-lg bg-indigo-100 dark:bg-indigo-900/40">
+                            <Briefcase className="h-6 w-6 text-indigo-600 dark:text-indigo-400" />
                         </div>
                         <div>
-                            <h1 className="text-xl font-bold text-gray-900 sm:text-2xl">Managed Events</h1>
-                            <p className="text-sm text-gray-600">
+                            <h1 className="text-xl font-bold text-gray-900 dark:text-gray-100 sm:text-2xl">
+                                Managed Events
+                            </h1>
+                            <p className="text-sm text-gray-600 dark:text-gray-400">
                                 Here are the events you have been assigned to as a Panitia.
                             </p>
                         </div>
