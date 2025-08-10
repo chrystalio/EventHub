@@ -40,13 +40,14 @@ class DashboardController extends Controller
 
     private function getSystemAdministratorData(): array
     {
-        // Key Metrics
+        $now = now();
+        $startOfDay = now()->startOfDay();
+        $endOfDay = now()->endOfDay();
         $totalUsers = User::count();
         $totalEvents = Event::count();
         $totalRegistrations = Registration::count();
         $totalRevenue = Transaction::where('status', 'paid')->sum('total_amount');
 
-        $now = now();
         $activeEventsByRoom = Event::where('start_time', '<=', $now)
             ->where('end_time', '>=', $now)
             ->get()
@@ -71,6 +72,33 @@ class DashboardController extends Controller
 
         $recentActivities = $this->getRecentActivitiesGlobal();
 
+        $eventsToday = Event::whereBetween('start_time', [$startOfDay, $endOfDay])->count();
+        $ongoingNow = Event::where('start_time', '<=', $now)->where('end_time', '>=', $now)->count();
+        $totalRooms = Room::count();
+        $roomsInUse = Event::where('start_time', '<=', $now)->where('end_time', '>=', $now)->distinct('room_id')->count('room_id');
+
+        $todayEvents = Event::with([
+            'building:id,name',
+            'room:id,name',
+            'staff:id,name',
+        ])
+            ->whereBetween('start_time', [$startOfDay, $endOfDay])
+            ->orderBy('start_time')
+            ->take(5)
+            ->get()
+            ->map(function ($e) use ($now) {
+                return [
+                    'uuid' => $e->uuid,
+                    'name' => $e->name,
+                    'start_time' => (string) $e->start_time,
+                    'end_time' => (string) $e->end_time,
+                    'building' => ['name' => optional($e->building)->name],
+                    'room' => ['name' => optional($e->room)->name],
+                    'staff' => $e->staff->map(fn ($u) => ['id' => $u->id, 'name' => $u->name])->values(),
+                    'ongoing' => $e->start_time <= $now && $e->end_time >= $now,
+                ];
+            });
+
         return [
             'role' => 'System Administrator',
             'stats' => [
@@ -82,6 +110,13 @@ class DashboardController extends Controller
             'roomAvailability' => $paginatedRooms,
             'eventTypeDistribution' => $eventTypeDistribution,
             'recentActivities' => $recentActivities,
+            'glance' => [
+                'eventsToday' => $eventsToday,
+                'ongoingNow' => $ongoingNow,
+                'roomsInUse' => $roomsInUse,
+                'totalRooms' => $totalRooms,
+            ],
+            'todayEvents' => $todayEvents,
         ];
     }
 
@@ -336,7 +371,7 @@ class DashboardController extends Controller
             ->all();
     }
 
-    private function getRecentActivitiesGlobal(): array
+    private function getRecentActivitiesGlobal(int $limit = 20): array
     {
         $registrations = DB::table('registrations')
             ->join('events', 'registrations.event_uuid', '=', 'events.uuid')
@@ -379,7 +414,7 @@ class DashboardController extends Controller
         return DB::query()
             ->fromSub($union, 'a')
             ->orderByDesc('occurred_at')
-            ->limit(10)
+            ->limit($limit)
             ->get()
             ->map(function ($row) {
                 $message = match ($row->type) {
@@ -398,5 +433,4 @@ class DashboardController extends Controller
             })
             ->all();
     }
-
 }

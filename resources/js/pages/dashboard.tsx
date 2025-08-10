@@ -20,6 +20,8 @@ import EventsHappeningNowWidget from '@/pages/dashboard/widgets/eventHappeningNo
 import UpcomingManagedScheduleWidget from '@/pages/dashboard/widgets/upcomingManagedSchedule';
 import RegistrationApprovalsWidget from '@/pages/dashboard/widgets/registrationApproval';
 import RecentActivitiesWidget from '@/pages/dashboard/widgets/recentActivities';
+import TodayGlance, { Glance } from '@/pages/dashboard/widgets/todayGlance';
+import TodayEvents from '@/pages/dashboard/widgets/todayEvents';
 
 type YearlyAttendancePoint = { month: string; attended: number; missed: number };
 
@@ -31,6 +33,17 @@ type EventNowItem = {
     total_registered: number;
     building?: { name: string } | null;
     room?: { name: string } | null;
+};
+
+type TodayEventItem = {
+    uuid: string;
+    name: string;
+    start_time: string;
+    end_time: string;
+    building?: { name: string } | null;
+    room?: { name: string } | null;
+    staff: { id: number; name: string }[];
+    ongoing: boolean;
 };
 
 interface DashboardProps {
@@ -47,6 +60,8 @@ interface DashboardProps {
     recentActivities?: { type: 'registration' | 'approval' | 'attendance'; event_uuid: string; message: string; occurred_at: string }[];
     yearlyAttendance?: YearlyAttendancePoint[];
     totalUpcomingCount?: number;
+    glance?: Glance;
+    todayEvents?: TodayEventItem[];
 }
 
 const breadcrumbs: BreadcrumbItem[] = [{ title: 'Dashboard', href: route('dashboard') }];
@@ -76,6 +91,8 @@ export default function Dashboard(props: DashboardProps) {
                         </div>
                         <div className="grid grid-cols-1 items-start gap-8 lg:grid-cols-3">
                             <div className="lg:col-span-2 space-y-8">
+                                {props.glance && <TodayGlance data={props.glance} />}
+                                <TodayEvents items={props.todayEvents || []} />
                                 {roomAvailability && (
                                     <RoomAvailabilityWidget rooms={roomAvailability} />
                                 )}
