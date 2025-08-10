@@ -107,4 +107,9 @@ class Event extends Model
             ->where('status', '!=', 'cancelled')
             ->exists();
     }
+
+    public function getTotalAttendedAttribute(): int
+    {
+        return $this->attendees()->whereNotNull('attended_at')->count();
+    }
 }
