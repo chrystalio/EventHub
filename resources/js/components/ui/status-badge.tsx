@@ -2,8 +2,7 @@ import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 import { CheckCircle, XCircle, Clock, AlertTriangle, UserCheck } from 'lucide-react';
 
-// Define all possible registration statuses
-type RegistrationStatus = 'approved' | 'pending_payment' | 'cancelled' | 'pending_approval' | 'rejected' | 'attended' | 'missed';
+type RegistrationStatus = 'approved' | 'pending' | 'pending_payment' | 'cancelled'  | 'rejected' | 'attended' | 'missed';
 
 interface StatusBadgeProps {
     status: RegistrationStatus;
@@ -36,7 +35,7 @@ const statusMap: Record<RegistrationStatus, { text: string; className: string; i
         className: 'bg-red-100 text-red-800 border-red-200',
         icon: XCircle,
     },
-    pending_approval: {
+    pending: {
         text: 'Pending Approval',
         className: 'bg-orange-100 text-orange-800 border-orange-200',
         icon: AlertTriangle,
@@ -49,8 +48,7 @@ const statusMap: Record<RegistrationStatus, { text: string; className: string; i
 };
 
 export function StatusBadge({ status, className }: StatusBadgeProps) {
-    // Default to pending_approval if status is unknown
-    const config = statusMap[status] || statusMap.pending_approval;
+    const config = statusMap[status] || statusMap.pending;
 
     return (
         <Badge variant="outline" className={cn('font-medium capitalize', config.className, className)}>
