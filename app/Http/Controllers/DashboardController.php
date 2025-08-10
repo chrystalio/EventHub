@@ -25,26 +25,19 @@ class DashboardController extends Controller
         $user = Auth::user();
         $data = [];
 
-        // We will add logic for other roles here later.
         if ($user->hasRole('System Administrator')) {
             $data = $this->getSystemAdministratorData();
         } elseif ($user->hasRole('Panitia')) {
-            // Placeholder for Panitia data
             $data = $this->getPanitiaData($user);
         } elseif ($user->hasRole('Akademik')) {
-            // Placeholder for Akademik data
             $data = $this->getAkademikData();
         } else {
-            // Default to Peserta (registrant) data
             $data = $this->getPesertaData($user);
         }
 
         return Inertia::render('dashboard', $data);
     }
 
-    /**
-     * Get data for the System Administrator dashboard.
-     */
     private function getSystemAdministratorData(): array
     {
         // Key Metrics
@@ -59,12 +52,10 @@ class DashboardController extends Controller
             ->get()
             ->keyBy('room_id');
 
-        // Recent Activity
         $recentEvents = Event::latest()->take(5)->get();
         $recentRegistrations = Registration::with(['user', 'event'])->latest()->take(5)->get();
         $paginatedRooms = Room::with('building')->paginate(5, ['*'], 'roomsPage')->withQueryString();
 
-        // User Growth Chart Data (last 30 days)
         $userGrowth = User::select(DB::raw('DATE(created_at) as date'), DB::raw('count(*) as count'))
             ->where('created_at', '>=', now()->subDays(30))
             ->groupBy('date')
@@ -281,14 +272,13 @@ class DashboardController extends Controller
 
     private function getRecentActivitiesForPanitia(User $user, int $limit = 15)
     {
-        // If the user manages no events, we can stop here.
         if (!$user->managedEvents()->exists()) {
             return [];
         }
 
         $managedEventUuidsSub = $user->managedEvents()->select('events.uuid');
 
-        // 1. Gathers initial registrations
+
         $registrations = DB::table('registrations')
             ->join('events', 'registrations.event_uuid', '=', 'events.uuid')
             ->join('users', 'users.uuid', '=', 'registrations.user_uuid')
@@ -301,13 +291,12 @@ class DashboardController extends Controller
             events.name as event_name
         ");
 
-        // 2. Gathers status changes like approvals and rejections
-        // The 'type' is now dynamic based on the status column
+
         $statusChanges = DB::table('registrations')
             ->join('events', 'registrations.event_uuid', '=', 'events.uuid')
             ->join('users', 'users.uuid', '=', 'registrations.user_uuid')
             ->whereIn('registrations.event_uuid', $managedEventUuidsSub)
-            ->whereIn('registrations.status', ['approved', 'rejected']) // Can be expanded later
+            ->whereIn('registrations.status', ['approved', 'rejected'])
             ->whereColumn('registrations.updated_at', '>', 'registrations.created_at')
             ->selectRaw("
             registrations.updated_at as occurred_at,
@@ -317,7 +306,6 @@ class DashboardController extends Controller
             events.name as event_name
         ");
 
-        // 3. Gathers attendance check-ins
         $attendance = DB::table('registrations_attendees')
             ->join('registrations', 'registrations_attendees.registration_id', '=', 'registrations.id')
             ->join('events', 'registrations.event_uuid', '=', 'events.uuid')
@@ -331,7 +319,6 @@ class DashboardController extends Controller
             events.name as event_name
         ");
 
-        // Combine all activity streams
         $union = $registrations->unionAll($statusChanges)->unionAll($attendance);
 
         return DB::query()
@@ -340,7 +327,6 @@ class DashboardController extends Controller
             ->limit($limit)
             ->get()
             ->map(function ($row) {
-                // Message generation is now aware of more types
                 $message = match ($row->type) {
                     'registration' => "{$row->actor_name} registered for {$row->event_name}",
                     'approved' => "Registration approved for {$row->actor_name} – {$row->event_name}",
@@ -357,5 +343,4 @@ class DashboardController extends Controller
             })
             ->all();
     }
-
 }
