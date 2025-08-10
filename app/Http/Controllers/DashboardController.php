@@ -169,8 +169,7 @@ class DashboardController extends Controller
      */
     private function getAkademikData(): array
     {
-        // TODO: Implement data fetching for Akademik
-        return ['role' => 'Akademik', 'stats' => []];
+        return $this->getSystemAdministratorData();
     }
 
     /**
