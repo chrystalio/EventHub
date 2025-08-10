@@ -3,7 +3,6 @@
 import { Column, ColumnDef } from "@tanstack/react-table"
 import type { Registration } from "@/types"
 import { formatDateTime } from "@/utils/dateUtils"
-import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Link } from "@inertiajs/react"
 import { ArrowUpDown } from "lucide-react"
@@ -27,9 +26,9 @@ export const columns: ColumnDef<Registration>[] = [
         cell: ({ row }) => {
             const registration = row.original;
             return (
-                <div className="font-medium text-gray-900">
+                <div className="font-medium text-gray-900 dark:text-gray-100">
                     <div>{registration.event.name}</div>
-                    <div className="text-sm text-gray-500 font-normal">
+                    <div className="text-sm text-gray-500 dark:text-gray-400 font-normal">
                         {registration.event.building.name} - {registration.event.room.name}
                     </div>
                 </div>
