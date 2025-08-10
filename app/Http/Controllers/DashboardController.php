@@ -52,15 +52,7 @@ class DashboardController extends Controller
             ->get()
             ->keyBy('room_id');
 
-        $recentEvents = Event::latest()->take(5)->get();
-        $recentRegistrations = Registration::with(['user', 'event'])->latest()->take(5)->get();
         $paginatedRooms = Room::with('building')->paginate(5, ['*'], 'roomsPage')->withQueryString();
-
-        $userGrowth = User::select(DB::raw('DATE(created_at) as date'), DB::raw('count(*) as count'))
-            ->where('created_at', '>=', now()->subDays(30))
-            ->groupBy('date')
-            ->orderBy('date', 'asc')
-            ->get();
 
         $paginatedRooms->getCollection()->transform(function ($room) use ($activeEventsByRoom) {
             $activeEvent = $activeEventsByRoom->get($room->id);
@@ -77,6 +69,8 @@ class DashboardController extends Controller
             ->groupBy('type')
             ->get();
 
+        $recentActivities = $this->getRecentActivitiesGlobal();
+
         return [
             'role' => 'System Administrator',
             'stats' => [
@@ -85,11 +79,9 @@ class DashboardController extends Controller
                 ['label' => 'Total Registrations', 'value' => $totalRegistrations],
                 ['label' => 'Total Revenue', 'value' => 'Rp ' . number_format($totalRevenue, 0, ',', '.')],
             ],
-            'recentRegistrations' => $recentRegistrations,
-            'userGrowth' => $userGrowth,
-            'recentEvents' => $recentEvents,
             'roomAvailability' => $paginatedRooms,
             'eventTypeDistribution' => $eventTypeDistribution,
+            'recentActivities' => $recentActivities,
         ];
     }
 
@@ -343,4 +335,68 @@ class DashboardController extends Controller
             })
             ->all();
     }
+
+    private function getRecentActivitiesGlobal(): array
+    {
+        $registrations = DB::table('registrations')
+            ->join('events', 'registrations.event_uuid', '=', 'events.uuid')
+            ->join('users', 'users.uuid', '=', 'registrations.user_uuid')
+            ->selectRaw("
+            registrations.registered_at as occurred_at,
+            'registration' as type,
+            registrations.event_uuid as event_uuid,
+            users.name as actor_name,
+            events.name as event_name
+        ");
+
+        $statusChanges = DB::table('registrations')
+            ->join('events', 'registrations.event_uuid', '=', 'events.uuid')
+            ->join('users', 'users.uuid', '=', 'registrations.user_uuid')
+            ->whereIn('registrations.status', ['approved', 'rejected'])
+            ->whereColumn('registrations.updated_at', '>', 'registrations.created_at')
+            ->selectRaw("
+            registrations.updated_at as occurred_at,
+            registrations.status as type,
+            registrations.event_uuid as event_uuid,
+            users.name as actor_name,
+            events.name as event_name
+        ");
+
+        $attendance = DB::table('registrations_attendees')
+            ->join('registrations', 'registrations_attendees.registration_id', '=', 'registrations.id')
+            ->join('events', 'registrations.event_uuid', '=', 'events.uuid')
+            ->join('users', 'users.uuid', '=', 'registrations.user_uuid')
+            ->selectRaw("
+            registrations_attendees.attended_at as occurred_at,
+            'attended' as type,
+            registrations.event_uuid as event_uuid,
+            users.name as actor_name,
+            events.name as event_name
+        ");
+
+        $union = $registrations->unionAll($statusChanges)->unionAll($attendance);
+
+        return DB::query()
+            ->fromSub($union, 'a')
+            ->orderByDesc('occurred_at')
+            ->limit(10)
+            ->get()
+            ->map(function ($row) {
+                $message = match ($row->type) {
+                    'registration' => "{$row->actor_name} registered for {$row->event_name}",
+                    'approved'     => "Registration approved for {$row->actor_name} – {$row->event_name}",
+                    'rejected'     => "Registration rejected for {$row->actor_name} – {$row->event_name}",
+                    'attended'     => "{$row->actor_name} checked in to {$row->event_name}",
+                    default        => "Update for {$row->actor_name} – {$row->event_name}",
+                };
+                return [
+                    'type' => $row->type,
+                    'event_uuid' => $row->event_uuid,
+                    'message' => $message,
+                    'occurred_at' => (string) $row->occurred_at,
+                ];
+            })
+            ->all();
+    }
+
 }

@@ -82,6 +82,7 @@ export default function Dashboard(props: DashboardProps) {
                             </div>
                             <div className="space-y-8">
                                 <EventTypeChartWidget data={eventTypeDistribution || []} />
+                                <RecentActivitiesWidget items={props.recentActivities || []} />
                             </div>
                         </div>
                     </div>

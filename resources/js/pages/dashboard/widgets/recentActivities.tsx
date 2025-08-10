@@ -65,7 +65,7 @@ const iconFor = (type: ActivityType) => {
             return <XCircle className="h-4 w-4 text-red-500" />;
         case 'attended':
         case 'attendance':
-            return <BadgeCheck className="h-4 w-4 text-indigo-500" />;
+            return <BadgeCheck className="h-4 w-4 text-green-500" />;
         case 'missed':
             return <UserX className="h-4 w-4" />;
         default:
