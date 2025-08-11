@@ -1,22 +1,25 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { ScrollArea } from '@/components/ui/scroll-area';
 import { Link } from '@inertiajs/react';
-import { Clock, MapPin, Calendar, CalendarCheck, ChevronRight } from 'lucide-react';
+import { Calendar, CalendarCheck, ChevronRight, Clock, MapPin } from 'lucide-react';
 
 type Staff = { id: number; name: string };
 type TodayEventItem = {
     uuid: string;
     name: string;
     start_time: string;
-    end_time: string;
+    end_time: string | null;
     building?: { name: string } | null;
     room?: { name: string } | null;
     staff: Staff[];
-    ongoing: boolean;
+    state: 'ongoing' | 'upcoming' | 'past';
 };
 
-function timeRange(startStr: string, endStr: string) {
-    const opt: Intl.DateTimeFormatOptions = { hour: 'numeric', minute: '2-digit' };
-    return `${new Date(startStr).toLocaleTimeString([], opt)} – ${new Date(endStr).toLocaleTimeString([], opt)}`;
+function timeRange(startStr: string, endStr: string | null) {
+    const fmt: Intl.DateTimeFormatOptions = { hour: 'numeric', minute: '2-digit' };
+    const start = new Date(startStr).toLocaleTimeString([], fmt);
+    const end = endStr ? new Date(endStr).toLocaleTimeString([], fmt) : start;
+    return `${start} – ${end}`;
 }
 
 function initials(name: string) {
@@ -24,31 +27,45 @@ function initials(name: string) {
     return parts.map((p) => p[0]?.toUpperCase() || '').join('');
 }
 
-function Status({ ongoing }: { ongoing: boolean }) {
+function Status({ state }: { state: TodayEventItem['state'] }) {
+    const styles =
+        state === 'ongoing'
+            ? {
+                wrap: 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/50 dark:text-emerald-300',
+                dot: 'bg-emerald-500',
+                label: 'Ongoing',
+            }
+            : state === 'upcoming'
+                ? {
+                    wrap: 'bg-muted text-muted-foreground',
+                    dot: 'bg-muted-foreground/50',
+                    label: 'Upcoming',
+                }
+                : {
+                    wrap: 'bg-muted text-muted-foreground',
+                    dot: 'bg-zinc-400 dark:bg-zinc-600',
+                    label: 'Past',
+                };
+
     return (
-        <span
-            className={`inline-flex items-center gap-1.5 rounded-full px-2 py-0.5 text-xs font-medium ${
-                ongoing
-                    ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/50 dark:text-emerald-300'
-                    : 'bg-muted text-muted-foreground'
-            }`}
-        >
-      <span
-          className={`h-2 w-2 rounded-full ${ongoing ? 'bg-emerald-500' : 'bg-muted-foreground/50'}`}
-      />
-            {ongoing ? 'Ongoing' : 'Upcoming'}
+        <span className={`inline-flex items-center gap-1.5 rounded-full px-2 py-0.5 text-xs font-medium ${styles.wrap}`}>
+      <span className={`h-2 w-2 rounded-full ${styles.dot}`} />
+            {styles.label}
     </span>
     );
 }
 
-function EventIcon({ ongoing }: { ongoing: boolean }) {
-    const cls = "h-10 w-10 flex-shrink-0 rounded-lg flex items-center justify-center";
-    return ongoing ? (
-        <div className={`${cls} bg-emerald-100 text-emerald-600 dark:bg-emerald-900/50 dark:text-emerald-400`} aria-hidden>
-            <CalendarCheck className="h-5 w-5" />
-        </div>
-    ) : (
-        <div className={`${cls} bg-muted text-muted-foreground`} aria-hidden>
+function EventIcon({ state }: { state: TodayEventItem['state'] }) {
+    const base = 'h-10 w-10 flex-shrink-0 rounded-lg flex items-center justify-center';
+    if (state === 'ongoing') {
+        return (
+            <div className={`${base} bg-emerald-100 text-emerald-600 dark:bg-emerald-900/50 dark:text-emerald-400`} aria-hidden>
+                <CalendarCheck className="h-5 w-5" />
+            </div>
+        );
+    }
+    return (
+        <div className={`${base} bg-muted text-muted-foreground`} aria-hidden>
             <Calendar className="h-5 w-5" />
         </div>
     );
@@ -85,49 +102,50 @@ export default function TodayEvents({ items }: { items: TodayEventItem[] }) {
                 <CardTitle>Happening Today</CardTitle>
             </CardHeader>
             <CardContent className="pt-2">
-                <ul className="-my-2 divide-y divide-border/50">
-                    {items.map((e) => (
-                        <li key={e.uuid} className="py-2">
-                            <Link
-                                href={route('admin.events.show', { event: e.uuid })}
-                                prefetch="hover"
-                                aria-label={`Open event ${e.name}`}
-                                className="group flex items-center gap-4 rounded-lg p-2 -m-2 transition-colors hover:bg-muted/50 focus:outline-none focus:ring-2 focus:ring-ring/40"
-                            >
-                                <EventIcon ongoing={e.ongoing} />
+                {/* keeps the card compact; scrolls if there are many rows */}
+                <ScrollArea className="max-h-80 md:max-h-96">
+                    <ul className="-my-2 divide-y divide-border/50 pr-2">
+                        {items.map((e) => (
+                            <li key={e.uuid} className="py-2">
+                                <Link
+                                    href={route('admin.events.show', { event: e.uuid })}
+                                    prefetch="hover"
+                                    aria-label={`Open event ${e.name}`}
+                                    className="group -m-2 flex items-center gap-4 rounded-lg p-2 transition-colors hover:bg-muted/50 focus:outline-none focus:ring-2 focus:ring-ring/40"
+                                >
+                                    <EventIcon state={e.state} />
 
-                                <div className="min-w-0 flex-1">
-                                    <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
-                                        <p className="text-sm font-semibold line-clamp-2 sm:line-clamp-1 sm:truncate">
-                                            {e.name}
-                                        </p>
-                                        <Status ongoing={e.ongoing} />
+                                    <div className="min-w-0 flex-1">
+                                        <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+                                            <p className="text-sm font-semibold line-clamp-2 sm:line-clamp-1 sm:truncate">{e.name}</p>
+                                            <Status state={e.state} />
+                                        </div>
+
+                                        <div className="mt-1.5 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-muted-foreground">
+                      <span className="inline-flex items-center gap-1.5">
+                        <Clock className="h-3.5 w-3.5" aria-hidden />
+                          {timeRange(e.start_time, e.end_time)}
+                      </span>
+                                            <span className="inline-flex items-center gap-1.5">
+                        <MapPin className="h-3.5 w-3.5" aria-hidden />
+                                                {(e.building?.name || 'N/A') + (e.room?.name ? ` – ${e.room.name}` : '')}
+                      </span>
+                                        </div>
+
+                                        <div className="mt-2">
+                                            <StaffGroup staff={e.staff} />
+                                        </div>
                                     </div>
 
-                                    <div className="mt-1.5 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-muted-foreground">
-                    <span className="inline-flex items-center gap-1.5">
-                      <Clock className="h-3.5 w-3.5" aria-hidden />
-                        {timeRange(e.start_time, e.end_time)}
-                    </span>
-                                        <span className="inline-flex items-center gap-1.5">
-                      <MapPin className="h-3.5 w-3.5" aria-hidden />
-                                            {(e.building?.name || 'N/A') + (e.room?.name ? ` – ${e.room.name}` : '')}
-                    </span>
-                                    </div>
-
-                                    <div className="mt-2">
-                                        <StaffGroup staff={e.staff} />
-                                    </div>
-                                </div>
-
-                                <ChevronRight
-                                    className="h-5 w-5 self-center text-muted-foreground transition-transform group-hover:translate-x-1"
-                                    aria-hidden
-                                />
-                            </Link>
-                        </li>
-                    ))}
-                </ul>
+                                    <ChevronRight
+                                        className="h-5 w-5 self-center text-muted-foreground transition-transform group-hover:translate-x-1"
+                                        aria-hidden
+                                    />
+                                </Link>
+                            </li>
+                        ))}
+                    </ul>
+                </ScrollArea>
             </CardContent>
         </Card>
     );
