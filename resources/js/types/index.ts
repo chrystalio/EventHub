@@ -279,3 +279,11 @@ export type CalendarEvent = {
     event_uuid: string;
     type?: 'free' | 'paid' | 'private';
 };
+
+export type TodayEventItem = {
+    uuid: string; name: string;
+    start_time: string; end_time: string | null;
+    building?: { name: string } | null; room?: { name: string } | null;
+    staff: { id: number; name: string }[];
+    state: 'ongoing' | 'upcoming' | 'past';
+};
