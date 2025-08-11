@@ -2,7 +2,6 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Link } from '@inertiajs/react';
 import { Clock, MapPin, Calendar, CalendarCheck, ChevronRight } from 'lucide-react';
 
-// --- TYPE DEFINITIONS (Unchanged) ---
 type Staff = { id: number; name: string };
 type TodayEventItem = {
     uuid: string;
@@ -15,7 +14,6 @@ type TodayEventItem = {
     ongoing: boolean;
 };
 
-// --- HELPER FUNCTIONS (Unchanged) ---
 function timeRange(startStr: string, endStr: string) {
     const opt: Intl.DateTimeFormatOptions = { hour: 'numeric', minute: '2-digit' };
     return `${new Date(startStr).toLocaleTimeString([], opt)} – ${new Date(endStr).toLocaleTimeString([], opt)}`;
@@ -26,9 +24,6 @@ function initials(name: string) {
     return parts.map((p) => p[0]?.toUpperCase() || '').join('');
 }
 
-// --- REFINED SUB-COMPONENTS ---
-
-// Status Badge: No functional changes, slightly adjusted for consistency.
 function Status({ ongoing }: { ongoing: boolean }) {
     return (
         <span
@@ -46,7 +41,6 @@ function Status({ ongoing }: { ongoing: boolean }) {
     );
 }
 
-// Event Icon: New component to provide a clear visual anchor for each event status.
 function EventIcon({ ongoing }: { ongoing: boolean }) {
     const cls = "h-10 w-10 flex-shrink-0 rounded-lg flex items-center justify-center";
     return ongoing ? (
@@ -60,7 +54,6 @@ function EventIcon({ ongoing }: { ongoing: boolean }) {
     );
 }
 
-// StaffGroup: Unchanged functionally, styling is inherited.
 function StaffGroup({ staff }: { staff: Staff[] }) {
     if (!staff.length) return <span className="text-xs text-muted-foreground">No staff assigned</span>;
     const show = staff.slice(0, 4);
@@ -83,7 +76,6 @@ function StaffGroup({ staff }: { staff: Staff[] }) {
     );
 }
 
-// --- MAIN COMPONENT (Refactored) ---
 export default function TodayEvents({ items }: { items: TodayEventItem[] }) {
     if (!items?.length) return null;
 

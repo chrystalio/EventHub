@@ -249,26 +249,23 @@ export interface EventWithPendingCount extends Event {
     pending_requests_count: number;
 }
 
-// For the "Upcoming Managed Schedule" widget
 export interface EventWithRegistrationsCount extends Event {
     registrations_count: number;
 }
 
-// For the "Attendance Performance" chart widget
 export interface AttendancePerformanceData {
     name: string;
     registered: number;
     attended: number;
 }
 
-// For the "Registrations Per Event" chart widget
 export interface RegistrationsPerEventData {
     name: string;
     registrants: number;
 }
 
 export interface MonthlyAttendanceData {
-    month: string; // e.g., "Jan", "Feb"
+    month: string;
     attended: number;
     missed: number;
 }
