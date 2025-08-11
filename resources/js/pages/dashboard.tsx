@@ -8,7 +8,7 @@ import type {
     UserGrowthData,
     RoomAvailability,
     EventTypeDistribution,
-    EventWithPendingCount, EventWithRegistrationsCount, RegistrationsPerEventData, PaginatedData
+    EventWithPendingCount, EventWithRegistrationsCount, RegistrationsPerEventData, PaginatedData, CalendarEvent
 } from '@/types';
 
 import StatCard from './dashboard/widgets/statCard';
@@ -22,6 +22,7 @@ import RegistrationApprovalsWidget from '@/pages/dashboard/widgets/registrationA
 import RecentActivitiesWidget from '@/pages/dashboard/widgets/recentActivities';
 import TodayGlance, { Glance } from '@/pages/dashboard/widgets/todayGlance';
 import TodayEvents from '@/pages/dashboard/widgets/todayEvents';
+import FullCalendarWidget from '@/pages/dashboard/widgets/calendar/fullCalendar';
 
 type YearlyAttendancePoint = { month: string; attended: number; missed: number };
 
@@ -62,6 +63,7 @@ interface DashboardProps {
     totalUpcomingCount?: number;
     glance?: Glance;
     todayEvents?: TodayEventItem[];
+    calendarEvents?: CalendarEvent[];
 }
 
 const breadcrumbs: BreadcrumbItem[] = [{ title: 'Dashboard', href: route('dashboard') }];
@@ -136,13 +138,19 @@ export default function Dashboard(props: DashboardProps) {
                         </div>
                         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
                             <div className="lg:col-span-2">
-                                <YearlyAttendanceChartWidget data={yearlyAttendance || []} />
+                                <FullCalendarWidget
+                                    events={props.calendarEvents || []}
+                                    title="My Calendar"
+                                    description="Your registered events."
+                                    initialView="dayGridMonth"
+                                />
                             </div>
                             <div>
                                 <UpcomingScheduleWidget
                                     registrations={upcomingRegistrations || []}
                                     totalUpcomingCount={totalUpcomingCount || 0}
                                 />
+                                <YearlyAttendanceChartWidget data={yearlyAttendance || []} />
                             </div>
                         </div>
                     </div>
