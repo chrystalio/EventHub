@@ -272,3 +272,13 @@ export interface MonthlyAttendanceData {
     attended: number;
     missed: number;
 }
+
+export type CalendarEvent = {
+    id: string;
+    title: string;
+    start: string;
+    end: string;
+    location?: string | null;
+    event_uuid: string;
+    type?: 'free' | 'paid' | 'private';
+};
