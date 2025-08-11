@@ -28,14 +28,14 @@ export default function YearlyAttendanceChartWidget({ data }: YearlyAttendanceCh
     };
 
     return (
-        <Card>
+        <Card className="mt-5">
             <CardHeader>
                 <CardTitle>My Yearly Attendance</CardTitle>
                 <CardDescription>A summary of your event attendance for the current year.</CardDescription>
             </CardHeader>
-            <CardContent>
+            <CardContent className="h-97">
                 {hasData ? (
-                    <ChartContainer config={chartConfig} className="min-h-[300px] w-full">
+                    <ChartContainer config={chartConfig} className="min-h-[370px] w-full">
                         <BarChart accessibilityLayer data={data}>
                             <CartesianGrid vertical={false} />
                             <XAxis
@@ -57,7 +57,7 @@ export default function YearlyAttendanceChartWidget({ data }: YearlyAttendanceCh
                             <Legend
                                 formatter={formatLegendValue}
                                 verticalAlign="top"
-                                wrapperStyle={{ paddingBottom: '1rem' }}
+                                wrapperStyle={{ paddingBottom: '0.5rem' }}
                             />
                             <Bar dataKey="attended" fill="var(--color-attended)" radius={4} />
                             <Bar dataKey="missed" fill="var(--color-missed)" radius={4} />
