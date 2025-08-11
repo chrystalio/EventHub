@@ -40,7 +40,8 @@ class DashboardController extends Controller
 
     private function getSystemAdministratorData(): array
     {
-        $now = now();
+        $tz = config('app.timezone');
+        $now = now($tz);
         $startOfDay = now()->startOfDay();
         $endOfDay = now()->endOfDay();
         $totalUsers = User::count();
@@ -82,20 +83,29 @@ class DashboardController extends Controller
             'room:id,name',
             'staff:id,name',
         ])
-            ->whereBetween('start_time', [$startOfDay, $endOfDay])
-            ->orderBy('start_time')
-            ->take(5)
+            ->where('start_time', '<=', $endOfDay)
+            ->where('end_time', '>=', $startOfDay)
+            ->orderByRaw("CASE
+            WHEN start_time <= ? AND end_time >= ? THEN 0  -- ongoing
+            WHEN start_time >  ? THEN 1                    -- upcoming
+            ELSE 2                                         -- past
+        END", [$now, $now, $now])
+            ->orderBy('start_time', 'asc')
             ->get()
             ->map(function ($e) use ($now) {
+                $state = $e->start_time->lte($now) && $e->end_time->gte($now)
+                    ? 'ongoing'
+                    : ($e->start_time->gt($now) ? 'upcoming' : 'past');
+
                 return [
                     'uuid' => $e->uuid,
                     'name' => $e->name,
-                    'start_time' => (string) $e->start_time,
-                    'end_time' => (string) $e->end_time,
+                    'start_time' => $e->start_time->toIso8601String(),
+                    'end_time' => optional($e->end_time)->toIso8601String(),
                     'building' => ['name' => optional($e->building)->name],
                     'room' => ['name' => optional($e->room)->name],
-                    'staff' => $e->staff->map(fn ($u) => ['id' => $u->id, 'name' => $u->name])->values(),
-                    'ongoing' => $e->start_time <= $now && $e->end_time >= $now,
+                    'staff' => $e->staff->map(fn($u) => ['id' => $u->id, 'name' => $u->name])->values(),
+                    'state' => $state,
                 ];
             });
 
@@ -182,6 +192,7 @@ class DashboardController extends Controller
             'recentActivities' => $recentActivities,
         ];
     }
+
     /**
      * Get data for the Akademik dashboard.
      */
@@ -375,7 +386,7 @@ class DashboardController extends Controller
                     'type' => $row->type,
                     'event_uuid' => $row->event_uuid,
                     'message' => $message,
-                    'occurred_at' => (string) $row->occurred_at,
+                    'occurred_at' => (string)$row->occurred_at,
                 ];
             })
             ->all();
@@ -429,16 +440,16 @@ class DashboardController extends Controller
             ->map(function ($row) {
                 $message = match ($row->type) {
                     'registration' => "{$row->actor_name} registered for {$row->event_name}",
-                    'approved'     => "Registration approved for {$row->actor_name} – {$row->event_name}",
-                    'rejected'     => "Registration rejected for {$row->actor_name} – {$row->event_name}",
-                    'attended'     => "{$row->actor_name} checked in to {$row->event_name}",
-                    default        => "Update for {$row->actor_name} – {$row->event_name}",
+                    'approved' => "Registration approved for {$row->actor_name} – {$row->event_name}",
+                    'rejected' => "Registration rejected for {$row->actor_name} – {$row->event_name}",
+                    'attended' => "{$row->actor_name} checked in to {$row->event_name}",
+                    default => "Update for {$row->actor_name} – {$row->event_name}",
                 };
                 return [
                     'type' => $row->type,
                     'event_uuid' => $row->event_uuid,
                     'message' => $message,
-                    'occurred_at' => (string) $row->occurred_at,
+                    'occurred_at' => (string)$row->occurred_at,
                 ];
             })
             ->all();
