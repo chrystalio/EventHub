@@ -167,7 +167,7 @@ class DashboardController extends Controller
             ->withCount(['registrations as pending_requests_count' => fn($q) => $q->where('status', 'pending')])
             ->get();
 
-        $recentActivities = $this->getRecentActivitiesForPanitia($user, 15);
+        $recentActivities = $this->getRecentActivitiesForPanitia($user);
 
         return [
             'role' => 'Panitia',
@@ -237,7 +237,7 @@ class DashboardController extends Controller
             ->select('registrations.*')
             ->take(3)
             ->get();
-        
+
         $attendedByMonth = DB::table('registrations')
             ->join('events', 'registrations.event_uuid', '=', 'events.uuid')
             ->select(DB::raw('MONTH(events.start_time) as month'), DB::raw('COUNT(registrations.uuid) as count'))
@@ -293,7 +293,7 @@ class DashboardController extends Controller
     }
 
 
-    private function getRecentActivitiesForPanitia(User $user, int $limit = 15)
+    private function getRecentActivitiesForPanitia(User $user)
     {
         if (!$user->managedEvents()->exists()) {
             return [];
@@ -347,7 +347,7 @@ class DashboardController extends Controller
         return DB::query()
             ->fromSub($union, 'a')
             ->orderByDesc('occurred_at')
-            ->limit($limit)
+            ->limit(10)
             ->get()
             ->map(function ($row) {
                 $message = match ($row->type) {
@@ -367,7 +367,7 @@ class DashboardController extends Controller
             ->all();
     }
 
-    private function getRecentActivitiesGlobal(int $limit = 20): array
+    private function getRecentActivitiesGlobal(): array
     {
         $registrations = DB::table('registrations')
             ->join('events', 'registrations.event_uuid', '=', 'events.uuid')
@@ -410,7 +410,7 @@ class DashboardController extends Controller
         return DB::query()
             ->fromSub($union, 'a')
             ->orderByDesc('occurred_at')
-            ->limit($limit)
+            ->limit(10)
             ->get()
             ->map(function ($row) {
                 $message = match ($row->type) {
