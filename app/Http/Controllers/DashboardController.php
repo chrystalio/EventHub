@@ -277,6 +277,19 @@ class DashboardController extends Controller
             ];
         }
 
+        $calendarEvents = Registration::with('event')
+            ->where('user_uuid', $user->uuid)
+            ->get()
+            ->map(fn($registration) => [
+                'id' => $registration->event->id,
+                'title' => $registration->event->name,
+                'start' => $registration->event->start_time->toIso8601String(),
+                'end' => optional($registration->event->end_time)->toIso8601String(),
+                'location' => $registration->event->location ?? null,
+                'event_uuid' => $registration->event->uuid,
+                'type' => $registration->event->type,
+            ]);
+
         return [
             'role' => 'Peserta',
             'stats' => [
@@ -289,6 +302,7 @@ class DashboardController extends Controller
             'upcomingRegistrations' => $upcomingRegistrations,
             'totalUpcomingCount' => $totalUpcomingCount,
             'yearlyAttendance' => $monthlyData,
+            'calendarEvents' => $calendarEvents,
         ];
     }
 
