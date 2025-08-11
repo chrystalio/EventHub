@@ -198,8 +198,6 @@ class DashboardController extends Controller
         $now = now();
         $startOfYear = $now->copy()->startOfYear();
 
-        // --- Monthly Stats ---
-        // Note: Consider if these should be based on event date instead of registration date.
         $registeredThisMonthCount = Registration::where('user_uuid', $user->uuid)
             ->whereMonth('registered_at', $now->month)
             ->whereYear('registered_at', $now->year)
@@ -227,7 +225,6 @@ class DashboardController extends Controller
             ->where('status', 'pending')
             ->count();
 
-        // --- Upcoming Events ---
         $totalUpcomingCount = Registration::where('user_uuid', $user->uuid)
             ->whereHas('event', fn($q) => $q->where('start_time', '>=', $now))
             ->count();
@@ -240,8 +237,7 @@ class DashboardController extends Controller
             ->select('registrations.*')
             ->take(3)
             ->get();
-
-        // --- Yearly Attendance Chart Data ---
+        
         $attendedByMonth = DB::table('registrations')
             ->join('events', 'registrations.event_uuid', '=', 'events.uuid')
             ->select(DB::raw('MONTH(events.start_time) as month'), DB::raw('COUNT(registrations.uuid) as count'))
