@@ -21,6 +21,9 @@ interface IndexProps {
     events: Event[];
     buildings: Building[];
     rooms: Room[];
+    canCreate: boolean;
+    canUpdate: boolean;
+    canDelete: boolean;
 }
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -28,7 +31,7 @@ const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Events', href: route('admin.events.index') },
 ];
 
-export default function Index({ events = [], buildings = [], rooms = [] }: IndexProps) {
+export default function Index({ events = [], buildings = [], rooms = [], canCreate, canUpdate, canDelete }: IndexProps) {
     useFlashToast();
 
     const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
@@ -142,7 +145,6 @@ export default function Index({ events = [], buildings = [], rooms = [] }: Index
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Event Management" />
-
             <div className="m-4">
                 <Card>
                     <CardContent className="pt-6">
@@ -154,15 +156,17 @@ export default function Index({ events = [], buildings = [], rooms = [] }: Index
                                 onChange={(e) => setColumnFilters([{ id: 'name', value: e.target.value }])}
                                 className="w-full sm:w-64"
                             />
-                            <Button onClick={handleCreate} className="w-full sm:w-auto">
-                                <PlusCircle className="mr-2 h-4 w-4" />
-                                Add Event
-                            </Button>
+                            {canCreate && (
+                                <Button onClick={handleCreate} className="w-full sm:w-auto">
+                                    <PlusCircle className="mr-2 h-4 w-4" />
+                                    Add Event
+                                </Button>
+                            )}
                         </div>
                         <div className="grid">
                             <div className="overflow-x-auto">
                                 <DataTable
-                                    columns={getColumns({ onEdit: handleEdit, onDelete: handleDelete })}
+                                    columns={getColumns({ onEdit: handleEdit, onDelete: handleDelete, canUpdate, canDelete })}
                                     data={events || []}
                                     columnFilters={columnFilters}
                                     onColumnFiltersChange={setColumnFilters}

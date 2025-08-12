@@ -106,6 +106,23 @@ export interface PaginationLink {
     active: boolean;
 }
 
+export type PaginatedData<T> = {
+    data: T[];
+    current_page: number;
+    last_page: number;
+    per_page: number;
+    total: number;
+    links: PaginationLink[];
+    first_page_url?: string;
+    last_page_url?: string;
+    next_page_url?: string | null;
+    prev_page_url?: string | null;
+    from?: number | null;
+    to?: number | null;
+    path?: string;
+};
+
+
 export interface PaginatedEvents {
     data: Event[];
     current_page: number;
@@ -209,3 +226,64 @@ export interface RolePermissionPageProps {
     permissions: Record<string, Permission[]>
     assigned: string[]
 }
+
+export interface UserGrowthData {
+    date: string;
+    count: number;
+}
+
+export interface RoomAvailability {
+    id: number;
+    name: string;
+    building: string;
+    status: 'Available' | 'In Use';
+    event_name: string | null;
+}
+
+export interface EventTypeDistribution {
+    type: 'free' | 'paid' | 'private';
+    count: number;
+}
+
+export interface EventWithPendingCount extends Event {
+    pending_requests_count: number;
+}
+
+export interface EventWithRegistrationsCount extends Event {
+    registrations_count: number;
+}
+
+export interface AttendancePerformanceData {
+    name: string;
+    registered: number;
+    attended: number;
+}
+
+export interface RegistrationsPerEventData {
+    name: string;
+    registrants: number;
+}
+
+export interface MonthlyAttendanceData {
+    month: string;
+    attended: number;
+    missed: number;
+}
+
+export type CalendarEvent = {
+    id: string;
+    title: string;
+    start: string;
+    end: string;
+    location?: string | null;
+    event_uuid: string;
+    type?: 'free' | 'paid' | 'private';
+};
+
+export type TodayEventItem = {
+    uuid: string; name: string;
+    start_time: string; end_time: string | null;
+    building?: { name: string } | null; room?: { name: string } | null;
+    staff: { id: number; name: string }[];
+    state: 'ongoing' | 'upcoming' | 'past';
+};

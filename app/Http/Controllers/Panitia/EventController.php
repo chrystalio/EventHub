@@ -30,6 +30,17 @@ class EventController extends Controller
                 'uuid' => $event->uuid,
                 'name' => $event->name,
                 'organizer' => $event->organizer,
+                'start_time' => $event->start_time,
+                'end_time' => $event->end_time,
+                'building' => $event->building ? [
+                    'id' => $event->building->id,
+                    'name' => $event->building->name,
+                ] : null,
+                'room' => $event->room ? [
+                    'id' => $event->room->id,
+                    'name' => $event->room->name,
+                ] : null,
+                'status' => $event->status,
             ];
         });
 
@@ -102,8 +113,7 @@ class EventController extends Controller
             $attendee->update(['attended_at' => now()]);
 
             $registration = $attendee->registration;
-            $allAttended = $registration->attendees()->whereNull('attended_at')->doesntExist();
-            if ($allAttended) {
+            if ($registration->status !== 'attended') {
                 $registration->update(['status' => 'attended']);
             }
 

@@ -14,9 +14,11 @@ import { Badge } from '@/components/ui/badge';
 interface GetColumnsProps {
     onEdit: (event: Event) => void;
     onDelete: (event: Event) => void;
+    canUpdate?: boolean;
+    canDelete?: boolean;
 }
 
-export function getColumns({ onEdit, onDelete }: GetColumnsProps): ColumnDef<Event>[] {
+export function getColumns({ onEdit, onDelete, canDelete, canUpdate }: GetColumnsProps): ColumnDef<Event>[] {
     return [
         {
             accessorKey: 'name',
@@ -112,16 +114,19 @@ export function getColumns({ onEdit, onDelete }: GetColumnsProps): ColumnDef<Eve
                             <EyeIcon className="mr-2 h-4 w-4" />
                             View Detail
                         </DropdownMenuItem>
-                            <DropdownMenuItem className="cursor-pointer" onClick={() => onEdit(event)}>
-                                <PencilIcon className="mr-2 h-4 w-4" />
-                                Edit
-                            </DropdownMenuItem>
-                            <DropdownMenuItem
-                                className="cursor-pointer text-red-500 focus:text-red-500"
-                                onClick={() => onDelete(event)}>
-                                <LucideTrash className="mr-2 h-4 w-4" />
-                                Delete
-                            </DropdownMenuItem>
+                            {canUpdate && (
+                                <DropdownMenuItem className="cursor-pointer" onClick={() => onEdit(event)}>
+                                    <PencilIcon className="mr-2 h-4 w-4" />
+                                    Edit
+                                </DropdownMenuItem>
+                            )}
+
+                            {canDelete && (
+                                <DropdownMenuItem className="cursor-pointer text-red-500 focus:text-red-500" onClick={() => onDelete(event)}>
+                                    <LucideTrash className="mr-2 h-4 w-4" />
+                                    Delete
+                                </DropdownMenuItem>
+                            )}
                         </DropdownMenuContent>
                     </DropdownMenu>
                 );
