@@ -55,6 +55,12 @@ const StatusDisplay = ({ status, orderId }: { status: Registration['status'], or
             description: 'You missed the event. If you have any questions, please contact the organizer.',
             color: 'red',
         },
+        rejected: {
+            icon: XCircle,
+            title: 'Registration Rejected',
+            description: 'Your registration has been rejected. If you have any questions, please contact the organizer.',
+            color: 'red',
+        },
         default: {
             icon: ClockIcon,
             title: 'Registration Pending',
