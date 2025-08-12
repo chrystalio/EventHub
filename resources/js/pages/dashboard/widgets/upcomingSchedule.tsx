@@ -1,10 +1,8 @@
-import React from 'react';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Link } from '@inertiajs/react';
-import { formatDateTime } from '@/utils/dateUtils';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import type { Registration } from '@/types';
-import { ArrowRight, Calendar, ChevronRight, MapPin } from 'lucide-react';
+import { Link } from '@inertiajs/react';
+import { ArrowRight, Calendar, ChevronRight, ClockIcon, MapPin } from 'lucide-react';
 
 interface UpcomingScheduleProps {
     registrations: Registration[];
@@ -20,7 +18,7 @@ export default function UpcomingScheduleWidget({ registrations, totalUpcomingCou
             </CardHeader>
             <CardContent className="flex-grow">
                 {!registrations || registrations.length === 0 ? (
-                    <div className="flex h-full flex-col items-center justify-center text-center text-muted-foreground">
+                    <div className="text-muted-foreground flex h-full flex-col items-center justify-center text-center">
                         <p className="mb-4">You have no upcoming event registrations.</p>
                         <Button variant="outline" size="sm" asChild>
                             <Link href={route('registrations.browse')}>Browse Events</Link>
@@ -36,29 +34,43 @@ export default function UpcomingScheduleWidget({ registrations, totalUpcomingCou
                             return (
                                 <Link href={route('registrations.show', registration.uuid)} key={registration.uuid} className="block">
                                     <div className="flex items-stretch rounded-lg border transition-all hover:shadow-md">
-                                        <div className="flex flex-col items-center justify-center bg-muted/50 p-4 border-r w-20">
-                                            <p className="text-sm font-bold text-primary">{month.toUpperCase()}</p>
-                                            <p className="text-2xl font-extrabold text-foreground">{day}</p>
+                                        <div className="bg-muted/50 flex w-20 flex-col items-center justify-center border-r p-4">
+                                            <p className="text-primary text-sm font-bold">{month.toUpperCase()}</p>
+                                            <p className="text-foreground text-2xl font-extrabold">{day}</p>
                                         </div>
-                                        <div className="p-4 flex-grow">
+                                        <div className="flex-grow p-4">
                                             <p className="font-semibold">{registration.event.name}</p>
-                                            <div className="mt-2 space-y-1 text-sm text-muted-foreground">
+                                            <div className="text-muted-foreground mt-2 space-y-1 text-sm">
                                                 <div className="flex items-center gap-2">
-                                                    <Calendar className="h-4 w-4" />
-                                                    <span>{formatDateTime(registration.event.start_time)}</span>
+                                                    <ClockIcon className="h-4 w-4" />
+                                                    <span>
+                                                        {new Date(registration.event.start_time).toLocaleTimeString('en-US', {
+                                                            hour: '2-digit',
+                                                            minute: '2-digit',
+                                                            hour12: true,
+                                                        })}
+                                                        {' – '}
+                                                        {new Date(registration.event.end_time).toLocaleTimeString('en-US', {
+                                                            hour: '2-digit',
+                                                            minute: '2-digit',
+                                                            hour12: true,
+                                                        })}
+                                                    </span>
                                                 </div>
                                                 <div className="flex items-center gap-2">
                                                     <MapPin className="h-4 w-4" />
-                                                    <span>{registration.event.building.name} - {registration.event.room.name}</span>
+                                                    <span>
+                                                        {registration.event.building.name} - {registration.event.room.name}
+                                                    </span>
                                                 </div>
                                             </div>
                                         </div>
-                                        <div className="p-4 flex items-center">
-                                            <ChevronRight className="h-5 w-5 text-muted-foreground" />
+                                        <div className="flex items-center p-4">
+                                            <ChevronRight className="text-muted-foreground h-5 w-5" />
                                         </div>
                                     </div>
                                 </Link>
-                            )
+                            );
                         })}
                     </div>
                 )}
