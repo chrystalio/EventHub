@@ -94,7 +94,7 @@ export default function TodayEvents({ items }: { items: TodayEventItem[] }) {
                 <ScrollArea className="max-h-80 md:max-h-96">
                     <ul className="divide-border/50 -my-2 divide-y pr-2">
                         {items.map((e) => (
-                            <li key={e.uuid} className="py-2">
+                            <li key={e.uuid} className="my-4">
                                 <Link
                                     href={route('admin.events.show', { event: e.uuid })}
                                     prefetch="hover"
