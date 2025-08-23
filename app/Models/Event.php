@@ -92,6 +92,24 @@ class Event extends Model
             'id'
         );
     }
+
+    public function certificateTemplate(): BelongsTo
+    {
+        return $this->belongsTo(CertificateTemplate::class, 'certificate_template_id');
+    }
+
+    public function certificates(): HasManyThrough
+    {
+        return $this->hasManyThrough(
+            Certificate::class,
+            RegistrationAttendee::class,
+            'registration_id',
+            'attendee_id',
+            'uuid',
+            'id'
+        )->whereHas('attendee.registration', fn($query) => $query->where('event_uuid', $this->uuid));
+    }
+
     public function getTotalRegisteredAttribute(): int
     {
         return $this->registrations()
