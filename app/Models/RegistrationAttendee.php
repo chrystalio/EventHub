@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Support\Str;
 use PragmaRX\Google2FA\Google2FA;
 
@@ -45,6 +46,11 @@ class RegistrationAttendee extends Model
     public function registration(): BelongsTo
     {
         return $this->belongsTo(Registration::class);
+    }
+
+    public function certificate(): RegistrationAttendee|HasOne
+    {
+        return $this->hasOne(Certificate::class, 'attendee_id');
     }
 
     // Helper method to check if attendee has attended
