@@ -10,14 +10,17 @@
     "license": "MIT",
     "require": {
         "php": "^8.2",
+        "dompdf/dompdf": "^3.1",
         "inertiajs/inertia-laravel": "^2.0",
         "lab404/laravel-impersonate": "^1.7",
         "laravel/framework": "^12.0",
         "laravel/sanctum": "^4.0",
         "laravel/tinker": "^2.10.1",
         "midtrans/midtrans-php": "^2.6",
+        "phpoffice/phpword": "^1.4",
         "pragmarx/google2fa-laravel": "^2.3",
         "propaganistas/laravel-phone": "^6.0",
+        "simplesoftwareio/simple-qrcode": "^4.2",
         "spatie/laravel-permission": "^6.18",
         "spatie/laravel-ray": "^1.40",
         "tightenco/ziggy": "^2.5"

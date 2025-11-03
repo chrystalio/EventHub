@@ -10,6 +10,7 @@ class CertificateTemplate extends Model
         'name',
         'theme',
         'config',
+        'file_path',
     ];
 
     protected $casts = [

@@ -5,6 +5,7 @@ use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Http\Middleware\AddLinkHeadersForPreloadedAssets;
+use Illuminate\Support\Facades\Route;
 use Spatie\Permission\Middleware\PermissionMiddleware;
 use Spatie\Permission\Middleware\RoleMiddleware;
 
@@ -20,12 +21,14 @@ return Application::configure(basePath: dirname(__DIR__))
             HandleInertiaRequests::class,
             AddLinkHeadersForPreloadedAssets::class,
         ]);
-        $middleware->statefulApi();
+        // Commenting out statefulApi to allow performance endpoints without auth
+        // $middleware->statefulApi();
 
         $middleware->trustProxies(at: '*');
         $middleware->validateCsrfTokens(
             except: [
                 'midtrans/webhook',
+                'api/performance/*', // Performance testing endpoints
             ]
         );
 

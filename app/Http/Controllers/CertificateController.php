@@ -41,7 +41,7 @@ class CertificateController extends Controller
         ]);
     }
 
-    public function download($attendeeId): \Symfony\Component\HttpFoundation\StreamedResponse
+    public function download($attendeeId): \Symfony\Component\HttpFoundation\BinaryFileResponse
     {
         $attendee = RegistrationAttendee::with(['registration.event', 'registration.user'])
             ->findOrFail($attendeeId);
@@ -55,11 +55,34 @@ class CertificateController extends Controller
         }
 
         $certificate = $this->certificateService->generateCertificate($attendee);
-        $safeFilename = str_replace(['/', '\\', ':', '*', '?', '"', '<', '>', '|'], '-', $certificate->certificate_number);
 
-        return Storage::download(
-            $certificate->file_path,
-            $safeFilename . '.pdf'
-        );
+        // Get the actual file path
+        $filePath = storage_path('app/' . $certificate->file_path);
+
+        // Verify file exists
+        if (!file_exists($filePath)) {
+            abort(404, 'Certificate file not found');
+        }
+
+        // Clear any output buffers to prevent corruption
+        while (ob_get_level()) {
+            ob_end_clean();
+        }
+
+        // Get correct file extension
+        $fileExtension = pathinfo($certificate->file_path, PATHINFO_EXTENSION);
+
+        // Create safe filename with correct extension
+        $safeFilename = preg_replace('/[^a-zA-Z0-9._-]/', '_', $certificate->certificate_number);
+        $downloadName = $safeFilename . '.' . $fileExtension;
+
+        // Use response()->download() with absolute path instead of Storage::download()
+        return response()->download($filePath, $downloadName, [
+            'Content-Type' => $fileExtension === 'pdf'
+                ? 'application/pdf'
+                : 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+            'Content-Disposition' => 'attachment; filename="' . $downloadName . '"',
+        ]);
     }
+
 }

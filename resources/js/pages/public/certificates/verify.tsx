@@ -108,27 +108,30 @@ export default function Verify({ certificate, attendee, event }: VerifyProps) {
                                 </div>
                             </div>
                             <hr />
-                            <div className="space-y-4">
-                                <h3 className="text-sm font-medium text-gray-500">Digitally Signed & Verified By</h3>
-                                <div className="flex items-start gap-4 pt-2">
-                                    <div className="flex-shrink-0">
-                                        <BadgeCheck className="h-10 w-10 text-green-600" />
-                                    </div>
-                                    <div>
-                                        <p className="font-semibold text-gray-900">Dr. Eng Ansarullah Lawi</p>
-                                        <p className="text-sm text-gray-600">
-                                            Vice Rector 1 For Academic Affairs, Student Affairs, and Alumni of ITEBA
-                                        </p>
+                            {certificate.status.toLowerCase() === 'valid' && (
+                                <div className="space-y-4">
+                                    <h3 className="text-sm font-medium text-gray-500">Digitally Signed & Verified
+                                        By</h3>
+                                    <div className="flex items-start gap-4 pt-2">
+                                        <div className="flex-shrink-0">
+                                            <BadgeCheck className="h-10 w-10 text-green-500" />
+                                        </div>
+                                        <div>
+                                            <p className="font-semibold text-gray-900">Dr. Eng Ansarullah Lawi</p>
+                                            <p className="text-sm text-gray-600">
+                                                Vice Rector 1 For Academic Affairs, Student Affairs, and Alumni of ITEBA
+                                            </p>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
+                            )}
                         </div>
                         <footer className="mt-8 text-center text-sm text-gray-500">
                             <p>
                                 Verification Hash: <span className="font-mono">{certificate.short_hash}</span>
                             </p>
                             <p className="mt-1">
-                                Verified on {new Date().toLocaleDateString('en-GB', {
+                                Verified check at {new Date().toLocaleDateString('en-GB', {
                                 day: 'numeric',
                                 month: 'long',
                                 year: 'numeric'

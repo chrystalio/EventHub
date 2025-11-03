@@ -14,13 +14,13 @@ import {
     ArrowRightIcon,
     CheckCircle2,
     ClockIcon,
-    CreditCard,
+    CreditCard, Download, File,
     Loader2,
     MapPinIcon,
     QrCodeIcon,
     TicketIcon,
     UsersIcon,
-    XCircle,
+    XCircle
 } from 'lucide-react';
 import { QRCodeSVG } from 'qrcode.react';
 import { useEffect, useState } from 'react';
@@ -200,7 +200,8 @@ export default function RegistrationShow({ registration }: Props) {
             <div className="space-y-8 px-4 py-8 lg:px-8">
                 <Link
                     href={route('registrations.index')}
-                    className="text-muted-foreground hover:text-primary inline-flex items-center text-sm font-medium">
+                    className="text-muted-foreground hover:text-primary inline-flex items-center text-sm font-medium"
+                >
                     <ArrowLeftIcon className="mr-2 h-4 w-4" />
                     Back to My Registrations
                 </Link>
@@ -279,13 +280,25 @@ export default function RegistrationShow({ registration }: Props) {
                                         <p className="text-foreground text-lg font-bold">{attendee.name}</p>
                                         {attendee.phone && <p className="text-muted-foreground text-sm">{attendee.phone}</p>}
                                     </div>
+
                                     {attendee.attended_at ? (
-                                        <div className="flex flex-col items-center text-center sm:text-right">
-                                            <Badge className="border-green-200 bg-green-100 text-green-800 hover:bg-green-100">
+                                        <div className="flex flex-col items-center text-center sm:items-end sm:text-right">
+                                            <Badge variant="outline" className="border-green-200 bg-green-100 text-green-800 hover:bg-green-100">
                                                 <CheckCircle2 className="mr-1.5 h-4 w-4" />
                                                 Checked-in
                                             </Badge>
                                             <p className="text-muted-foreground mt-1 text-xs">at {formatDateTime(attendee.attended_at)}</p>
+                                            <Button asChild size="sm" className="mt-2">
+                                                <a
+                                                    href={`/registrants/attendees/${attendee.id}/certificate`}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    className="inline-flex min-w-[120px] flex-1 items-center justify-center rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700 sm:flex-none"
+                                                >
+                                                    <File className="mr-2 h-4 w-4" />
+                                                    Certificate
+                                                </a>
+                                            </Button>
                                         </div>
                                     ) : isCheckinClosed ? (
                                         <Badge className="border-red-200 bg-red-100 text-red-800 hover:bg-red-100">

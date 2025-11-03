@@ -41,6 +41,9 @@ class StoreEventRequest extends FormRequest
                     }
                 },
             ],
+            'certificate_enabled' => 'nullable|boolean',
+            'certificate_template_file' => 'nullable|file|mimes:docx|max:5120',
+            'certificate_number_format' => 'nullable|string|max:255',
         ];
     }
 
@@ -64,5 +67,13 @@ class StoreEventRequest extends FormRequest
 
             }
         }
+    }
+
+    public function messages(): array
+    {
+        return [
+            'certificate_template_file.mimes' => 'The certificate template must be a DOCX file.',
+            'certificate_template_file.max' => 'The certificate template file size must not exceed 5MB.',
+        ];
     }
 }

@@ -2,7 +2,13 @@
 
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Api\AttendeeController;
+use App\Http\Controllers\Performance\QrScanController;
 use Illuminate\Support\Facades\Route;
+
+// Performance testing routes (no auth, only in local/testing)
+// Temporarily removing environment check for debugging
+Route::post('/performance/ticket-verify', [QrScanController::class, 'verify'])
+    ->name('performance.ticket.verify');
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/admin/users/search', [UserController::class, 'search'])

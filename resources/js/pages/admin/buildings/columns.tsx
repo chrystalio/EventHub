@@ -13,7 +13,7 @@ import { DataTableColumnHeader } from '@/components/ui/data-table-column-header'
 
 interface GetColumnsProps {
     onEdit: (building: Building) => void;
-    onDelete: (building: Building) => void;
+    onnDelete: (building: Building) => void;
 }
 
 export function getColumns({ onEdit, onDelete }: GetColumnsProps): ColumnDef<Building>[] {

@@ -26,6 +26,8 @@ class Event extends Model
         'building_id',
         'room_id',
         'created_by',
+        'certificate_enabled',
+        'certificate_template_id',
     ];
 
     protected $casts = [
@@ -95,7 +97,7 @@ class Event extends Model
 
     public function certificateTemplate(): BelongsTo
     {
-        return $this->belongsTo(CertificateTemplate::class, 'certificate_template_id');
+        return $this->belongsTo(CertificateTemplate::class);
     }
 
     public function certificates(): HasManyThrough

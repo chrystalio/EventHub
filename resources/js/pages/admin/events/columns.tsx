@@ -23,6 +23,34 @@ export function getColumns({ onEdit, onDelete, canDelete, canUpdate }: GetColumn
         {
             accessorKey: 'name',
             header: 'Event Name',
+            cell: ({ row }) => {
+                const event = row.original;
+                const { type, name, organizer } = event;
+
+                let variant: 'default' | 'secondary' | 'destructive' | 'outline' = 'secondary';
+
+                switch (type) {
+                    case 'free':
+                        variant = 'default';
+                        break;
+                    case 'private':
+                        variant = 'secondary';
+                        break;
+                    case 'paid':
+                        variant = 'destructive';
+                        break;
+                }
+
+                return (
+                    <div className="flex flex-col gap-1">
+                        {/*<Badge variant={variant} className="text-xs capitalize">*/}
+                        {/*    {type}*/}
+                        {/*</Badge>*/}
+                        <span className="font-medium">{name}</span>
+                        <span className="text-xs text-muted-foreground">By {organizer || '-'}</span>
+                    </div>
+                );
+            },
         },
         {
             id: 'room',
@@ -50,25 +78,29 @@ export function getColumns({ onEdit, onDelete, canDelete, canUpdate }: GetColumn
                     return (
                         <div>
                             <div className="text-sm font-medium">{startDate}</div>
-                            <div className="text-xs text-muted-foreground">{startTime} - {endTime}</div>
+                            <div className="text-muted-foreground text-xs">
+                                {startTime} - {endTime}
+                            </div>
                         </div>
                     );
                 } else {
                     return (
                         <div className="space-y-1">
                             <div className="text-sm font-medium">{fullStartTimeString}</div>
-                            <div className="text-xs text-muted-foreground">to {fullEndTimeString}</div>
+                            <div className="text-muted-foreground text-xs">to {fullEndTimeString}</div>
                         </div>
                     );
                 }
             },
         },
         {
-            accessorKey: "type",
-            header: "Type",
+            id: 'type',
+            header: 'Type',
             cell: ({ row }) => {
-                const type = row.original.type;
-                let variant: "default" | "secondary" | "destructive" | "outline" = "secondary";
+                const event = row.original;
+                const { type } = event;
+
+                let variant: 'default' | 'secondary' | 'destructive' | 'outline' = 'secondary';
 
                 switch (type) {
                     case 'free':
@@ -83,17 +115,11 @@ export function getColumns({ onEdit, onDelete, canDelete, canUpdate }: GetColumn
                 }
 
                 return (
-                    <Badge variant={variant} className="capitalize">
+                    <Badge variant={variant} className="text-xs capitalize">
                         {type}
                     </Badge>
-                )
-            }
-        },
-
-        {
-            id: 'organizer',
-            header: 'Organizer',
-            cell: ({ row }) => row.original.organizer || '-',
+                );
+            },
         },
         {
             id: 'actions',
@@ -110,17 +136,19 @@ export function getColumns({ onEdit, onDelete, canDelete, canUpdate }: GetColumn
                             </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end" className="w-40">
-                        <DropdownMenuItem className="cursor-pointer" onClick={() => window.open(route('admin.events.show', event.uuid), '_blank')}>
-                            <EyeIcon className="mr-2 h-4 w-4" />
-                            View Detail
-                        </DropdownMenuItem>
+                            <DropdownMenuItem
+                                className="cursor-pointer"
+                                onClick={() => window.open(route('admin.events.show', event.uuid), '_blank')}
+                            >
+                                <EyeIcon className="mr-2 h-4 w-4" />
+                                View Detail
+                            </DropdownMenuItem>
                             {canUpdate && (
                                 <DropdownMenuItem className="cursor-pointer" onClick={() => onEdit(event)}>
                                     <PencilIcon className="mr-2 h-4 w-4" />
                                     Edit
                                 </DropdownMenuItem>
                             )}
-
                             {canDelete && (
                                 <DropdownMenuItem className="cursor-pointer text-red-500 focus:text-red-500" onClick={() => onDelete(event)}>
                                     <LucideTrash className="mr-2 h-4 w-4" />
@@ -134,3 +162,4 @@ export function getColumns({ onEdit, onDelete, canDelete, canUpdate }: GetColumn
         },
     ];
 }
+

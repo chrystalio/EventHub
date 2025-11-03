@@ -1,24 +1,16 @@
-import { usePage } from '@inertiajs/react';
-import { NavFooter } from '@/components/nav-footer';
-import { NavMain } from '@/components/nav-main';
-import { NavUser } from '@/components/nav-user';
+import { usePage, Link } from '@inertiajs/react';
 import {
     Sidebar, SidebarContent, SidebarFooter,
     SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem
 } from '@/components/ui/sidebar';
-import { type NavItem, User } from '@/types';
-import { Link } from '@inertiajs/react';
+import { NavMain } from '@/components/nav-main';
+import { NavFooter } from '@/components/nav-footer';
+import { NavUser } from '@/components/nav-user';
 import {
-    LayoutGrid,
-    UserCog,
-    Users,
-    Building,
-    DoorOpenIcon,
-    CalendarRange,
-    CalendarIcon,
-    TicketIcon,
-    Briefcase, Award
+    LayoutGrid, UserCog, Users, Building, DoorOpenIcon,
+    CalendarRange, CalendarIcon, TicketIcon, Briefcase, Award
 } from 'lucide-react';
+import { type NavItem, User } from '@/types';
 import AppLogo from './app-logo';
 
 const rawNavItems: NavItem[] = [
@@ -30,28 +22,25 @@ const rawNavItems: NavItem[] = [
     { title: 'Events', url: route('admin.events.index'), icon: CalendarRange, role: ['System Administrator', 'Akademik'] },
     { title: 'Buildings', url: route('admin.buildings.index'), icon: Building, role: ['System Administrator', 'Akademik'] },
     { title: 'Rooms', url: route('admin.rooms.index'), icon: DoorOpenIcon, role: ['System Administrator', 'Akademik'] },
-    { title: 'Users', url: route('admin.users.index'), icon: Users, role: ['System Administrator', 'Akademik'] },
-    { title: 'Roles', url: route('roles.index'), icon: UserCog, role: ['System Administrator', 'Akademik'] },
+    { title: 'Users', url: route('admin.users.index'), icon: Users, role: 'System Administrator' },
+    { title: 'Roles', url: route('roles.index'), icon: UserCog, role: 'System Administrator' },
 ];
 
-const footerNavItems: NavItem[] = [];
+type Role = string | { name: string };
+
+const roleMatches = (userRoles: Role[] | undefined, required: string[]): boolean =>
+    !!userRoles?.some(r => required.includes(typeof r === 'string' ? r : r?.name));
 
 export function AppSidebar() {
     const { props } = usePage<{ auth: { user: User } }>();
     const user = props.auth?.user;
 
     const mainNavItems = rawNavItems.filter(item => {
-        if (item.permission) {
-            return user?.permissions?.includes(item.permission);
-        }
-
+        if (item.permission) return user?.permissions?.includes(item.permission);
         if (item.role) {
-            const requiredRoles = Array.isArray(item.role) ? item.role : [item.role];
-            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-            // @ts-expect-error
-            return user?.roles?.some(userRoleName => requiredRoles.includes(userRoleName));
+            const required = Array.isArray(item.role) ? item.role : [item.role];
+            return roleMatches(user?.roles as Role[], required);
         }
-
         return true;
     });
 
@@ -74,7 +63,7 @@ export function AppSidebar() {
             </SidebarContent>
 
             <SidebarFooter>
-                <NavFooter items={footerNavItems} className="mt-auto" />
+                <NavFooter items={[]} className="mt-auto" />
                 <NavUser />
             </SidebarFooter>
         </Sidebar>

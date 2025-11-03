@@ -1,6 +1,8 @@
 <?php
 
 use App\Http\Controllers\Admin\BuildingController;
+use App\Http\Controllers\Admin\CertificateController as AdminCertificateController;
+use App\Http\Controllers\Admin\CertificateSettingsController;
 use App\Http\Controllers\Admin\EventController;
 use App\Http\Controllers\Admin\EventStaffController;
 use App\Http\Controllers\Admin\RegistrationManagementController;
@@ -8,11 +10,14 @@ use App\Http\Controllers\Admin\RoleController;
 use App\Http\Controllers\Admin\RolePermissionController;
 use App\Http\Controllers\Admin\RoomController;
 use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\CertificateVerificationController;
+use App\Http\Controllers\CertificateController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\PublicEventController;
 use App\Http\Controllers\RegistrationController;
 use App\Http\Controllers\Panitia\EventController as PanitiaEventController;
 use App\Http\Controllers\TransactionController;
+
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -53,24 +58,46 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
         Route::get('/events', [EventController::class, 'index'])->name('admin.events.index')->middleware('can:event.view');
         Route::post('/events', [EventController::class, 'store'])->name('admin.events.store')->middleware('can:event.create');
-        Route::put('/events/{event}', [EventController::class, 'update'])->name('admin.events.update')->middleware('can:event.update');
+        Route::match(['PUT', 'POST'], '/events/{event}', [EventController::class, 'update'])->name('admin.events.update')->middleware('can:event.update');
         Route::delete('/events/{event}', [EventController::class, 'destroy'])->name('admin.events.destroy')->middleware('can:event.delete');
         Route::get('/events/{event}/show', [EventController::class, 'show'])->name('admin.events.show')->middleware('can:event.view');
         Route::post('/events/{event}/staff', [EventStaffController::class, 'store'])->name('admin.events.staff.store');
         Route::delete('/events/{event}/staff/{user}', [EventStaffController::class, 'destroy'])->name('admin.events.staff.destroy');
 
-        Route::get('/users/search', [UserController::class, 'search'])->name('admin.users.search');
+        // Admin Certificate Management Routes
+        Route::get('/events/{event}/certificates', [AdminCertificateController::class, 'show'])
+            ->name('admin.events.certificates')
+            ->middleware('can:event.view');
+        Route::post('/events/{event}/certificates/configure', [AdminCertificateController::class, 'configure'])
+            ->name('admin.events.certificates.configure')
+            ->middleware('can:event.update');
+        Route::post('/events/{event}/certificates/bulk-reissue', [AdminCertificateController::class, 'bulkReissue'])
+            ->name('admin.events.certificates.bulk-reissue')
+            ->middleware('can:event.update');
+        Route::patch('/admin/events/{event:uuid}/toggle-certificate', [EventController::class, 'toggleCertificate'])
+            ->name('admin.events.toggle-certificate');
 
+        Route::get('/certificate-settings', [CertificateSettingsController::class, 'index'])
+            ->name('admin.certificate-settings.index');
+        Route::patch('/certificate-settings', [CertificateSettingsController::class, 'update'])
+            ->name('admin.certificate-settings.update');
+        Route::get('/certificate-template/download', [CertificateSettingsController::class, 'downloadTemplate'])
+            ->name('admin.certificate-template.download');
+        Route::post('/certificate-template/upload-master', [CertificateSettingsController::class, 'uploadMasterTemplate'])
+            ->name('admin.certificate-template.upload-master');
+
+
+
+        Route::get('/users/search', [UserController::class, 'search'])->name('admin.users.search');
 
         Route::patch('/registrations/{registration}/approve', [RegistrationManagementController::class, 'approve'])->name('admin.registrations.approve');
         Route::patch('/registrations/{registration}/reject', [RegistrationManagementController::class, 'reject'])->name('admin.registrations.reject');
     });
 
     Route::prefix('/registrants')->group(function() {
-
         Route::get('/my-registrations', [RegistrationController::class, 'index'])
-        ->name('registrations.index')
-        ->middleware('can:registration.view');
+            ->name('registrations.index')
+            ->middleware('can:registration.view');
 
         Route::get('/my-registrations/{registration:uuid}', [RegistrationController::class, 'show'])
             ->name('registrations.show')
@@ -87,6 +114,15 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::post('events/{event:uuid}/register', [RegistrationController::class, 'store'])
             ->name('registrations.store')
             ->middleware('can:registration.create');
+
+        // User Certificate Download Route
+        Route::get('/attendees/{attendee}/certificate', [CertificateController::class, 'download'])
+            ->name('attendees.certificate')
+            ->middleware('can:registration.view');
+
+        Route::get('/my-certificates', [CertificateController::class, 'index'])
+            ->name('certificates.index');
+
     });
 
     Route::prefix('/panitia')->middleware(['auth', 'role:Panitia'])->group(function () {
@@ -100,6 +136,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
 Route::get('/events', [PublicEventController::class, 'index'])->name('public.events.index');
 Route::get('/events/{event:uuid}/show', [PublicEventController::class, 'show'])->name('public.events.show');
 Route::post('/midtrans/webhook', [TransactionController::class, 'webhook'])->name('midtrans.webhook');
+
+// Public Certificate Verification Route (no auth required)
+Route::get('/verify/{uuid}', [CertificateVerificationController::class, 'verify'])
+    ->name('certificates.verify');
 
 require __DIR__.'/settings.php';
 require __DIR__.'/auth.php';

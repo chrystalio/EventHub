@@ -34,6 +34,7 @@ export interface Event {
     description: string;
     organizer: string;
     type: 'free' | 'paid' | 'private';
+    certificate_enabled: boolean;
     price: number;
     start_time: string;
     end_time: string;
