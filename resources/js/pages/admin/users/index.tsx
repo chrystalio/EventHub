@@ -76,7 +76,7 @@ export default function Index({ users, roles }: { users: User[], roles: string[]
 
                                 setIsSubmitting(true)
 
-                                router.put(`/admin/users/${editingUser.id}/roles`, formData, {
+                                router.put(`/admin/users/${editingUser.uuid}/roles`, formData, {
                                     onSuccess: () => {
                                         setIsDialogOpen(false)
                                         setEditingUser(null)
