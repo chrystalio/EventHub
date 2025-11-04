@@ -123,5 +123,25 @@
         "name": "event.delete",
         "shortname": "Admin - Manage Events",
         "guard_name": "web"
+    },
+    {
+        "name": "registration.view",
+        "shortname": "Registrant - Manage Registration",
+        "guard_name": "web"
+    },
+    {
+        "name": "registration.create",
+        "shortname": "Registrant - Manage Registration",
+        "guard_name": "web"
+    },
+    {
+        "name": "registration.update",
+        "shortname": "Registrant - Manage Registration",
+        "guard_name": "web"
+    },
+    {
+        "name": "registration.delete",
+        "shortname": "Registrant - Manage Registration",
+        "guard_name": "web"
     }
 ]
