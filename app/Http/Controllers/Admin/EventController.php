@@ -10,13 +10,13 @@ use App\Models\Event;
 use App\Models\Room;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Inertia\Response;
 
 class EventController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
+    public function index(): Response
     {
         $events = Event::with(['building', 'room', 'creator'])->latest()->get();
         $buildings = Building::all();
@@ -32,33 +32,33 @@ class EventController extends Controller
         ]);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(StoreEventRequest $request): RedirectResponse
     {
-       $validatedData = $request->validated();
-       $validatedData['created_by'] = auth()->id();
+        DB::beginTransaction();
 
-       Event::create($validatedData);
+        try {
+            $validatedData = $request->validated();
+            $validatedData['created_by'] = auth()->id();
 
+            Event::create($validatedData);
 
-        return redirect()->route('admin.events.index')->with('success', 'Event created successfully.');
+            DB::commit();
+
+            return redirect()
+                ->route('admin.events.index')
+                ->with('success', 'Event created successfully.');
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Event creation failed', ['error' => $e->getMessage()]);
+
+            return redirect()
+                ->route('admin.events.index')
+                ->with('error', 'Failed to create event. Please try again.');
+        }
     }
 
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(Event $event)
+    public function show(Event $event): Response
     {
         $this->authorize('manage', $event);
 
@@ -69,33 +69,57 @@ class EventController extends Controller
         ]);
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(UpdateEventRequest $request, Event $event): RedirectResponse
     {
-        $event->update($request->validated());
+        DB::beginTransaction();
 
-        return redirect()->route('admin.events.index')->with('success', 'Event updated successfully.');
+        try {
+            $event->update($request->validated());
+
+            DB::commit();
+
+            return redirect()
+                ->route('admin.events.index')
+                ->with('success', 'Event updated successfully.');
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Event update failed', ['error' => $e->getMessage(), 'event_id' => $event->id]);
+
+            return redirect()
+                ->route('admin.events.index')
+                ->with('error', 'Failed to update event. Please try again.');
+        }
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(Event $event): RedirectResponse
     {
-        $event->delete();
+        $hasActiveRegistrations = $event->registrations()->exists();
 
-        return redirect()->route('admin.events.index')
-            ->with('success', 'Event deleted successfully.');
+        if ($hasActiveRegistrations) {
+            return redirect()
+                ->route('admin.events.index')
+                ->with('error', 'Delete failed: Event has registered attendees.');
+        }
+
+        DB::beginTransaction();
+
+        try {
+            $event->delete();
+
+            DB::commit();
+
+            return redirect()
+                ->route('admin.events.index')
+                ->with('success', 'Event deleted successfully.');
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Event deletion failed', ['error' => $e->getMessage(), 'event_id' => $event->id]);
+
+            return redirect()
+                ->route('admin.events.index')
+                ->with('error', 'Failed to delete event. Please try again.');
+        }
     }
-
 }
