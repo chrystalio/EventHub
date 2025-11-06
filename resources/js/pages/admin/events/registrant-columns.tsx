@@ -94,7 +94,7 @@ export const registrantColumns: ColumnDef<Registration>[] = [
                             <DropdownMenuContent align="end">
                                 <DropdownMenuItem className="cursor-pointer p-0 hover:bg-accent/50 data-[state=open]:bg-accent/50">
                                     <Link
-                                        href={route('admin.registrations.approve', registration.id)}
+                                        href={route('admin.registrations.approve', registration.uuid)}
                                         method="patch"
                                         preserveScroll
                                         className="flex w-full items-center px-2 py-1.5 hover:bg-green-50/50"
@@ -105,7 +105,7 @@ export const registrantColumns: ColumnDef<Registration>[] = [
                                 </DropdownMenuItem>
                                 <DropdownMenuItem className="cursor-pointer p-0 text-destructive focus:text-destructive hover:bg-accent/50 data-[state=open]:bg-accent/50">
                                     <Link
-                                        href={route('admin.registrations.reject', registration.id)}
+                                        href={route('admin.registrations.reject', registration.uuid)}
                                         method="patch"
                                         preserveScroll
                                         className="flex w-full items-center px-2 py-1.5 hover:bg-red-50/50"

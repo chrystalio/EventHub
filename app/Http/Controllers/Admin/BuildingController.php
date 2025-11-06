@@ -7,7 +7,8 @@ use App\Http\Requests\StoreBuildingRequest;
 use App\Http\Requests\UpdateBuildingRequest;
 use App\Models\Building;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class BuildingController extends Controller
 {
@@ -25,37 +26,32 @@ class BuildingController extends Controller
     }
 
     /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
      * Store a newly created resource in storage.
+     * @throws \Throwable
      */
     public function store(StoreBuildingRequest $request): RedirectResponse
     {
-        Building::create($request->validated());
 
-        return redirect()->route('admin.buildings.index')->with('success', 'Building created successfully.');
-    }
+        DB::beginTransaction();
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id): void
-    {
-        //
-    }
+        try {
+            $validatedData = $request->validated();
+            Building::create($validatedData);
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id): void
-    {
-        //
+            DB::commit();
+
+            return redirect()
+                ->route('admin.buildings.index')
+                ->with('success', 'Building created successfully.');
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Building creation failed', ['error' => $e->getMessage()]);
+
+            return redirect()
+                ->route('admin.buildings.index')
+                ->with('error', 'Failed to create building. Please try again.');
+        }
     }
 
     /**
@@ -63,10 +59,26 @@ class BuildingController extends Controller
      */
     public function update(UpdateBuildingRequest $request, string $id): RedirectResponse
     {
-        $building = Building::findOrFail($id);
-        $building->update($request->validated());
+        DB::beginTransaction();
 
-        return redirect()->route('admin.buildings.index')->with('success', 'Building updated successfully.');
+        try {
+            $building = Building::findOrFail($id);
+            $building->update($request->validated());
+
+            DB::commit();
+
+            return redirect()
+                ->route('admin.buildings.index')
+                ->with('success', 'Building updated successfully.');
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Building update failed', ['error' => $e->getMessage()]);
+
+            return redirect()
+                ->route('admin.buildings.index')
+                ->with('error', 'Failed to update building. Please try again.');
+        }
     }
 
     /**
@@ -74,16 +86,31 @@ class BuildingController extends Controller
      */
     public function destroy(string $id): RedirectResponse
     {
-        $building = Building::with('rooms')->findOrFail($id);
+        try {
+            $building = Building::findOrFail($id);
 
-        if ($building->rooms()->exists()) {
-            return redirect()->route('admin.buildings.index')
-                ->with('error', 'Building cannot be deleted because it has associated rooms.');
+            if ($building->rooms()->exists()) {
+                return redirect()->route('admin.buildings.index')
+                    ->with('error', 'Building cannot be deleted because it has associated rooms.');
+            }
+
+            DB::beginTransaction();
+
+            $building->delete();
+
+            DB::commit();
+
+            return redirect()
+                ->route('admin.buildings.index')
+                ->with('success', 'Building deleted successfully.');
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Building deletion failed', ['error' => $e->getMessage()]);
+
+            return redirect()
+                ->route('admin.buildings.index')
+                ->with('error', 'Failed to delete building. Please try again.');
         }
-
-        $building->delete();
-
-        return redirect()->route('admin.buildings.index')
-            ->with('success', 'Building deleted successfully.');
     }
 }

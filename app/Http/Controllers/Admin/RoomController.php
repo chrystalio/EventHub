@@ -8,9 +8,10 @@ use App\Http\Requests\UpdateRoomRequest;
 use App\Models\Building;
 use App\Models\Room;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class RoomController extends Controller
 {
@@ -29,48 +30,61 @@ class RoomController extends Controller
     }
 
     /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
      * Store a newly created resource in storage.
+     * @throws \Throwable
      */
     public function store(StoreRoomRequest $request): RedirectResponse
     {
-        Room::create($request->validated());
 
-        return redirect()->route('admin.rooms.index')->with('success', __('Room created successfully.'));
-    }
+        DB::beginTransaction();
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
-    }
+        try {
+            $validatedData = $request->validated();
+            Room::create($validatedData);
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
+            DB::commit();
+
+            return redirect()
+                ->route('admin.rooms.index')
+                ->with('success', 'Room created successfully.');
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Room creation failed', ['error' => $e->getMessage()]);
+
+            return redirect()
+                ->route('admin.rooms.index')
+                ->with('error', 'Failed to create room. Please try again.');
+        }
     }
 
     /**
      * Update the specified resource in storage.
+     * @throws \Throwable
      */
     public function update(UpdateRoomRequest $request, string $id): RedirectResponse
     {
-        $room = Room::findOrFail($id);
-        $room->update($request->validated());
+        DB::beginTransaction();
 
-        return redirect()->route('admin.rooms.index')->with('success', __('Room updated successfully.'));
+        try {
+            $room = Room::findOrFail($id);
+            $validatedData = $request->validated();
+            $room->update($validatedData);
+
+            DB::commit();
+
+            return redirect()
+                ->route('admin.rooms.index')
+                ->with('success', 'Room updated successfully.');
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Room update failed', ['error' => $e->getMessage()]);
+
+            return redirect()
+                ->route('admin.rooms.index')
+                ->with('error', 'Failed to update room. Please try again.');
+        }
     }
 
     /**
@@ -78,9 +92,32 @@ class RoomController extends Controller
      */
     public function destroy(string $id): RedirectResponse
     {
-        $room = Room::findOrFail($id);
-        $room->delete();
+        try {
+            $room = Room::findOrFail($id);
 
-        return redirect()->route('admin.rooms.index')->with('success', __('Room deleted successfully.'));
+            // Check for associated events before deletion
+            if ($room->events()->exists()) {
+                return redirect()->route('admin.rooms.index')
+                    ->with('error', 'Room cannot be deleted because it has associated events.');
+            }
+
+            DB::beginTransaction();
+
+            $room->delete();
+
+            DB::commit();
+
+            return redirect()
+                ->route('admin.rooms.index')
+                ->with('success', 'Room deleted successfully.');
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Room deletion failed', ['error' => $e->getMessage()]);
+
+            return redirect()
+                ->route('admin.rooms.index')
+                ->with('error', 'Failed to delete room. Please try again.');
+        }
     }
 }
