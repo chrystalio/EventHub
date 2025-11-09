@@ -11,7 +11,9 @@ interface UpcomingManagedScheduleWidgetProps {
 
 export default function UpcomingManagedScheduleWidget({ events }: UpcomingManagedScheduleWidgetProps) {
     const { auth } = usePage<SharedData>().props;
-    const isPanitia = auth.user.roles.some(role => role.name === 'Panitia');
+    // Use panitia route only if user doesn't have event.view permission (Panitia role)
+    // System Administrator and Akademik have event.view permission and use admin routes
+    const usePanitiaRoute = !auth.user.permissions?.includes('event.view');
     const formatMonth = (dateString: string) =>
         new Date(dateString).toLocaleDateString([], { month: 'short' }).toUpperCase();
     const formatDay = (dateString: string) =>
@@ -59,7 +61,7 @@ export default function UpcomingManagedScheduleWidget({ events }: UpcomingManage
 
                                     <div className="w-full flex-shrink-0 sm:w-auto">
                                         <Button asChild size="sm" className="w-full sm:w-auto">
-                                            <Link href={route(isPanitia ? 'panitia.events.show' : 'admin.events.show', { event: event.uuid })}>Manage Event</Link>
+                                            <Link href={route(usePanitiaRoute ? 'panitia.events.show' : 'admin.events.show', { event: event.uuid })}>Manage Event</Link>
                                         </Button>
                                     </div>
                                 </li>
