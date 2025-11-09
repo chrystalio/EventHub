@@ -10,4 +10,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::get('/attendees/{attendee:qr_code}/generate-token', [AttendeeController::class, 'generateToken'])
         ->name('api.attendees.generate-token');
+
+    Route::get('/attendees/{attendee:qr_code}/static-qr', [AttendeeController::class, 'getStaticQR'])
+        ->name('api.attendees.static-qr');
 });

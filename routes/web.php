@@ -8,6 +8,7 @@ use App\Http\Controllers\Admin\RoleController;
 use App\Http\Controllers\Admin\RolePermissionController;
 use App\Http\Controllers\Admin\RoomController;
 use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\AttendeeQRController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\PublicEventController;
 use App\Http\Controllers\RegistrationController;
@@ -87,6 +88,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::post('events/{event:uuid}/register', [RegistrationController::class, 'store'])
             ->name('registrations.store')
             ->middleware('can:registration.create');
+
+        // QR Code Download
+        Route::get('/attendees/{attendee:qr_code}/qr-download', [AttendeeQRController::class, 'download'])
+            ->name('attendees.qr.download');
     });
 
     Route::prefix('/panitia')->middleware(['auth', 'role:Panitia'])->group(function () {
@@ -95,6 +100,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/events/{event:uuid}/scan', [PanitiaEventController::class, 'scanner'])->name('panitia.events.scanner');
         Route::post('/ticket-check', [PanitiaEventController::class, 'verifyQrCode'])
             ->name('panitia.ticket.verify');
+        Route::post('/verify-static-qr', [PanitiaEventController::class, 'verifyStaticQR'])
+            ->middleware('throttle:100,1')
+            ->name('panitia.static-ticket.verify');
     });
 });
 
