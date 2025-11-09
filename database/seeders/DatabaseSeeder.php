@@ -17,6 +17,7 @@ class DatabaseSeeder extends Seeder
             RoleSeeder::class,
             AdminUserSeeder::class,
             PermissionSeeder::class,
+            RolePermissionSeeder::class,
 
             BuildingSeeder::class,
             RoomSeeder::class,
