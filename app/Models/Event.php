@@ -23,6 +23,7 @@ class Event extends Model
         'start_time',
         'end_time',
         'max_guests_per_registration',
+        'qr_type',
         'building_id',
         'room_id',
         'created_by',
