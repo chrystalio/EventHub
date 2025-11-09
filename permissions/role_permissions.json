@@ -1,0 +1,53 @@
+{
+    "System Administrator": [
+        "building.create",
+        "building.delete",
+        "building.update",
+        "building.view",
+        "event.create",
+        "event.delete",
+        "event.update",
+        "event.view",
+        "registration.create",
+        "registration.delete",
+        "registration.update",
+        "registration.view",
+        "role.create",
+        "role.delete",
+        "role.edit",
+        "role.view",
+        "rolepermission.create",
+        "rolepermission.delete",
+        "rolepermission.update",
+        "rolepermission.view",
+        "room.create",
+        "room.delete",
+        "room.update",
+        "room.view",
+        "user.create",
+        "user.delete",
+        "user.edit",
+        "user.impersonate",
+        "user.view"
+    ],
+    "Akademik": [
+        "building.create",
+        "building.delete",
+        "building.update",
+        "building.view",
+        "event.create",
+        "event.delete",
+        "event.update",
+        "event.view",
+        "room.create",
+        "room.delete",
+        "room.update",
+        "room.view"
+    ],
+    "Panitia": [],
+    "Peserta": [
+        "registration.create",
+        "registration.update",
+        "registration.view"
+    ]
+}
