@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Link } from '@inertiajs/react';
+import { Link, usePage } from '@inertiajs/react';
 import { Clock, Users, MapPin, CheckCircle2, BellRing, QrCode } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import type { SharedData } from '@/types';
 
 type EventWithDetails = {
     uuid: string;
@@ -19,7 +20,7 @@ interface EventsHappeningNowWidgetProps {
     events: EventWithDetails[];
 }
 
-const OngoingEventItem = ({ event }: { event: EventWithDetails }) => {
+const OngoingEventItem = ({ event, isPanitia }: { event: EventWithDetails; isPanitia: boolean }) => {
     const [isCheckinActive, setIsCheckinActive] = useState(false);
     const [countdownText, setCountdownText] = useState('');
 
@@ -81,7 +82,7 @@ const OngoingEventItem = ({ event }: { event: EventWithDetails }) => {
                     </Button>
                 ) : (
                     <Button asChild size="sm" variant="outline" className="w-full">
-                        <Link href={route('admin.events.show', { event: event.uuid })}>
+                        <Link href={route(isPanitia ? 'panitia.events.show' : 'admin.events.show', { event: event.uuid })}>
                             Details
                         </Link>
                     </Button>
@@ -92,6 +93,9 @@ const OngoingEventItem = ({ event }: { event: EventWithDetails }) => {
 };
 
 export default function EventsHappeningNowWidget({ events }: EventsHappeningNowWidgetProps) {
+    const { auth } = usePage<SharedData>().props;
+    const isPanitia = auth.user.roles.some(role => role.name === 'Panitia');
+
     if (!events || events.length === 0) {
         return (
             <Card>
@@ -125,7 +129,7 @@ export default function EventsHappeningNowWidget({ events }: EventsHappeningNowW
                 <ScrollArea className="max-h-80">
                     <ul className="divide-y dark:divide-gray-800 pr-6">
                         {events.map((event) => (
-                            <OngoingEventItem key={event.uuid} event={event} />
+                            <OngoingEventItem key={event.uuid} event={event} isPanitia={isPanitia} />
                         ))}
                     </ul>
                 </ScrollArea>

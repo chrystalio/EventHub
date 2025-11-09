@@ -1,15 +1,17 @@
 import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Link } from '@inertiajs/react';
+import { Link, usePage } from '@inertiajs/react';
 import { AlertTriangle, CheckCircle2 } from 'lucide-react';
-import type { EventWithPendingCount } from '@/types';
+import type { EventWithPendingCount, SharedData } from '@/types';
 
 interface RegistrationApprovalsWidgetProps {
     approvals: EventWithPendingCount[];
 }
 
 export default function RegistrationApprovalsWidget({ approvals }: RegistrationApprovalsWidgetProps) {
+    const { auth } = usePage<SharedData>().props;
+    const isPanitia = auth.user.roles.some(role => role.name === 'Panitia');
     const hasApprovals = approvals && approvals.length > 0;
 
     return (
@@ -41,7 +43,7 @@ export default function RegistrationApprovalsWidget({ approvals }: RegistrationA
                                     </p>
                                 </div>
                                 <Button asChild size="sm">
-                                    <Link href={route('admin.events.show', { event: event.uuid })}>
+                                    <Link href={route(isPanitia ? 'panitia.events.show' : 'admin.events.show', { event: event.uuid })}>
                                         View Requests
                                     </Link>
                                 </Button>

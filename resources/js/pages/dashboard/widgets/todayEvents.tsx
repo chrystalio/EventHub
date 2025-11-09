@@ -1,7 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import type { TodayEventItem } from '@/types';
-import { Link } from '@inertiajs/react';
+import type { TodayEventItem, SharedData } from '@/types';
+import { Link, usePage } from '@inertiajs/react';
 import { Calendar, CalendarCheck, ChevronRight, Clock, MapPin } from 'lucide-react';
 
 function timeRange(startStr: string, endStr: string | null) {
@@ -83,6 +83,9 @@ function StaffGroup({ staff }: { staff: TodayEventItem['staff'] }) {
 }
 
 export default function TodayEvents({ items }: { items: TodayEventItem[] }) {
+    const { auth } = usePage<SharedData>().props;
+    const isPanitia = auth.user.roles.some(role => role.name === 'Panitia');
+
     if (!items?.length) return null;
 
     return (
@@ -96,7 +99,7 @@ export default function TodayEvents({ items }: { items: TodayEventItem[] }) {
                         {items.map((e) => (
                             <li key={e.uuid} className="my-4">
                                 <Link
-                                    href={route('admin.events.show', { event: e.uuid })}
+                                    href={route(isPanitia ? 'panitia.events.show' : 'admin.events.show', { event: e.uuid })}
                                     prefetch="hover"
                                     aria-label={`Open event ${e.name}`}
                                     className="group hover:bg-muted/50 focus:ring-ring/40 -m-2 flex items-center gap-4 rounded-lg p-2 transition-colors focus:ring-2 focus:outline-none"

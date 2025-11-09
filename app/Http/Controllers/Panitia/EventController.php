@@ -49,6 +49,17 @@ class EventController extends Controller
         ]);
     }
 
+    public function show(Event $event): Response
+    {
+        $this->authorize('manage', $event);
+
+        $event->load(['building', 'room', 'creator', 'registrations.user', 'registrations.attendees', 'staff']);
+
+        return Inertia::render('panitia/events/show', [
+            'event' => $event,
+        ]);
+    }
+
     public function scanner(Event $event): Response
     {
         $this->authorize('manage', $event);

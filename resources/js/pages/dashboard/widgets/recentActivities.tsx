@@ -11,8 +11,9 @@ import {
     CreditCard,
     UserX,
 } from 'lucide-react';
-import { Link } from '@inertiajs/react';
+import { Link, usePage } from '@inertiajs/react';
 import { Button } from '@/components/ui/button';
+import type { SharedData } from '@/types';
 
 /** Accept both coarse kinds and granular statuses to match whatever the server sends */
 type ActivityType =
@@ -74,6 +75,9 @@ const iconFor = (type: ActivityType) => {
 };
 
 export default function RecentActivitiesWidget({ items }: RecentActivitiesWidgetProps) {
+    const { auth } = usePage<SharedData>().props;
+    const isPanitia = auth.user.roles.some(role => role.name === 'Panitia');
+
     return (
         <Card>
             <CardHeader>
@@ -97,7 +101,7 @@ export default function RecentActivitiesWidget({ items }: RecentActivitiesWidget
 
                                     <div className="flex-shrink-0">
                                         <Button asChild variant="ghost" size="icon" className="h-8 w-8">
-                                            <Link href={route('admin.events.show', { event: it.event_uuid })}>
+                                            <Link href={route(isPanitia ? 'panitia.events.show' : 'admin.events.show', { event: it.event_uuid })}>
                                                 <ArrowRight className="h-4 w-4" />
                                             </Link>
                                         </Button>

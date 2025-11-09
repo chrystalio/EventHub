@@ -1,8 +1,8 @@
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import type { EventWithRegistrationsCount } from '@/types';
-import { Link } from '@inertiajs/react';
+import type { EventWithRegistrationsCount, SharedData } from '@/types';
+import { Link, usePage } from '@inertiajs/react';
 import { Clock, MapPin, Ticket, Users } from 'lucide-react';
 
 interface UpcomingManagedScheduleWidgetProps {
@@ -10,6 +10,8 @@ interface UpcomingManagedScheduleWidgetProps {
 }
 
 export default function UpcomingManagedScheduleWidget({ events }: UpcomingManagedScheduleWidgetProps) {
+    const { auth } = usePage<SharedData>().props;
+    const isPanitia = auth.user.roles.some(role => role.name === 'Panitia');
     const formatMonth = (dateString: string) =>
         new Date(dateString).toLocaleDateString([], { month: 'short' }).toUpperCase();
     const formatDay = (dateString: string) =>
@@ -57,7 +59,7 @@ export default function UpcomingManagedScheduleWidget({ events }: UpcomingManage
 
                                     <div className="w-full flex-shrink-0 sm:w-auto">
                                         <Button asChild size="sm" className="w-full sm:w-auto">
-                                            <Link href={route('admin.events.show', { event: event.uuid })}>Manage Event</Link>
+                                            <Link href={route(isPanitia ? 'panitia.events.show' : 'admin.events.show', { event: event.uuid })}>Manage Event</Link>
                                         </Button>
                                     </div>
                                 </li>

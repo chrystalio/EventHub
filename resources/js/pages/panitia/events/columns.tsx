@@ -130,7 +130,7 @@ export const columns: ColumnDef<Event>[] = [
             return (
                 <div className="flex items-center justify-end gap-2">
                     <Button variant="outline" size="sm" asChild>
-                        <Link href={route('admin.events.show', event.uuid)}>
+                        <Link href={route('panitia.events.show', event.uuid)}>
                             <Users className="mr-2 h-4 w-4" />
                             {manageButtonText}
                         </Link>
