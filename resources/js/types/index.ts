@@ -38,6 +38,7 @@ export interface Event {
     start_time: string;
     end_time: string;
     max_guests_per_registration: number;
+    qr_type: 'dynamic' | 'static';
     building: { id: number; name: string };
     room: { id: number; name: string; code: string };
     creator: { id: number; name: string };
