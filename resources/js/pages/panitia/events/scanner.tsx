@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { Head, Link } from '@inertiajs/react';
+import { Head, Link, usePage } from '@inertiajs/react';
 import { Html5Qrcode, Html5QrcodeScannerState, Html5QrcodeCameraScanConfig, CameraDevice } from 'html5-qrcode';
 import axios from 'axios';
 import { CheckCircle2, XCircle, ScanLine, ArrowLeft, Camera } from 'lucide-react';
@@ -52,6 +52,18 @@ export default function Scanner({ event }: Props) {
     const [activeCameraId, setActiveCameraId] = useState<string | undefined>(undefined);
     const html5QrcodeRef = useRef<Html5Qrcode | null>(null);
 
+    // Configure axios with CSRF token
+    useEffect(() => {
+        const token = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+        if (token) {
+            axios.defaults.headers.common['X-CSRF-TOKEN'] = token;
+            axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
+            console.log('[Scanner] CSRF token configured:', token.substring(0, 10) + '...');
+        } else {
+            console.error('[Scanner] CSRF token not found in meta tag!');
+        }
+    }, []);
+
     const resetScanner = () => {
         setScanResult(null);
         if (html5QrcodeRef.current?.getState() === Html5QrcodeScannerState.PAUSED) {
@@ -85,21 +97,76 @@ export default function Scanner({ event }: Props) {
             scanner.pause();
             setScanResult({ status: 'loading', message: 'Verifying...' });
 
-            const parts = decodedText.split(',');
-            if (parts.length !== 2) {
-                setScanResult({ status: 'error', message: 'Invalid QR Code format.' });
-                return;
+            console.log('[Scanner] Decoded text:', decodedText);
+            console.log('[Scanner] Decoded text length:', decodedText.length);
+
+            // Try parsing as JSON (Static QR)
+            let isStaticQR = false;
+            let staticData = null;
+
+            try {
+                const parsed = JSON.parse(decodedText);
+                console.log('[Scanner] Successfully parsed as JSON:', parsed);
+
+                // Validate static QR structure
+                if (
+                    parsed.attendee_uuid &&
+                    parsed.event_uuid &&
+                    parsed.signature &&
+                    typeof parsed.timestamp === 'number'
+                ) {
+                    isStaticQR = true;
+                    staticData = parsed;
+                    console.log('[Scanner] Detected as Static QR');
+                }
+            } catch (e) {
+                // Not JSON - will try dynamic format
+                console.log('[Scanner] Not JSON, trying dynamic format');
             }
 
-            const [attendee_uuid, token] = parts;
+            if (isStaticQR && staticData) {
+                // Verify static QR
+                console.log('[Scanner] Sending static QR verification request');
+                axios.post(route('panitia.static-ticket.verify'), {
+                    event_uuid: event.uuid,
+                    qr_data: decodedText,  // Send raw JSON string
+                }, { withCredentials: true })
+                    .then(response => {
+                        console.log('[Scanner] Static QR verification success:', response.data);
+                        setScanResult(response.data);
+                    })
+                    .catch(error => {
+                        console.error('[Scanner] Static QR verification error:', error);
+                        console.error('[Scanner] Error response:', error.response);
+                        setScanResult(error.response?.data || {
+                            status: 'error',
+                            message: 'Verification Failed'
+                        });
+                    });
+            } else {
+                // Dynamic TOTP QR (existing logic - unchanged)
+                const parts = decodedText.split(',');
+                if (parts.length !== 2) {
+                    setScanResult({
+                        status: 'error',
+                        message: 'Invalid QR Code format.'
+                    });
+                    return;
+                }
 
-            axios.post(route('panitia.ticket.verify'), {
-                event_uuid: event.uuid,
-                attendee_uuid: attendee_uuid,
-                token: token,
-            }, { withCredentials: true })
-                .then(response => setScanResult(response.data))
-                .catch(error => setScanResult(error.response?.data || { status: 'error', message: 'Verification Failed' }));
+                const [attendee_uuid, token] = parts;
+
+                axios.post(route('panitia.ticket.verify'), {
+                    event_uuid: event.uuid,
+                    attendee_uuid: attendee_uuid,
+                    token: token,
+                }, { withCredentials: true })
+                    .then(response => setScanResult(response.data))
+                    .catch(error => setScanResult(error.response?.data || {
+                        status: 'error',
+                        message: 'Verification Failed'
+                    }));
+            }
         };
 
         const config: Html5QrcodeCameraScanConfig = {
