@@ -33,7 +33,7 @@ interface PageProps {
 }
 
 const EventHeader = ({ event, totalRegistered }: { event: Event, totalRegistered: number }) => (
-    <div className="space-y-4">
+    <div className="space-y-6">
         <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
             <Badge variant="secondary" className="w-fit bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300">
                 {new Date(event.start_time) > new Date() ? 'Upcoming' : 'Past Event'}
@@ -234,7 +234,7 @@ export default function AuthenticatedEventShow({ event, userRegistration, canReg
     return (
         <AppLayout>
             <Head title={`${event.name} - ITEBA Events`} />
-            <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+            <div className="w-full max-w-none px-4 py-8 sm:px-6 lg:px-10 2xl:px-12">
                 <div className="mb-8">
                     <Link href={route('registrations.browse')} className="inline-flex items-center text-sm text-gray-600 transition-colors hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100">
                         <ArrowLeftIcon className="mr-2 h-4 w-4" />
@@ -242,12 +242,12 @@ export default function AuthenticatedEventShow({ event, userRegistration, canReg
                     </Link>
                 </div>
 
-                <div className="grid grid-cols-1 items-start gap-12 lg:grid-cols-3">
-                    <div className="space-y-8 lg:col-span-2">
+                <div className="grid grid-cols-1 items-start gap-12 lg:grid-cols-[minmax(0,1fr)_420px]">
+                    <div className="space-y-8">
                         <EventHeader event={event} totalRegistered={totalRegistered} />
                         <EventDetails event={event} />
                     </div>
-                    <div className="lg:col-span-1">
+                    <div>
                         <div className="sticky top-24 space-y-6">
                             {userRegistration ? (
                                 <RegistrationStatusCard registration={userRegistration} />
