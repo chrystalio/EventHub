@@ -19,6 +19,7 @@ class StoreEventRequest extends FormRequest
             'start_time' => 'required|date',
             'end_time' => 'required|date|after:start_time',
             'max_guests_per_registration' => 'required|integer|min:0',
+            'qr_type' => 'required|in:dynamic,static',
             'building_id' => 'required|exists:buildings,id',
             'room_id' => [
                 'required',
