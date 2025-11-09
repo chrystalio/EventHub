@@ -15,8 +15,10 @@ import {
     CheckCircle2,
     ClockIcon,
     CreditCard,
+    Download,
     Loader2,
     MapPinIcon,
+    Printer,
     QrCodeIcon,
     TicketIcon,
     UsersIcon,
@@ -130,32 +132,58 @@ export default function RegistrationShow({ registration }: Props) {
     useEffect(() => {
         if (!selectedAttendee) return;
 
-        let qrRefreshInterval: number;
+        const isStaticQR = event.qr_type === 'static';
 
-        const fetchNewQrCode = async () => {
-            setIsLoadingQr(true);
-            setQrError(null);
-            try {
-                const response = await axios.get(route('api.attendees.generate-token', selectedAttendee.qr_code), {
-                    withCredentials: true,
-                });
+        if (isStaticQR) {
+            // Static QR: Fetch once (no polling)
+            const fetchStaticQR = async () => {
+                setIsLoadingQr(true);
+                setQrError(null);
+                try {
+                    const response = await axios.get(
+                        route('api.attendees.static-qr', selectedAttendee.qr_code),
+                        { withCredentials: true }
+                    );
 
-                const compositeValue = `${selectedAttendee.qr_code},${response.data.token}`;
-                setQrCodeValue(compositeValue);
-                setCountdown(30);
-            } catch (error) {
-                console.error('Failed to refresh QR code:', error);
-                setQrError('Could not load QR code. Please try again.');
-                clearInterval(qrRefreshInterval);
-            } finally {
-                setIsLoadingQr(false);
-            }
-        };
+                    setQrCodeValue(response.data.qr_data);
+                } catch (error) {
+                    console.error('Failed to load static QR:', error);
+                    setQrError('Could not load QR code. Please try again.');
+                } finally {
+                    setIsLoadingQr(false);
+                }
+            };
 
-        fetchNewQrCode();
-        qrRefreshInterval = window.setInterval(fetchNewQrCode, 30000);
+            fetchStaticQR();
+        } else {
+            // Dynamic QR: Existing polling logic (unchanged)
+            let qrRefreshInterval: number;
 
-        return () => clearInterval(qrRefreshInterval);
+            const fetchNewQrCode = async () => {
+                setIsLoadingQr(true);
+                setQrError(null);
+                try {
+                    const response = await axios.get(route('api.attendees.generate-token', selectedAttendee.qr_code), {
+                        withCredentials: true,
+                    });
+
+                    const compositeValue = `${selectedAttendee.qr_code},${response.data.token}`;
+                    setQrCodeValue(compositeValue);
+                    setCountdown(30);
+                } catch (error) {
+                    console.error('Failed to refresh QR code:', error);
+                    setQrError('Could not load QR code. Please try again.');
+                    clearInterval(qrRefreshInterval);
+                } finally {
+                    setIsLoadingQr(false);
+                }
+            };
+
+            fetchNewQrCode();
+            qrRefreshInterval = window.setInterval(fetchNewQrCode, 30000);
+
+            return () => clearInterval(qrRefreshInterval);
+        }
     }, [selectedAttendee]);
 
     useEffect(() => {
@@ -330,10 +358,41 @@ export default function RegistrationShow({ registration }: Props) {
                         </div>
 
                         {!isLoadingQr && !qrError && qrCodeValue && (
-                            <div className="mt-6 w-full text-center">
-                                <p className="text-muted-foreground text-sm">
-                                    Code automatically refreshes in <span className="text-foreground font-bold">{countdown}s</span>
-                                </p>
+                            <div className="mt-6 w-full">
+                                {event.qr_type === 'static' ? (
+                                    <div className="space-y-3">
+                                        <p className="text-muted-foreground text-center text-sm">
+                                            This QR code can be downloaded and printed for event check-in
+                                        </p>
+                                        <div className="flex gap-2">
+                                            <Button
+                                                variant="outline"
+                                                className="flex-1"
+                                                asChild
+                                            >
+                                                <a
+                                                    href={route('attendees.qr.download', selectedAttendee.qr_code)}
+                                                    download
+                                                >
+                                                    <Download className="mr-2 h-4 w-4" />
+                                                    Download QR
+                                                </a>
+                                            </Button>
+                                            <Button
+                                                variant="outline"
+                                                className="flex-1"
+                                                onClick={() => window.print()}
+                                            >
+                                                <Printer className="mr-2 h-4 w-4" />
+                                                Print
+                                            </Button>
+                                        </div>
+                                    </div>
+                                ) : (
+                                    <p className="text-muted-foreground text-center text-sm">
+                                        Code automatically refreshes in <span className="text-foreground font-bold">{countdown}s</span>
+                                    </p>
+                                )}
                             </div>
                         )}
                         <Separator className="my-6" />
