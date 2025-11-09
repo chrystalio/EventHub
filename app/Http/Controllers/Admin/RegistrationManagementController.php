@@ -14,6 +14,8 @@ class RegistrationManagementController extends Controller
     public function approve($registrationId): RedirectResponse
     {
         $registration = Registration::findOrFail($registrationId);
+        $this->authorize('manage', $registration->event);
+
         $registration->update([
             'status' => 'approved',
             'approved_at' => now(),
@@ -24,6 +26,8 @@ class RegistrationManagementController extends Controller
     public function reject($registrationId): RedirectResponse
     {
         $registration = Registration::findOrFail($registrationId);
+        $this->authorize('manage', $registration->event);
+
         $registration->update([
             'status' => 'rejected',
         ]);
