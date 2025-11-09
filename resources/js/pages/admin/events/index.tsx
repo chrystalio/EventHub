@@ -49,6 +49,7 @@ export default function Index({ events = [], buildings = [], rooms = [], canCrea
         start_time: '',
         end_time: '',
         max_guests_per_registration: '0',
+        qr_type: 'dynamic',
         building_id: '',
         room_id: '',
     });
@@ -80,6 +81,7 @@ export default function Index({ events = [], buildings = [], rooms = [], canCrea
             start_time: '',
             end_time: '',
             max_guests_per_registration: '0',
+            qr_type: 'dynamic',
             building_id: '',
             room_id: '',
         });
@@ -111,6 +113,7 @@ export default function Index({ events = [], buildings = [], rooms = [], canCrea
             start_time: formatForInput(event.start_time),
             end_time: formatForInput(event.end_time),
             max_guests_per_registration: event.max_guests_per_registration?.toString() || '0',
+            qr_type: event.qr_type || 'dynamic',
             building_id: event.building.id.toString(),
             room_id: event.room.id.toString(),
         });
@@ -281,6 +284,34 @@ export default function Index({ events = [], buildings = [], rooms = [], canCrea
                             {errors.price && <p className="text-sm text-red-500">{errors.price}</p>}
                         </div>
                     )}
+
+                    <div className="space-y-2 md:col-span-2">
+                        <Label>QR Code Type</Label>
+                        <p className="text-sm text-muted-foreground">
+                            Choose the QR code type for event check-in.
+                        </p>
+                        <RadioGroup
+                            value={data.qr_type}
+                            onValueChange={(value) => setData('qr_type', value as 'dynamic' | 'static')}
+                            className="space-y-1 pt-2"
+                        >
+                            <div className="flex items-center space-x-3 p-3 rounded-md border has-[input:checked]:border-primary">
+                                <RadioGroupItem value="dynamic" id="qr-type-dynamic" />
+                                <Label htmlFor="qr-type-dynamic" className="font-normal cursor-pointer w-full">
+                                    <span className="font-semibold block">Dynamic QR Code (TOTP-based)</span>
+                                    <span className="text-muted-foreground text-xs">Time-based QR code that refreshes every 30 seconds. Recommended for regular events and security-sensitive scenarios.</span>
+                                </Label>
+                            </div>
+                            <div className="flex items-center space-x-3 p-3 rounded-md border has-[input:checked]:border-primary">
+                                <RadioGroupItem value="static" id="qr-type-static" />
+                                <Label htmlFor="qr-type-static" className="font-normal cursor-pointer w-full">
+                                    <span className="font-semibold block">Static QR Code (Printable)</span>
+                                    <span className="text-muted-foreground text-xs">Fixed QR code that can be downloaded and printed in advance. Recommended for large-scale events.</span>
+                                </Label>
+                            </div>
+                        </RadioGroup>
+                        {errors.qr_type && <p className="text-sm text-red-500">{errors.qr_type}</p>}
+                    </div>
 
                     <div className="space-y-2">
                         <Label htmlFor="start_time">Start Time</Label>
