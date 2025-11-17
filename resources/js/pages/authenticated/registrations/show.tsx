@@ -372,19 +372,12 @@ export default function RegistrationShow({ registration }: Props) {
                                             >
                                                 <a
                                                     href={route('attendees.qr.download', selectedAttendee.qr_code)}
-                                                    download
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
                                                 >
                                                     <Download className="mr-2 h-4 w-4" />
-                                                    Download QR
+                                                    Download PDF
                                                 </a>
-                                            </Button>
-                                            <Button
-                                                variant="outline"
-                                                className="flex-1"
-                                                onClick={() => window.print()}
-                                            >
-                                                <Printer className="mr-2 h-4 w-4" />
-                                                Print
                                             </Button>
                                         </div>
                                     </div>
