@@ -1,5 +1,5 @@
 import React from 'react';
-import { Head, Link, useForm } from '@inertiajs/react';
+import { Head, Link, useForm, router } from '@inertiajs/react';
 import AppLayout from '@/layouts/app-layout';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -228,7 +228,16 @@ export default function AuthenticatedEventShow({ event, userRegistration, canReg
 
     const handleRegistrationSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        post(route('registrations.store', event.uuid), { preserveScroll: true });
+        post(route('registrations.store', event.uuid), {
+            preserveScroll: true,
+            onSuccess: () => {
+                // Redirect to registrations page with fresh data
+                router.visit(route('registrations.index'), {
+                    preserveState: false,
+                    preserveScroll: false,
+                });
+            },
+        });
     };
 
     return (
