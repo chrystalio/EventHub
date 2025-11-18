@@ -32,13 +32,12 @@ class AttendeeQRController extends Controller
         $qrService = app(StaticQRCodeService::class);
         $qrData = $qrService->generateQRData($attendee);
 
-        // Generate styled QR code with modern design
-        $qrCodeImage = QrCode::size(250)
-            ->errorCorrection('H')  // Highest error correction (30%)
+        // Generate QR code optimized for scanning
+        // Larger size and proper margin improve scanning reliability
+        $qrCodeImage = QrCode::size(300)
+            ->errorCorrection('M')  // Medium error correction (15%) - better balance for scanning
             ->format('png')
-            ->margin(0)
-            ->style('round')  // Rounded dots for modern look
-            ->eye('circle')   // Circular eye pattern
+            ->margin(2)  // Add quiet zone for better scanner detection
             ->generate($qrData);
 
         // Convert to base64 data URI
