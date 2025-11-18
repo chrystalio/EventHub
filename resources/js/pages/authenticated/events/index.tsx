@@ -9,7 +9,7 @@ import type { Event, PaginatedEvents, Registration } from '@/types';
 
 interface Props {
     events: PaginatedEvents;
-    userRegistrations: Record<number, Registration>;
+    userRegistrations: Record<string, Registration>;
     canRegister: boolean;
     isAuthenticated: boolean;
 }
@@ -58,7 +58,7 @@ export default function AuthenticatedEventsIndex({ events, userRegistrations, ca
                             <AuthenticatedEventCard
                                 key={event.id}
                                 event={event}
-                                userRegistration={userRegistrations[event.id]}
+                                userRegistration={userRegistrations[event.uuid]}
                                 canRegister={canRegister}
                             />
                         ))
@@ -135,14 +135,7 @@ function AuthenticatedEventCard({ event, userRegistration, canRegister }: { even
                         <UserIcon className="h-4 w-4 text-gray-400 dark:text-gray-500" />
                         <span>By {event.organizer}</span>
                     </div>
-
-                    {userRegistration && (
-                        <div className="rounded bg-gray-50 px-2 py-1 text-xs text-gray-500 dark:bg-gray-800 dark:text-gray-400">
-                            Registered with {userRegistration.guest_count} guest{userRegistration.guest_count !== 1 ? 's' : ''}
-                        </div>
-                    )}
                 </div>
-
                 <div className="mt-6">
                     <Button variant="outline" className="flex w-full items-center justify-center gap-2" asChild>
                         <Link href={route('registrations.show_event', event.uuid)}>View Details</Link>
