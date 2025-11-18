@@ -89,8 +89,8 @@
 
         .qr-image {
             display: block;
-            width: 200px;
-            height: 200px;
+            width: 250px;
+            height: 250px;
         }
 
         .qr-label {
