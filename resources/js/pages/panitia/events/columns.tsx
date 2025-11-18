@@ -80,7 +80,7 @@ export const columns: ColumnDef<Event>[] = [
         },
     },
     {
-        accessorKey: "start_time",
+        id: "status",
         header: ({ column }) => <SortableHeader column={column} title="Status" />,
         cell: ({ row }) => {
             const startTime = new Date(row.original.start_time);
