@@ -52,15 +52,12 @@ export default function Scanner({ event }: Props) {
     const [activeCameraId, setActiveCameraId] = useState<string | undefined>(undefined);
     const html5QrcodeRef = useRef<Html5Qrcode | null>(null);
 
-    // Configure axios with CSRF token
+    // Configure axios with CSRF token (handled globally by Inertia, but set explicitly for safety)
     useEffect(() => {
         const token = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
         if (token) {
             axios.defaults.headers.common['X-CSRF-TOKEN'] = token;
             axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
-            console.log('[Scanner] CSRF token configured:', token.substring(0, 10) + '...');
-        } else {
-            console.error('[Scanner] CSRF token not found in meta tag!');
         }
     }, []);
 
@@ -119,7 +116,7 @@ export default function Scanner({ event }: Props) {
                     staticData = parsed;
                     console.log('[Scanner] Detected as Static QR');
                 }
-            } catch (e) {
+            } catch {
                 // Not JSON - will try dynamic format
                 console.log('[Scanner] Not JSON, trying dynamic format');
             }
@@ -170,15 +167,16 @@ export default function Scanner({ event }: Props) {
         };
 
         const config: Html5QrcodeCameraScanConfig = {
-            fps: 10,
-            qrbox: { width: 300, height: 300 },
+            fps: 15,  // Increased from 10 for faster detection
+            qrbox: { width: 250, height: 250 },  // Slightly smaller box for better focus
+            aspectRatio: 1.0,  // Square aspect ratio for QR codes
         };
 
         scanner.start(
             activeCameraId,
             config,
             onScanSuccess,
-            (errorMessage) => { /* Ignore errors */ }
+            () => { /* Ignore scan errors */ }
         ).catch(err => console.error("Unable to start scanning.", err));
 
         return () => {
@@ -186,7 +184,7 @@ export default function Scanner({ event }: Props) {
                 scanner.stop().catch(err => console.error("Failed to stop scanner cleanly.", err));
             }
         };
-    }, [activeCameraId]);
+    }, [activeCameraId, event.uuid]);
     
     useEffect(() => {
         if (scanResult && (scanResult.status === 'success' || scanResult.status === 'error')) {
