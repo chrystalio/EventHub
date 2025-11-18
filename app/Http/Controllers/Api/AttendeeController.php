@@ -37,8 +37,20 @@ class AttendeeController extends Controller
 
     public function getStaticQR(RegistrationAttendee $attendee)
     {
+        // Check if user is authenticated
+        if (!auth()->check()) {
+            \Log::warning('Static QR API: User not authenticated', [
+                'attendee_qr_code' => $attendee->qr_code,
+            ]);
+            return response()->json(['error' => 'Unauthenticated'], 401);
+        }
+
         // Authorization: user must own this attendee's registration
         if (auth()->user()->uuid !== $attendee->registration->user_uuid) {
+            \Log::warning('Static QR API: Unauthorized access attempt', [
+                'user_uuid' => auth()->user()->uuid,
+                'attendee_owner_uuid' => $attendee->registration->user_uuid,
+            ]);
             return response()->json(['error' => 'Unauthorized'], 403);
         }
 
