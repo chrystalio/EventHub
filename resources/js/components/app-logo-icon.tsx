@@ -17,7 +17,7 @@ export default function AppLogoIcon(props: SVGAttributes<SVGElement>) {
 
         <svg id="emoji" viewBox="0 0 72 72" xmlns="http://www.w3.org/2000/svg" {...props}>
             <g id="line">
-                <path fill="none" stroke="#ffffff" stroke-miterlimit="10" stroke-width="5"
+                <path fill="none" stroke="#ffffff" strokeMiterlimit="10" strokeWidth="5"
                       d="M48.1546,23.505 c-3.4279-3.5522-4.0284-8.7836-1.8682-12.9334l-3.6009-3.7315L6.3276,41.9262l3.8016,3.9394 c4.0722-1.5735,8.8681-0.6711,12.09,2.6676s3.9531,8.1636,2.2356,12.1773l3.8016,3.9394l36.3579-35.0861l-3.6009-3.7315 C56.7892,27.8434,51.5825,27.0572,48.1546,23.505z" />
                 <ellipse cx="37.1223" cy="22.122" rx="2" ry="2"
                          transform="matrix(0.7098 -0.7044 0.7044 0.7098 -4.8096 32.5704)" fill="#ffffff"
