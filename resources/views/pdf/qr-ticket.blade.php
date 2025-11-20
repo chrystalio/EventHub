@@ -5,8 +5,8 @@
     <title>Event Ticket - {{ $attendee->name }}</title>
     <style>
         @page {
-            margin: 20mm;
-            size: A4 portrait;
+            margin: 0;
+            size: 105mm 180mm;
         }
 
         * {
@@ -16,246 +16,253 @@
         }
 
         body {
-            font-family: 'DejaVu Sans', sans-serif;
+            font-family: 'Helvetica', 'Arial', sans-serif;
             background: #ffffff;
             color: #0f172a;
-            line-height: 1.4;
-            padding: 20px 0;
-        }
-
-        .ticket-container {
             width: 100%;
-            max-width: 480px;
-            margin: 0 auto;
-            background: white;
-            border: 2px solid #e2e8f0;
-            border-radius: 8px;
+            height: 100%;
         }
 
-        /* Top accent bar - DomPDF doesn't support gradients well, use solid color */
-        .accent-bar {
-            height: 6px;
-            background: #3b82f6;
-        }
-
-        /* Header Section */
+        /* Header */
         .header {
-            padding: 25px 30px 20px;
-            text-align: center;
-            border-bottom: 1px solid #e2e8f0;
+            background: #1e293b;
+            color: white;
+            padding: 15px 20px;
+            border-bottom: 4px solid #3b82f6;
+        }
+
+        .header-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .header-table td {
+            vertical-align: middle;
+        }
+
+        .event-label {
+            font-size: 8px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #94a3b8;
+            margin-bottom: 2px;
+            font-weight: bold;
+        }
+
+        .event-name {
+            font-size: 16px;
+            font-weight: bold;
+            line-height: 1.2;
+            text-align: left;
         }
 
         .ticket-type {
             display: inline-block;
-            background: #dbeafe;
-            color: #1e40af;
-            font-size: 9px;
+            background: rgba(255, 255, 255, 0.15);
+            padding: 4px 12px;
+            border-radius: 4px;
+            font-size: 10px;
             font-weight: bold;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
-            padding: 6px 12px;
-            border-radius: 4px;
-            margin-bottom: 12px;
+            letter-spacing: 1px;
+            text-align: right;
         }
 
-        .event-title {
-            font-size: 18px;
-            font-weight: bold;
-            margin-bottom: 8px;
-            line-height: 1.3;
-        }
-
-        .attendee-name {
-            font-size: 14px;
-            font-weight: 600;
-            color: #64748b;
-        }
-
-        /* QR Code Section */
+        /* QR Section */
         .qr-section {
-            padding: 25px 30px;
+            padding: 15px 20px;
             text-align: center;
             background: #f8fafc;
             border-bottom: 1px solid #e2e8f0;
         }
 
-        .qr-container {
-            background: white;
+        .qr-box {
             display: inline-block;
-            padding: 12px;
+            padding: 8px;
+            background: white;
             border: 1px solid #e2e8f0;
-            border-radius: 4px;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
         }
 
         .qr-image {
+            width: 220px;
+            height: 220px;
             display: block;
-            width: 250px;
-            height: 250px;
         }
 
-        .qr-label {
-            margin-top: 12px;
+        .scan-hint {
+            margin-top: 8px;
             font-size: 10px;
-            font-weight: bold;
             color: #64748b;
+            font-weight: 600;
             text-transform: uppercase;
             letter-spacing: 0.5px;
         }
 
-        /* Info Section */
+        /* Info Section Grid */
         .info-section {
-            padding: 20px 30px;
+            padding: 0;
         }
 
-        .info-row {
+        .info-table {
             width: 100%;
-            padding: 12px 0;
-            border-bottom: 1px solid #f1f5f9;
+            border-collapse: collapse;
         }
 
-        .info-row:last-child {
+        .info-table td {
+            padding: 12px 20px;
+            vertical-align: top;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .info-table tr:last-child td {
             border-bottom: none;
         }
 
-        .info-label {
-            font-size: 9px;
-            font-weight: bold;
+        .border-right {
+            border-right: 1px solid #e2e8f0;
+        }
+
+        .label {
+            font-size: 8px;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
+            letter-spacing: 1px;
             color: #94a3b8;
-            margin-bottom: 4px;
-        }
-
-        .info-value {
-            font-size: 13px;
-            font-weight: 600;
-            line-height: 1.4;
-            color: #0f172a;
-        }
-
-        .info-value-sub {
-            font-size: 12px;
-            font-weight: normal;
-            color: #64748b;
-            margin-top: 2px;
-        }
-
-        /* Important Notice */
-        .notice-box {
-            margin-top: 15px;
-            padding: 12px;
-            background: #fef9c3;
-            border-left: 3px solid #eab308;
-            border-radius: 3px;
-        }
-
-        .notice-text {
-            font-size: 9px;
-            color: #854d0e;
-            line-height: 1.5;
-        }
-
-        .notice-text strong {
+            margin-bottom: 3px;
             font-weight: bold;
+        }
+
+        .value {
+            font-size: 14px;
+            font-weight: bold;
+            color: #0f172a;
+            line-height: 1.3;
+        }
+
+        .sub-value {
+            font-size: 10px;
+            color: #64748b;
+            font-weight: normal;
+            margin-top: 1px;
+        }
+
+        /* Policy Section */
+        .policy-section {
+            padding: 15px 20px;
+            border-top: 1px solid #e2e8f0;
+        }
+
+        .policy-title {
+            font-size: 9px;
+            font-weight: bold;
+            color: #0f172a;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+        }
+
+        .policy-list {
+            font-size: 8px;
+            color: #64748b;
+            line-height: 1.4;
+            padding-left: 12px;
+            margin: 0;
+        }
+
+        .policy-list li {
+            margin-bottom: 2px;
         }
 
         /* Footer */
         .footer {
-            padding: 15px 30px;
+            background: #1e293b;
+            padding: 8px;
             text-align: center;
-            background: #f8fafc;
-            border-top: 1px solid #e2e8f0;
-        }
-
-        .footer-logo {
-            font-size: 10px;
-            font-weight: bold;
-            color: #3b82f6;
-            letter-spacing: 1px;
-            margin-bottom: 8px;
-        }
-
-        .divider {
-            width: 40px;
-            height: 1px;
-            background: #cbd5e1;
-            margin: 8px auto;
-        }
-
-        .footer-text {
             font-size: 8px;
             color: #94a3b8;
+            position: fixed;
+            bottom: 0;
+            width: 100%;
         }
+
     </style>
 </head>
 <body>
 
-<div class="ticket-container">
+<!-- Header -->
+<div class="header">
+    <table class="header-table">
+        <tr>
+            <td style="text-align: left;">
+                <div class="event-label">Event</div>
+                <div class="event-name">{{ $event->name }}</div>
+            </td>
+            <td style="text-align: right;">
+                <div class="ticket-type">{{ strtoupper($attendee->attendee_type) }}</div>
+            </td>
+        </tr>
+    </table>
+</div>
 
-    <div class="accent-bar"></div>
-
-    <div class="header">
-        <div class="ticket-type">{{ strtoupper($attendee->attendee_type) }} Ticket</div>
-        <div class="event-title">{{ $event->name }}</div>
-        <div class="attendee-name">{{ $attendee->name }}</div>
+<!-- QR Code -->
+<div class="qr-section">
+    <div class="qr-box">
+        <img src="{{ $qrCodeDataUri }}" alt="QR Code" class="qr-image">
     </div>
+    <div class="scan-hint">Scan at Entrance</div>
+</div>
 
-    <div class="qr-section">
-        <div class="qr-container">
-            <img src="{{ $qrCodeDataUri }}" alt="QR Code" class="qr-image">
-        </div>
-        <div class="qr-label">Your Check-in Code</div>
-    </div>
-
-    <div class="info-section">
-        <div class="info-row">
-            <div class="info-label">Date & Time</div>
-            <div class="info-value">
-                {{ \Carbon\Carbon::parse($event->start_time)->format('l, F j, Y') }}
-                <div class="info-value-sub">
-                    {{ \Carbon\Carbon::parse($event->start_time)->format('g:i A') }}
-                    @if($event->end_time)
-                        – {{ \Carbon\Carbon::parse($event->end_time)->format('g:i A') }}
-                    @endif
-                </div>
-            </div>
-        </div>
-
-        @if($event->building && $event->room)
-            <div class="info-row">
-                <div class="info-label">Venue</div>
-                <div class="info-value">
-                    {{ $event->building->name }}
-                    <div class="info-value-sub">{{ $event->room->name }}</div>
-                </div>
-            </div>
-        @endif
-
-        <div class="info-row">
-            <div class="info-label">Attendee Info</div>
-            <div class="info-value">
-                {{ ucfirst($attendee->attendee_type) }}
+<!-- Info Grid -->
+<div class="info-section">
+    <table class="info-table">
+        <tr>
+            <td colspan="2">
+                <div class="label">Attendee</div>
+                <div class="value">{{ $attendee->name }}</div>
                 @if($attendee->phone)
-                    <div class="info-value-sub">{{ $attendee->phone }}</div>
+                    <div class="sub-value">{{ $attendee->phone }}</div>
                 @endif
-            </div>
-        </div>
+            </td>
+        </tr>
+        <tr>
+            <td style="width: 50%;" class="border-right">
+                <div class="label">Date</div>
+                <div class="value">{{ \Carbon\Carbon::parse($event->start_time)->format('l, d F Y') }}</div>
+            </td>
+            <td style="width: 50%;">
+                <div class="label">Time</div>
+                <div class="value">{{ \Carbon\Carbon::parse($event->start_time)->format('H:i') }}</div>
+                @if($event->end_time)
+                    <div class="sub-value">Until {{ \Carbon\Carbon::parse($event->end_time)->format('H:i') }}</div>
+                @endif
+            </td>
+        </tr>
+        @if($event->building && $event->room)
+        <tr>
+            <td colspan="2">
+                <div class="label">Location</div>
+                <div class="value">{{ $event->building->name }}</div>
+                <div class="sub-value">{{ $event->room->name }}</div>
+            </td>
+        </tr>
+        @endif
+    </table>
+</div>
 
-        <div class="notice-box">
-            <div class="notice-text">
-                <strong>Important:</strong> Please have this QR code ready for check-in. This code is for one-time use only, and we kindly ask that you arrive 15 minutes early.
-            </div>
-        </div>
-    </div>
+<!-- Policy Section -->
+<div class="policy-section">
+    <div class="policy-title">Important Notice</div>
+    <ul class="policy-list">
+        <li>This ticket is valid for one-time entry only.</li>
+        <li>Please present this QR code at the entrance for scanning.</li>
+        <li>Unauthorized duplication or resale is prohibited.</li>
+        <li>The organizer reserves the right to refuse entry.</li>
+    </ul>
+</div>
 
-    <div class="footer">
-        <div class="footer-logo">EVENTHUB</div>
-        <div class="divider"></div>
-        <div class="footer-text">
-            Generated {{ now()->format('M j, Y') }} • Official Event Ticket
-        </div>
-    </div>
-
+<!-- Footer -->
+<div class="footer">
+    EventHub &bull; Made By Chrystalio {{ \Carbon\Carbon::now()->format('Y') }}
 </div>
 
 </body>
