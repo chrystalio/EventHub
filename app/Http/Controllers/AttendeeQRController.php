@@ -20,6 +20,8 @@ class AttendeeQRController extends Controller
             abort(403, 'Unauthorized');
         }
 
+        $attendee->load('registration.user');
+
         // Load event with relationships
         $event = $attendee->registration->event->load(['building', 'room']);
 

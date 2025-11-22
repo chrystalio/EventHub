@@ -113,7 +113,6 @@
         .info-table td {
             padding: 12px 20px;
             vertical-align: top;
-            border-bottom: 1px solid #e2e8f0;
         }
 
         .info-table tr:last-child td {
@@ -149,7 +148,7 @@
 
         /* Policy Section */
         .policy-section {
-            padding: 15px 20px;
+            padding: 15px 20px 30px 20px;
             border-top: 1px solid #e2e8f0;
         }
 
@@ -178,11 +177,14 @@
             background: #1e293b;
             padding: 8px;
             text-align: center;
-            font-size: 8px;
+            font-size: 7px;
             color: #94a3b8;
             position: fixed;
             bottom: 0;
             width: 100%;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 600;
         }
 
     </style>
@@ -219,8 +221,8 @@
             <td colspan="2">
                 <div class="label">Attendee</div>
                 <div class="value">{{ $attendee->name }}</div>
-                @if($attendee->phone)
-                    <div class="sub-value">{{ $attendee->phone }}</div>
+                @if($attendee->phone_number)
+                    <div class="sub-value">{{ $attendee->phone_number }}</div>
                 @endif
             </td>
         </tr>
@@ -253,16 +255,15 @@
 <div class="policy-section">
     <div class="policy-title">Important Notice</div>
     <ul class="policy-list">
-        <li>This ticket is valid for one-time entry only.</li>
-        <li>Please present this QR code at the entrance for scanning.</li>
-        <li>Unauthorized duplication or resale is prohibited.</li>
-        <li>The organizer reserves the right to refuse entry.</li>
+        <li>Valid for one-time entry only.</li>
+        <li>Please arrive 15 minutes prior to the event.</li>
+        <li>Present QR code at entrance for scanning.</li>
     </ul>
 </div>
 
 <!-- Footer -->
 <div class="footer">
-    EventHub &bull; Made By Chrystalio {{ \Carbon\Carbon::now()->format('Y') }}
+    Powered by EventHub &bull; Crafted by Chrystalio &copy; {{ \Carbon\Carbon::now()->format('Y') }}
 </div>
 
 </body>

@@ -58,4 +58,14 @@ class RegistrationAttendee extends Model
     {
         return !is_null($this->cancelled_at);
     }
+
+    public function getPhoneNumberAttribute(): ?string
+    {
+        $phone = $this->phone;
+        if (!empty($phone)) {
+            return $phone;
+        }
+
+        return $this->registration?->user?->phone;
+    }
 }
