@@ -132,13 +132,14 @@ const RegistrationStatusCard = ({ registration }: { registration: Registration }
             description: 'Your registration was not approved.',
             classes: 'bg-red-50 border-red-200 dark:bg-red-950 dark:border-red-800',
             iconContainer: 'bg-red-100 dark:bg-red-900',
-            iconClass: 'text-red-600 dark:text-red-400', // <- renamed
+            iconClass: 'text-red-600 dark:text-red-400',
             titleText: 'text-red-900 dark:text-red-200',
             badge: 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200',
             body: 'text-red-800 dark:text-red-200',
             button: 'border-red-300 bg-transparent text-red-700 hover:bg-red-100 dark:border-red-700 dark:text-red-300 dark:hover:bg-red-900',
         },
-
+        attended: { icon: CheckCircleIcon, title: 'Event Attended', description: 'You attended this event.', classes: 'bg-blue-50 border-blue-200 dark:bg-blue-950 dark:border-blue-800', iconContainer: 'bg-blue-100 dark:bg-blue-900', iconClass: 'text-blue-600 dark:text-blue-400', titleText: 'text-blue-900 dark:text-blue-200', badge: 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200', body: 'text-blue-800 dark:text-blue-200', button: 'border-blue-300 bg-transparent text-blue-700 hover:bg-blue-100 dark:border-blue-700 dark:text-blue-300 dark:hover:bg-blue-900' },
+        missed: { icon: XCircleIcon, title: 'Event Missed', description: 'You missed this event.', classes: 'bg-gray-50 border-gray-200 dark:bg-gray-900 dark:border-gray-800', iconContainer: 'bg-gray-100 dark:bg-gray-800', iconClass: 'text-gray-600 dark:text-gray-400', titleText: 'text-gray-900 dark:text-gray-200', badge: 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-200', body: 'text-gray-800 dark:text-gray-200', button: 'border-gray-300 bg-transparent text-gray-700 hover:bg-gray-100 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800' },
         cancelled: { icon: XCircleIcon, title: 'Registration Cancelled', description: 'This registration has been cancelled.', classes: 'bg-gray-50 border-gray-200 dark:bg-gray-900 dark:border-gray-800', iconContainer: 'bg-gray-100 dark:bg-gray-800', iconClass: 'text-gray-600 dark:text-gray-400', titleText: 'text-gray-900 dark:text-gray-200', badge: 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-200', body: 'text-gray-800 dark:text-gray-200', button: 'border-gray-300 bg-transparent text-gray-700 hover:bg-gray-100 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800' },
         pending_payment: { icon: ClockIcon, title: 'Payment Pending', description: 'Your registration is pending payment.', classes: 'bg-yellow-50 border-yellow-200 dark:bg-yellow-950 dark:border-yellow-800', iconContainer: 'bg-yellow-100 dark:bg-yellow-900', iconClass: 'text-yellow-600 dark:text-yellow-400', titleText: 'text-yellow-900 dark:text-yellow-200', badge: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200', body: 'text-yellow-800 dark:text-yellow-200', button: 'border-yellow-300 bg-transparent text-yellow-700 hover:bg-yellow-100 dark:border-yellow-700 dark:text-yellow-300 dark:hover:bg-yellow-900' },
     };
@@ -167,43 +168,56 @@ const RegistrationStatusCard = ({ registration }: { registration: Registration }
     );
 };
 
-const RegistrationForm = ({ event, onSubmit, ...formProps }) => (
+interface RegistrationFormProps {
+    event: Event;
+    onSubmit: (e: React.FormEvent) => void;
+    data: {
+        guest_count: number;
+        guests: { name: string; phone: string }[];
+    };
+    errors: Record<string, string>;
+    processing: boolean;
+    handleGuestCountChange: (count: number) => void;
+    handleGuestDetailChange: (index: number, field: 'name' | 'phone', value: string) => void;
+}
+
+const RegistrationForm = ({ event, onSubmit, data, errors, processing, handleGuestCountChange, handleGuestDetailChange }: RegistrationFormProps) => (
     <form onSubmit={onSubmit} className="space-y-6">
         {event.max_guests_per_registration > 0 && (
             <div>
                 <Label className="font-medium">Add Guests</Label>
                 <p className="mb-3 text-sm text-gray-500 dark:text-gray-400">You can bring up to {event.max_guests_per_registration} guest(s).</p>
                 <div className="flex items-center gap-4">
-                    <Button type="button" variant="outline" size="icon" onClick={() => formProps.handleGuestCountChange(formProps.data.guest_count - 1)}><MinusIcon className="h-4 w-4" /></Button>
-                    <span className="w-10 text-center text-lg font-semibold">{formProps.data.guest_count}</span>
-                    <Button type="button" variant="outline" size="icon" onClick={() => formProps.handleGuestCountChange(formProps.data.guest_count + 1)}><PlusIcon className="h-4 w-4" /></Button>
+                    <Button type="button" variant="outline" size="icon" onClick={() => handleGuestCountChange(data.guest_count - 1)}><MinusIcon className="h-4 w-4" /></Button>
+                    <span className="w-10 text-center text-lg font-semibold">{data.guest_count}</span>
+                    <Button type="button" variant="outline" size="icon" onClick={() => handleGuestCountChange(data.guest_count + 1)}><PlusIcon className="h-4 w-4" /></Button>
                 </div>
             </div>
         )}
-        {formProps.data.guests.map((guest, index) => (
+        {data.guests.map((guest: { name: string; phone: string }, index: number) => (
             <div key={index} className="grid gap-4 rounded-md border p-4 dark:border-gray-800">
                 <div className="font-medium">Guest {index + 1} Details</div>
                 <div>
                     <Label htmlFor={`guest_name_${index}`}>Full Name</Label>
-                    <Input id={`guest_name_${index}`} type="text" value={guest.name} onChange={(e) => formProps.handleGuestDetailChange(index, 'name', e.target.value)} required />
-                    {formProps.errors[`guests.${index}.name`] && <p className="mt-1 text-xs text-red-500">{formProps.errors[`guests.${index}.name`]}</p>}
+                    <Input id={`guest_name_${index}`} type="text" value={guest.name} onChange={(e) => handleGuestDetailChange(index, 'name', e.target.value)} required />
+                    {errors[`guests.${index}.name`] && <p className="mt-1 text-xs text-red-500">{errors[`guests.${index}.name`]}</p>}
                 </div>
                 <div>
                     <Label htmlFor={`guest_phone_${index}`}>Phone Number</Label>
                     <PhoneInput
                         id={`guest_phone_${index}`}
                         value={guest.phone}
-                        onChange={(value) => formProps.handleGuestDetailChange(index, 'phone', value || '')}
+                        onChange={(value) => handleGuestDetailChange(index, 'phone', value || '')}
                         defaultCountry="ID"
                         placeholder="Enter phone number"
                         required
                     />
-                    {formProps.errors[`guests.${index}.phone`] && <p className="mt-1 text-xs text-red-500">{formProps.errors[`guests.${index}.phone`]}</p>}
+                    {errors[`guests.${index}.phone`] && <p className="mt-1 text-xs text-red-500">{errors[`guests.${index}.phone`]}</p>}
                 </div>
             </div>
         ))}
-        <Button type="submit" disabled={formProps.processing} className="w-full">
-            {formProps.processing ? 'Registering...' : 'Confirm Registration'}
+        <Button type="submit" disabled={processing} className="w-full">
+            {processing ? 'Registering...' : 'Confirm Registration'}
         </Button>
     </form>
 );
@@ -271,7 +285,6 @@ export default function AuthenticatedEventShow({ event, userRegistration, canReg
                                             event={event}
                                             onSubmit={handleRegistrationSubmit}
                                             data={data}
-                                            setData={setData}
                                             errors={errors}
                                             processing={processing}
                                             handleGuestCountChange={handleGuestCountChange}

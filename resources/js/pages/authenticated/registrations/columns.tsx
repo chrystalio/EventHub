@@ -63,8 +63,9 @@ export const columns: ColumnDef<Registration>[] = [
                             size="sm"
                             asChild
                             className="bg-amber-500 text-white hover:bg-amber-600 focus-visible:ring-amber-400"
+                            disabled={!registration.order_id}
                         >
-                            <Link href={route('transactions.show', registration.order_id)}>
+                            <Link href={registration.order_id ? route('transactions.show', registration.order_id) : '#'}>
                                 Pay Now
                             </Link>
                         </Button>
