@@ -1,7 +1,7 @@
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardTitle } from '@/components/ui/card';
-import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogDescription, DialogTitle } from '@/components/ui/dialog';
 import { Separator } from '@/components/ui/separator';
 import AppLayout from '@/layouts/app-layout';
 import type { Registration, RegistrationAttendee as Attendee } from '@/types';
@@ -345,6 +345,9 @@ export default function RegistrationShow({ registration }: Props) {
                             {selectedAttendee?.attendee_type === 'user' ? 'Registrant' : 'Guest'}
                         </Badge>
                         <DialogTitle className="text-center text-2xl font-bold">{selectedAttendee?.name}</DialogTitle>
+                        <DialogDescription className="sr-only">
+                            QR code for {selectedAttendee?.name} to check in at {event.name}
+                        </DialogDescription>
 
                         <div className="mt-6 flex min-h-[256px] min-w-[256px] items-center justify-center rounded-lg border bg-white p-2">
                             {isLoadingQr && <Loader2 className="text-muted-foreground h-12 w-12 animate-spin" />}
@@ -371,7 +374,7 @@ export default function RegistrationShow({ registration }: Props) {
                                                 asChild
                                             >
                                                 <a
-                                                    href={route('attendees.qr.download', selectedAttendee.qr_code)}
+                                                    href={selectedAttendee?.qr_code ? route('attendees.qr.download', selectedAttendee.qr_code) : '#'}
                                                     target="_blank"
                                                     rel="noopener noreferrer"
                                                 >
