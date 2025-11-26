@@ -65,7 +65,7 @@ export default function FullCalendarWidget({
     useEffect(() => {
         const mql = window.matchMedia('(max-width: 640px)');
         const handler = (e: MediaQueryListEvent | MediaQueryList) => {
-            const mobile = 'matches' in e ? e.matches : (e.currentTarget?.matches ?? false);
+            const mobile = e.matches;
             setIsMobile(mobile);
             const targetView = mobile ? 'timeGridWeek' : initialView;
             if (api()?.view.type !== targetView) {

@@ -51,9 +51,9 @@ export default function Show({ event }: ShowProps) {
         { title: event.name, href: '#' },
     ];
 
-    const { auth } = usePage<Page<SharedData>>().props;
-    const isSuperAdmin = ['System Administrator', 'Akademik'].some(role =>
-        auth.user.roles.includes(role)
+    const { auth } = usePage<{ auth: SharedData['auth'] }>().props;
+    const isSuperAdmin = ['System Administrator', 'Akademik'].some((role: string) =>
+        auth.user.roles.includes(role as any)
     );
     const startDate = event.start_time.split('T')[0];
     const endDate = event.end_time.split('T')[0];

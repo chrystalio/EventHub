@@ -21,6 +21,7 @@ interface GuestForm {
     name: string;
     email: string;
     phone: string;
+    [key: string]: string;
 }
 
 interface RegistrationFormData {
@@ -32,9 +33,9 @@ export default function RegistrationForm({ event, userRegistration, canRegister,
     const [guestCount, setGuestCount] = useState(0);
     const [guests, setGuests] = useState<GuestForm[]>([]);
 
-    const { data, setData, post, delete: destroy, processing, errors, reset } = useForm<RegistrationFormData>({
+    const { data, setData, post, delete: destroy, processing, errors, reset } = useForm({
         guest_count: 0,
-        guests: [],
+        guests: [] as GuestForm[],
     });
 
     // Update guest forms when count changes

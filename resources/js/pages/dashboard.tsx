@@ -40,11 +40,11 @@ type TodayEventItem = {
     uuid: string;
     name: string;
     start_time: string;
-    end_time: string;
+    end_time: string | null;
     building?: { name: string } | null;
     room?: { name: string } | null;
     staff: { id: number; name: string }[];
-    ongoing: boolean;
+    state: 'ongoing' | 'upcoming' | 'past';
 };
 
 interface DashboardProps {
