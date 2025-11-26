@@ -8,6 +8,8 @@ use App\Http\Requests\UpdateEventRequest;
 use App\Models\Building;
 use App\Models\Event;
 use App\Models\Room;
+use App\Services\StaticQRCodeService;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -121,5 +123,79 @@ class EventController extends Controller
                 ->route('admin.events.index')
                 ->with('error', 'Failed to delete event. Please try again.');
         }
+    }
+
+    /**
+     * Validate all QR codes for a static QR event before printing.
+     * Useful for pre-event testing to ensure all QR codes are valid.
+     */
+    public function validateQRCodes(Event $event): JsonResponse
+    {
+        $this->authorize('manage', $event);
+
+        if ($event->qr_type !== 'static') {
+            return response()->json([
+                'success' => false,
+                'message' => 'This endpoint is only for static QR events.',
+            ], 422);
+        }
+
+        $attendees = $event->registrations()
+            ->with('attendees')
+            ->get()
+            ->pluck('attendees')
+            ->flatten();
+
+        if ($attendees->isEmpty()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'No attendees registered for this event yet.',
+            ], 422);
+        }
+
+        $qrService = app(StaticQRCodeService::class);
+        $results = [];
+
+        foreach ($attendees as $attendee) {
+            try {
+                $qrData = $qrService->generateQRData($attendee);
+                $verified = $qrService->verifyQRData($qrData, $event);
+
+                $results[] = [
+                    'attendee_name' => $attendee->name,
+                    'attendee_uuid' => $attendee->uuid,
+                    'qr_valid' => $verified !== null,
+                    'error' => null,
+                ];
+            } catch (\Exception $e) {
+                $results[] = [
+                    'attendee_name' => $attendee->name,
+                    'attendee_uuid' => $attendee->uuid,
+                    'qr_valid' => false,
+                    'error' => $e->getMessage(),
+                ];
+            }
+        }
+
+        $validCount = collect($results)->where('qr_valid', true)->count();
+        $invalidCount = collect($results)->where('qr_valid', false)->count();
+
+        Log::info('Static QR validation completed', [
+            'event_uuid' => $event->uuid,
+            'event_name' => $event->name,
+            'total' => count($results),
+            'valid' => $validCount,
+            'invalid' => $invalidCount,
+            'validated_by' => auth()->id(),
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'total' => count($results),
+            'valid' => $validCount,
+            'invalid' => $invalidCount,
+            'validation_rate' => count($results) > 0 ? round(($validCount / count($results)) * 100, 2) : 0,
+            'results' => $results,
+        ]);
     }
 }

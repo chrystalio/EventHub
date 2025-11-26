@@ -57,6 +57,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::put('/events/{event}', [EventController::class, 'update'])->name('admin.events.update')->middleware('can:event.update');
         Route::delete('/events/{event}', [EventController::class, 'destroy'])->name('admin.events.destroy')->middleware('can:event.delete');
         Route::get('/events/{event}/show', [EventController::class, 'show'])->name('admin.events.show')->middleware('can:event.view');
+        Route::get('/events/{event}/validate-qr-codes', [EventController::class, 'validateQRCodes'])->name('admin.events.validate-qr-codes')->middleware('can:event.view');
         Route::post('/events/{event}/staff', [EventStaffController::class, 'store'])->name('admin.events.staff.store');
         Route::delete('/events/{event}/staff/{user}', [EventStaffController::class, 'destroy'])->name('admin.events.staff.destroy');
 
