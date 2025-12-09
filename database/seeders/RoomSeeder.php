@@ -4,7 +4,6 @@ namespace Database\Seeders;
 
 use App\Models\Building;
 use App\Models\Room;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
 class RoomSeeder extends Seeder
@@ -17,7 +16,6 @@ class RoomSeeder extends Seeder
 
         $btpBuilding = Building::where('code', 'A')->first()->id;
         $itebaBuilding = Building::where('code', 'B')->first()->id;
-
 
         $rooms = [
             [

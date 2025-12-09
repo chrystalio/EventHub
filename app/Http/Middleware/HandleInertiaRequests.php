@@ -45,7 +45,7 @@ class HandleInertiaRequests extends Middleware
             'auth' => function () use ($request) {
                 $user = $request->user();
 
-                if (!$user) {
+                if (! $user) {
                     return null;
                 }
 
@@ -67,5 +67,4 @@ class HandleInertiaRequests extends Middleware
             ],
         ];
     }
-
 }

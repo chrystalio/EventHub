@@ -24,7 +24,7 @@ class BuildingSeeder extends Seeder
                 'name' => 'ITEBA',
                 'created_at' => now(),
                 'updated_at' => now(),
-            ]
+            ],
         ];
 
         Building::upsert($buildings, ['code'], ['name', 'updated_at']);

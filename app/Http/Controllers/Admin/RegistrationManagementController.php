@@ -20,6 +20,7 @@ class RegistrationManagementController extends Controller
             'status' => 'approved',
             'approved_at' => now(),
         ]);
+
         return back()->with('success', 'Registration has been approved.');
     }
 
@@ -31,6 +32,7 @@ class RegistrationManagementController extends Controller
         $registration->update([
             'status' => 'rejected',
         ]);
+
         return back()->with('success', 'Registration has been rejected.');
     }
 }

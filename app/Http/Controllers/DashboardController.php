@@ -11,7 +11,6 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Str;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -58,6 +57,7 @@ class DashboardController extends Controller
 
         $paginatedRooms->getCollection()->transform(function ($room) use ($activeEventsByRoom) {
             $activeEvent = $activeEventsByRoom->get($room->id);
+
             return [
                 'id' => $room->id,
                 'name' => $room->name,
@@ -85,11 +85,11 @@ class DashboardController extends Controller
         ])
             ->where('start_time', '<=', $endOfDay)
             ->where('end_time', '>=', $startOfDay)
-            ->orderByRaw("CASE
+            ->orderByRaw('CASE
             WHEN start_time <= ? AND end_time >= ? THEN 0  -- ongoing
             WHEN start_time >  ? THEN 1                    -- upcoming
             ELSE 2                                         -- past
-        END", [$now, $now, $now])
+        END', [$now, $now, $now])
             ->orderBy('start_time', 'asc')
             ->get()
             ->map(function ($e) use ($now) {
@@ -104,7 +104,7 @@ class DashboardController extends Controller
                     'end_time' => optional($e->end_time)->toIso8601String(),
                     'building' => ['name' => optional($e->building)->name],
                     'room' => ['name' => optional($e->room)->name],
-                    'staff' => $e->staff->map(fn($u) => ['id' => $u->id, 'name' => $u->name])->values(),
+                    'staff' => $e->staff->map(fn ($u) => ['id' => $u->id, 'name' => $u->name])->values(),
                     'state' => $state,
                 ];
             });
@@ -115,7 +115,7 @@ class DashboardController extends Controller
                 ['label' => 'Total Users', 'value' => $totalUsers],
                 ['label' => 'Total Events', 'value' => $totalEvents],
                 ['label' => 'Total Registrations', 'value' => $totalRegistrations],
-                ['label' => 'Total Revenue', 'value' => 'Rp ' . number_format($totalRevenue, 0, ',', '.')],
+                ['label' => 'Total Revenue', 'value' => 'Rp '.number_format($totalRevenue, 0, ',', '.')],
             ],
             'roomAvailability' => $paginatedRooms,
             'eventTypeDistribution' => $eventTypeDistribution,
@@ -157,7 +157,7 @@ class DashboardController extends Controller
 
         $eventsHappeningNow = (clone $managedEventsQuery)
             ->with(['building', 'room'])
-            ->withCount(['registrations as total_registered' => fn($q) => $q->where('status', '!=', 'cancelled')])
+            ->withCount(['registrations as total_registered' => fn ($q) => $q->where('status', '!=', 'cancelled')])
             ->where('start_time', '<=', $now->copy()->addMinutes(5))
             ->where('end_time', '>=', $now)
             ->orderBy('start_time', 'asc')
@@ -166,15 +166,15 @@ class DashboardController extends Controller
         $upcomingManagedSchedule = (clone $managedEventsQuery)
             ->where('start_time', '>=', $now)
             ->with(['building', 'room'])
-            ->withCount(['registrations' => fn($q) => $q->where('status', '!=', 'cancelled')])
+            ->withCount(['registrations' => fn ($q) => $q->where('status', '!=', 'cancelled')])
             ->orderBy('start_time', 'asc')
             ->take(5)
             ->get();
 
         $registrationApprovals = (clone $managedEventsQuery)
             ->where('type', 'private')
-            ->whereHas('registrations', fn($q) => $q->where('status', 'pending'))
-            ->withCount(['registrations as pending_requests_count' => fn($q) => $q->where('status', 'pending')])
+            ->whereHas('registrations', fn ($q) => $q->where('status', 'pending'))
+            ->withCount(['registrations as pending_requests_count' => fn ($q) => $q->where('status', 'pending')])
             ->get();
 
         $recentActivities = $this->getRecentActivitiesForPanitia($user);
@@ -237,12 +237,12 @@ class DashboardController extends Controller
             ->count();
 
         $totalUpcomingCount = Registration::where('user_uuid', $user->uuid)
-            ->whereHas('event', fn($q) => $q->where('start_time', '>=', $now))
+            ->whereHas('event', fn ($q) => $q->where('start_time', '>=', $now))
             ->count();
 
         $upcomingRegistrations = Registration::with(['event.building', 'event.room'])
             ->where('user_uuid', $user->uuid)
-            ->whereHas('event', fn($q) => $q->where('start_time', '>=', $now))
+            ->whereHas('event', fn ($q) => $q->where('start_time', '>=', $now))
             ->join('events', 'registrations.event_uuid', '=', 'events.uuid')
             ->orderBy('events.start_time', 'asc')
             ->select('registrations.*')
@@ -291,7 +291,7 @@ class DashboardController extends Controller
         $calendarEvents = Registration::with('event')
             ->where('user_uuid', $user->uuid)
             ->get()
-            ->map(fn($registration) => [
+            ->map(fn ($registration) => [
                 'id' => $registration->event->id,
                 'title' => $registration->event->name,
                 'start' => $registration->event->start_time->toIso8601String(),
@@ -317,15 +317,13 @@ class DashboardController extends Controller
         ];
     }
 
-
     private function getRecentActivitiesForPanitia(User $user)
     {
-        if (!$user->managedEvents()->exists()) {
+        if (! $user->managedEvents()->exists()) {
             return [];
         }
 
         $managedEventUuidsSub = $user->managedEvents()->select('events.uuid');
-
 
         $registrations = DB::table('registrations')
             ->join('events', 'registrations.event_uuid', '=', 'events.uuid')
@@ -339,20 +337,19 @@ class DashboardController extends Controller
             events.name as event_name
         ");
 
-
         $statusChanges = DB::table('registrations')
             ->join('events', 'registrations.event_uuid', '=', 'events.uuid')
             ->join('users', 'users.uuid', '=', 'registrations.user_uuid')
             ->whereIn('registrations.event_uuid', $managedEventUuidsSub)
             ->whereIn('registrations.status', ['approved', 'rejected'])
             ->whereColumn('registrations.updated_at', '>', 'registrations.created_at')
-            ->selectRaw("
+            ->selectRaw('
             registrations.updated_at as occurred_at,
             registrations.status as type,
             registrations.event_uuid as event_uuid,
             users.name as actor_name,
             events.name as event_name
-        ");
+        ');
 
         $attendance = DB::table('registrations_attendees')
             ->join('registrations', 'registrations_attendees.registration_id', '=', 'registrations.id')
@@ -382,11 +379,12 @@ class DashboardController extends Controller
                     'attended' => "{$row->actor_name} checked in to {$row->event_name}",
                     default => "An update occurred for {$row->actor_name} in {$row->event_name}",
                 };
+
                 return [
                     'type' => $row->type,
                     'event_uuid' => $row->event_uuid,
                     'message' => $message,
-                    'occurred_at' => (string)$row->occurred_at,
+                    'occurred_at' => (string) $row->occurred_at,
                 ];
             })
             ->all();
@@ -410,13 +408,13 @@ class DashboardController extends Controller
             ->join('users', 'users.uuid', '=', 'registrations.user_uuid')
             ->whereIn('registrations.status', ['approved', 'rejected'])
             ->whereColumn('registrations.updated_at', '>', 'registrations.created_at')
-            ->selectRaw("
+            ->selectRaw('
             registrations.updated_at as occurred_at,
             registrations.status as type,
             registrations.event_uuid as event_uuid,
             users.name as actor_name,
             events.name as event_name
-        ");
+        ');
 
         $attendance = DB::table('registrations_attendees')
             ->join('registrations', 'registrations_attendees.registration_id', '=', 'registrations.id')
@@ -445,11 +443,12 @@ class DashboardController extends Controller
                     'attended' => "{$row->actor_name} checked in to {$row->event_name}",
                     default => "Update for {$row->actor_name} – {$row->event_name}",
                 };
+
                 return [
                     'type' => $row->type,
                     'event_uuid' => $row->event_uuid,
                     'message' => $message,
-                    'occurred_at' => (string)$row->occurred_at,
+                    'occurred_at' => (string) $row->occurred_at,
                 ];
             })
             ->all();

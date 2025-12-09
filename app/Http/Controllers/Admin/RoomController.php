@@ -8,10 +8,10 @@ use App\Http\Requests\UpdateRoomRequest;
 use App\Models\Building;
 use App\Models\Room;
 use Illuminate\Http\RedirectResponse;
-use Inertia\Inertia;
-use Inertia\Response;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Inertia\Inertia;
+use Inertia\Response;
 
 class RoomController extends Controller
 {
@@ -31,6 +31,7 @@ class RoomController extends Controller
 
     /**
      * Store a newly created resource in storage.
+     *
      * @throws \Throwable
      */
     public function store(StoreRoomRequest $request): RedirectResponse
@@ -60,6 +61,7 @@ class RoomController extends Controller
 
     /**
      * Update the specified resource in storage.
+     *
      * @throws \Throwable
      */
     public function update(UpdateRoomRequest $request, string $id): RedirectResponse

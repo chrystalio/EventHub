@@ -23,7 +23,7 @@ class UpdateBuildingRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'code' => 'required|string|max:255|unique:buildings,code,' . $this->route('building'),
+            'code' => 'required|string|max:255|unique:buildings,code,'.$this->route('building'),
             'name' => 'required|string|max:255',
         ];
     }

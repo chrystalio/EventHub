@@ -9,6 +9,7 @@ use Spatie\Permission\Models\Role;
 class SyncPermissions extends Command
 {
     protected $signature = 'sync:permissions';
+
     protected $description = 'Sync permissions and role-permission mappings from JSON files into the database';
 
     /**
@@ -27,6 +28,7 @@ class SyncPermissions extends Command
 
         $this->newLine();
         $this->info('✔️ Sync complete!');
+
         return self::SUCCESS;
     }
 
@@ -39,15 +41,17 @@ class SyncPermissions extends Command
     {
         $path = base_path('permissions/permissions.json');
 
-        if (!file_exists($path)) {
+        if (! file_exists($path)) {
             $this->warn('⚠️  permissions.json file not found. Skipping permission sync.');
+
             return;
         }
 
         $data = json_decode(file_get_contents($path), true, 512, JSON_THROW_ON_ERROR);
 
-        if (!is_array($data)) {
+        if (! is_array($data)) {
             $this->error('Invalid JSON structure in permissions.json');
+
             return;
         }
 
@@ -79,28 +83,32 @@ class SyncPermissions extends Command
     {
         $path = base_path('permissions/role_permissions.json');
 
-        if (!file_exists($path)) {
+        if (! file_exists($path)) {
             $this->warn('⚠️  role_permissions.json file not found. Skipping role-permission sync.');
+
             return;
         }
 
         $data = json_decode(file_get_contents($path), true, 512, JSON_THROW_ON_ERROR);
 
-        if (!is_array($data)) {
+        if (! is_array($data)) {
             $this->error('Invalid JSON structure in role_permissions.json');
+
             return;
         }
 
         foreach ($data as $roleName => $permissionNames) {
             $role = Role::findByName($roleName);
 
-            if (!$role) {
+            if (! $role) {
                 $this->warn("  ⚠️  Role '{$roleName}' not found. Skipping.");
+
                 continue;
             }
 
-            if (!is_array($permissionNames)) {
+            if (! is_array($permissionNames)) {
                 $this->warn("  ⚠️  Invalid permissions for role '{$roleName}'. Skipping.");
+
                 continue;
             }
 

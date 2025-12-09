@@ -30,14 +30,14 @@ class MakePermission extends Command
 
     public function getHelp(): string
     {
-        return <<<HELP
+        return <<<'HELP'
         Examples:
 
           # Create a single permission:
-          php artisan make:permission "App\\Http\\Controllers\\Admin\\UserController@update"
+          php artisan make:permission "App\Http\Controllers\Admin\UserController@update"
 
           # Create all CRUD permissions:
-          php artisan make:permission "App\\Http\\Controllers\\Admin\\UserController"
+          php artisan make:permission "App\Http\Controllers\Admin\UserController"
 
           Options:
             --guard     Specify a guard name (defaults to config('auth.defaults.guard'))
@@ -45,12 +45,11 @@ class MakePermission extends Command
         HELP;
     }
 
-
     public function handle()
     {
-        $rawName     = trim($this->argument('name'));
-        $shortname   = $this->argument('shortname');
-        $guard       = $this->option('guard') ?: config('auth.defaults.guard');
+        $rawName = trim($this->argument('name'));
+        $shortname = $this->argument('shortname');
+        $guard = $this->option('guard') ?: config('auth.defaults.guard');
 
         // If a shortname was not provided, generate one from the base name:
         if (! $shortname) {
@@ -67,7 +66,7 @@ class MakePermission extends Command
             // If user passed a “Controller@method” name, also include the action in the short label:
             if (str_contains($rawName, '@')) {
                 $action = explode('@', $rawName)[1];
-                $shortname = ucfirst($action) . ' ' . $basename;
+                $shortname = ucfirst($action).' '.$basename;
             } else {
                 // If it’s a bare controller, just use the resource name:
                 $shortname = $basename;
@@ -80,10 +79,10 @@ class MakePermission extends Command
             $this->createOrWarn($rawName, $shortname, $guard);
         } else {
             // (B) CRUD bundle case → create @view, @create, @update, @delete
-            $methods = [ 'view', 'create', 'update', 'delete' ];
+            $methods = ['view', 'create', 'update', 'delete'];
             foreach ($methods as $method) {
                 $resource = strtolower(class_basename(str_replace('Controller', '', $rawName)));
-                $fullName = $resource . '.' . $method;
+                $fullName = $resource.'.'.$method;
                 $this->createOrWarn($fullName, $shortname, $guard);
             }
         }
@@ -97,8 +96,8 @@ class MakePermission extends Command
     protected function createOrWarn(string $name, string $shortname, string $guard): void
     {
         $permission = Permission::firstOrCreate(
-            [ 'name' => $name, 'guard_name' => $guard ],
-            [ 'shortname' => $shortname ]
+            ['name' => $name, 'guard_name' => $guard],
+            ['shortname' => $shortname]
         );
 
         if ($permission->wasRecentlyCreated) {

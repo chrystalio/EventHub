@@ -12,7 +12,6 @@ use Illuminate\Support\Facades\Log;
 
 class BuildingController extends Controller
 {
-
     /**
      * Display a listing of the resource.
      */
@@ -27,6 +26,7 @@ class BuildingController extends Controller
 
     /**
      * Store a newly created resource in storage.
+     *
      * @throws \Throwable
      */
     public function store(StoreBuildingRequest $request): RedirectResponse

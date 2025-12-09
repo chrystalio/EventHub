@@ -47,6 +47,7 @@ class MarkMissedRegistrations extends Command
 
         if ($missedRegistrations->isEmpty()) {
             $this->info('No registrations to mark as missed.');
+
             return 0;
         }
 

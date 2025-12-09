@@ -99,7 +99,7 @@ class RegistrationController extends Controller
         return Inertia::render('authenticated/events/show', [
             'event' => $event,
             'userRegistration' => $userRegistration,
-            'canRegister' => $canCreate && !$userRegistration,
+            'canRegister' => $canCreate && ! $userRegistration,
             'totalRegistered' => $totalRegistered,
             'isAuthenticated' => true,
         ]);
@@ -110,14 +110,14 @@ class RegistrationController extends Controller
         $validated = $request->validated();
         $user = Auth::user();
 
-        if ($event->type === 'paid' && $event->price > 0){
+        if ($event->type === 'paid' && $event->price > 0) {
             $totalAmount = $event->price * ($validated['guest_count'] + 1);
 
             $timestamp = time();
             $timeCode = strtoupper(base_convert($timestamp, 10, 36));
             $UniqueId = strtoupper(Str::random(3));
 
-            $orderId = 'REG-' . $timeCode.$UniqueId;
+            $orderId = 'REG-'.$timeCode.$UniqueId;
 
             DB::beginTransaction();
             try {
@@ -144,7 +144,7 @@ class RegistrationController extends Controller
                     'phone' => $user->phone ?? '',
                 ]);
 
-                if (!empty($validated['guests'])) {
+                if (! empty($validated['guests'])) {
                     foreach ($validated['guests'] as $guestData) {
                         $registration->attendees()->create([
                             'attendee_type' => 'guest',
@@ -155,10 +155,12 @@ class RegistrationController extends Controller
                 }
 
                 DB::commit();
+
                 return redirect()->route('transactions.show', $orderId);
             } catch (\Throwable $e) {
                 DB::rollBack();
                 report($e);
+
                 return back()->with('error', 'A server error occurred. Please try again.');
             }
         } else {
@@ -171,10 +173,10 @@ class RegistrationController extends Controller
                 DB::beginTransaction();
 
                 $registration = Registration::create([
-                    'user_uuid'     => $user->uuid,
-                    'event_uuid'    => $event->uuid,
+                    'user_uuid' => $user->uuid,
+                    'event_uuid' => $event->uuid,
                     'guest_count' => $validated['guest_count'],
-                    'status'      => $status,
+                    'status' => $status,
                 ]);
 
                 $registration->attendees()->create([
@@ -183,8 +185,8 @@ class RegistrationController extends Controller
                     'phone' => $user->phone ?? '',
                 ]);
 
-                if (!empty($validated['guests'])) {
-                    foreach ($validated['guests'] as $guestData){
+                if (! empty($validated['guests'])) {
+                    foreach ($validated['guests'] as $guestData) {
                         $registration->attendees()->create([
                             'attendee_type' => 'guest',
                             'name' => $guestData['name'],
@@ -198,6 +200,7 @@ class RegistrationController extends Controller
             } catch (\Throwable $e) {
                 DB::rollBack();
                 report($e);
+
                 return back()->with('error', 'A server error occurred during registration.');
             }
 

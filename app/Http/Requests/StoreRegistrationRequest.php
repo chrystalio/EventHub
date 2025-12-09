@@ -18,7 +18,7 @@ class StoreRegistrationRequest extends FormRequest
         /** @var Event $event */
         $event = $this->event;
 
-        return Auth::check() && !$event->isUserRegistered(auth()->id());
+        return Auth::check() && ! $event->isUserRegistered(auth()->id());
     }
 
     /**
@@ -30,14 +30,14 @@ class StoreRegistrationRequest extends FormRequest
     {
         /** @var Event $event */
         $event = $this->event;
-        $guestCount = (int)$this->input('guest_count', 0);
+        $guestCount = (int) $this->input('guest_count', 0);
 
         return [
-            'guest_count' => ['required', 'integer', 'min:0', 'max:' . $event->max_guests_per_registration],
+            'guest_count' => ['required', 'integer', 'min:0', 'max:'.$event->max_guests_per_registration],
             'guests' => [
                 Rule::requiredIf($guestCount > 0),
                 'array',
-                'size:' . $guestCount
+                'size:'.$guestCount,
             ],
             'guests.*.name' => [Rule::requiredIf($guestCount > 0), 'string', 'max:255'],
             'guests.*.phone' => [Rule::requiredIf($guestCount > 0), 'string', 'max:20'],

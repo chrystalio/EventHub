@@ -7,7 +7,6 @@ use Carbon\Carbon;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Log;
 
-
 class RejectPrivatePendingRegistrations extends Command
 {
     /**
@@ -41,7 +40,8 @@ class RejectPrivatePendingRegistrations extends Command
             ->get();
 
         if ($pendingToReject->isEmpty()) {
-            $this->info("No pending private registrations to reject.");
+            $this->info('No pending private registrations to reject.');
+
             return 0;
         }
 

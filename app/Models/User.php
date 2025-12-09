@@ -15,7 +15,7 @@ use Spatie\Permission\Traits\HasRoles;
 class User extends Authenticatable implements MustVerifyEmail
 {
     /** @use HasFactory<UserFactory> */
-    use HasFactory, Notifiable, HasRoles, Impersonate;
+    use HasFactory, HasRoles, Impersonate, Notifiable;
 
     /**
      * The attributes that are mass assignable.
@@ -75,7 +75,7 @@ class User extends Authenticatable implements MustVerifyEmail
 
     public function canBeImpersonated(): bool
     {
-        return !$this->hasRole('System Administrator');
+        return ! $this->hasRole('System Administrator');
     }
 
     public function events(): HasMany

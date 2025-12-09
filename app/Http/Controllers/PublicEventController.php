@@ -42,7 +42,7 @@ class PublicEventController extends Controller
         return Inertia::render('public/events/show', [
             'event' => $event,
             'userRegistration' => $userRegistration,
-            'canRegister' => auth()->check() && !$userRegistration,
+            'canRegister' => auth()->check() && ! $userRegistration,
             'totalRegistered' => $totalRegistered,
             'isAuthenticated' => auth()->check(),
         ]);

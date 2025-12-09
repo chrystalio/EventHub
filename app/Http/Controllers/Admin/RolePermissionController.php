@@ -6,7 +6,6 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\UpdateRolePermissionRequest;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
 
@@ -25,7 +24,6 @@ class RolePermissionController extends Controller
         ]);
 
     }
-
 
     public function update(UpdateRolePermissionRequest $request, Role $role): RedirectResponse
     {

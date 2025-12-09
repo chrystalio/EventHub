@@ -10,6 +10,7 @@ use Spatie\Permission\Models\Role;
 class ExportPermissions extends Command
 {
     protected $signature = 'export:permissions';
+
     protected $description = 'Export all permissions and role-permission mappings to JSON files';
 
     /**
@@ -48,4 +49,3 @@ class ExportPermissions extends Command
         return 0;
     }
 }
-

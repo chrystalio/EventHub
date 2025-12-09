@@ -36,7 +36,7 @@ class RegistrationAttendee extends Model
             }
 
             if (empty($attendee->totp_secret)) {
-                $google2fa = new Google2FA();
+                $google2fa = new Google2FA;
                 $attendee->totp_secret = $google2fa->generateSecretKey();
             }
         });
@@ -50,19 +50,19 @@ class RegistrationAttendee extends Model
     // Helper method to check if attendee has attended
     public function hasAttended(): bool
     {
-        return !is_null($this->attended_at);
+        return ! is_null($this->attended_at);
     }
 
     // Helper method to check if attendee is cancelled
     public function isCancelled(): bool
     {
-        return !is_null($this->cancelled_at);
+        return ! is_null($this->cancelled_at);
     }
 
     public function getPhoneNumberAttribute(): ?string
     {
         $phone = $this->phone;
-        if (!empty($phone)) {
+        if (! empty($phone)) {
             return $phone;
         }
 

@@ -43,7 +43,7 @@ class AttendeeQRController extends Controller
             ->generate($qrData);
 
         // Convert to base64 data URI
-        $qrCodeDataUri = 'data:image/png;base64,' . base64_encode($qrCodeImage);
+        $qrCodeDataUri = 'data:image/png;base64,'.base64_encode($qrCodeImage);
 
         // Generate PDF from Blade view
         $pdf = Pdf::loadView('pdf.qr-ticket', [
@@ -58,18 +58,18 @@ class AttendeeQRController extends Controller
         $pdf->setOption('isRemoteEnabled', false);
 
         // Generate filename
-        $filename = $this->sanitizeFilename($attendee->name) . '-ticket.pdf';
+        $filename = $this->sanitizeFilename($attendee->name).'-ticket.pdf';
 
         // Return PDF as download
         return $pdf->download($filename);
     }
-
 
     private function sanitizeFilename(string $name): string
     {
         $name = preg_replace('/[^a-zA-Z0-9\s-]/', '', $name);
         $name = preg_replace('/\s+/', '-', $name);
         $name = strtolower(trim($name, '-'));
+
         return $name ?: 'attendee';
     }
 }

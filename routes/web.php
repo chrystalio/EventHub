@@ -10,12 +10,11 @@ use App\Http\Controllers\Admin\RoomController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\AttendeeQRController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\Panitia\EventController as PanitiaEventController;
 use App\Http\Controllers\PublicEventController;
 use App\Http\Controllers\RegistrationController;
-use App\Http\Controllers\Panitia\EventController as PanitiaEventController;
 use App\Http\Controllers\TransactionController;
 use Illuminate\Support\Facades\Route;
-use Inertia\Inertia;
 
 Route::impersonate();
 
@@ -62,16 +61,15 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
         Route::get('/users/search', [UserController::class, 'search'])->name('admin.users.search');
 
-
         Route::patch('/registrations/{registration}/approve', [RegistrationManagementController::class, 'approve'])->name('admin.registrations.approve');
         Route::patch('/registrations/{registration}/reject', [RegistrationManagementController::class, 'reject'])->name('admin.registrations.reject');
     });
 
-    Route::prefix('/registrants')->group(function() {
+    Route::prefix('/registrants')->group(function () {
 
         Route::get('/my-registrations', [RegistrationController::class, 'index'])
-        ->name('registrations.index')
-        ->middleware('can:registration.view');
+            ->name('registrations.index')
+            ->middleware('can:registration.view');
 
         Route::get('/my-registrations/{registration:uuid}', [RegistrationController::class, 'show'])
             ->name('registrations.show')

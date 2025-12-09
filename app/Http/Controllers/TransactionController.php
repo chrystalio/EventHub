@@ -8,10 +8,10 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use Midtrans\Config;
-use Midtrans\Snap;
 use Inertia\Inertia;
 use Inertia\Response;
+use Midtrans\Config;
+use Midtrans\Snap;
 
 class TransactionController extends Controller
 {
@@ -70,7 +70,7 @@ class TransactionController extends Controller
             $grossAmount = $payload['gross_amount'];
             $serverKey = config('services.midtrans.server_key');
 
-            $signature = hash('sha512', $orderId . $statusCode . $grossAmount . $serverKey);
+            $signature = hash('sha512', $orderId.$statusCode.$grossAmount.$serverKey);
 
             if ($signature !== $payload['signature_key']) {
                 return response()->json(['message' => 'Invalid signature.'], 403);
@@ -81,7 +81,7 @@ class TransactionController extends Controller
 
             $transaction = Transaction::where('order_id', $orderId)->first();
 
-            if (!$transaction) {
+            if (! $transaction) {
                 return response()->json(['message' => 'Transaction not found.'], 404);
             }
 
@@ -104,20 +104,21 @@ class TransactionController extends Controller
                         ]);
                     });
                 }
-            } else if ($transactionStatus === 'deny' || $transactionStatus === 'expire' || $transactionStatus === 'cancel') {
+            } elseif ($transactionStatus === 'deny' || $transactionStatus === 'expire' || $transactionStatus === 'cancel') {
                 $transaction->update(['status' => 'failed']);
             }
 
             return response()->json(['message' => 'Webhook processed successfully.']);
 
         } catch (\Exception $e) {
-            Log::error('Midtrans Webhook Error: ' . $e->getMessage(), [
+            Log::error('Midtrans Webhook Error: '.$e->getMessage(), [
                 'file' => $e->getFile(),
                 'line' => $e->getLine(),
-                'request_body' => $request->getContent()
+                'request_body' => $request->getContent(),
             ]);
 
             report($e);
+
             return response()->json(['message' => 'Error processing webhook.'], 500);
         }
     }

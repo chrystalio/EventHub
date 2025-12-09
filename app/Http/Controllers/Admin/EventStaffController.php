@@ -7,24 +7,23 @@ use App\Models\Event;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Spatie\Permission\PermissionRegistrar;
 
 class EventStaffController extends Controller
 {
     public function store(Request $request, Event $event): RedirectResponse
     {
         $validated = $request->validate([
-            'user_uuid' => 'required|exists:users,uuid'
+            'user_uuid' => 'required|exists:users,uuid',
         ]);
 
         $user = User::where('uuid', $validated['user_uuid'])->firstOrFail();
 
-        if (!$user->hasRole('Panitia')) {
+        if (! $user->hasRole('Panitia')) {
             $user->assignRole('Panitia');
         }
 
         $event->staff()->syncWithoutDetaching([
-            $user->uuid => ['role' => 'panitia']
+            $user->uuid => ['role' => 'panitia'],
         ]);
 
         return back()->with('success', 'User successfully assigned as Panitia.');
